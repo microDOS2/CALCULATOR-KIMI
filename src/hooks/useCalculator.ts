@@ -243,7 +243,23 @@ export function useCalculator() {
   const [state, setState] = useState<CalculatorState>(() => {
     if (typeof window !== "undefined" && window.location.hash) {
       const decoded = decodeState(window.location.hash);
-      if (decoded) return decoded;
+      if (decoded) {
+        const defaults = createDefaultState();
+        // Merge with defaults for any missing/new fields
+        // Handle old SKUs without per-SKU packaging
+        const skus = decoded.skus?.map((sku) => ({
+          ...defaults.skus[0],
+          ...sku,
+          packaging: sku.packaging ?? createDefaultPackaging(),
+        })) ?? defaults.skus;
+
+        return {
+          ...defaults,
+          ...decoded,
+          skus,
+          subscriptionPlans: decoded.subscriptionPlans ?? defaults.subscriptionPlans,
+        };
+      }
     }
     return createDefaultState();
   });
