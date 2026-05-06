@@ -14,6 +14,7 @@ import { ScenariosTab } from "@/components/tabs/ScenariosTab";
 import { ChartsTab } from "@/components/tabs/ChartsTab";
 import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
 import { SimulateTab } from "@/components/tabs/SimulateTab";
+import { CashFlowTab } from "@/components/tabs/CashFlowTab";
 
 function App() {
   const calc = useCalculator();
@@ -73,7 +74,8 @@ function App() {
             <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
             <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Subscriptions</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Cash Flow</TabsTrigger>
+            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Scenarios</TabsTrigger>
             <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
             <TabsTrigger value="simulate"><span className="text-xs text-primary mr-1 font-bold">●</span>Simulate</TabsTrigger>
           </TabsList>
@@ -173,6 +175,14 @@ function App() {
               addItem={calc.addSubscriptionItem}
               updateItem={calc.updateSubscriptionItem}
               removeItem={calc.removeSubscriptionItem}
+            />
+          </TabsContent>
+
+          <TabsContent value="cashflow">
+            <CashFlowTab
+              result={calc.result}
+              isWeekly={false}
+              onToggleWeekly={() => {}}
             />
           </TabsContent>
 

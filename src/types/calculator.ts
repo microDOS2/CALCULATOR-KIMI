@@ -12,6 +12,7 @@ export interface Ingredient {
   name: string;
   mgPerUnit: number;
   costPerMg: number;
+  supplierPaymentDays: number; // days to pay supplier after delivery
 }
 
 export interface SKU {
@@ -231,6 +232,9 @@ export interface CalculationResult {
   // Subscription projections
   subscriptionPlans: SubscriptionPlan[];
   subscriptionSummary: SubscriptionSummary;
+
+  // Cash flow
+  cashFlow: CashFlowResult;
 }
 
 export interface ChartSlice {
@@ -365,4 +369,55 @@ export interface CalculatorState {
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
   subscriptionPlans: SubscriptionPlan[];
+  // Cash flow
+  customerPaymentTerms: {
+    retailDays: number;
+    wholesaleDays: number;
+    distributorDays: number;
+  };
+  inventoryLeadTimeDays: number; // days from order to delivery
+  startingCashBalance: number;
+  capitalExpenditures: { id: string; name: string; amount: number; month: number }[];
+  debtServiceMonthly: number;
+}
+
+// Cash Flow Types
+export interface CashFlowMonth {
+  month: number;
+  monthLabel: string;
+  startingBalance: number;
+  cashIn: number;
+  cashOut: number;
+  netCashFlow: number;
+  endingBalance: number;
+  revenueCollected: number;
+  cogsPaid: number;
+  overheadPaid: number;
+  commissionsPaid: number;
+  debtServicePaid: number;
+  capexPaid: number;
+  subscriptionRevenue: number;
+}
+
+export interface CashFlowWeek {
+  week: number;
+  monthLabel: string;
+  startingBalance: number;
+  cashIn: number;
+  cashOut: number;
+  netCashFlow: number;
+  endingBalance: number;
+}
+
+export interface CashFlowResult {
+  months: CashFlowMonth[];
+  weekly?: CashFlowWeek[];
+  lowestBalance: number;
+  lowestBalanceMonth: number;
+  cashBreakevenMonth: number | null;
+  startingCash: number;
+  totalCashIn: number;
+  totalCashOut: number;
+  totalNetFlow: number;
+  endingBalance: number;
 }

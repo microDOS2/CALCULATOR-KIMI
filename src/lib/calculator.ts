@@ -538,6 +538,7 @@ export function calculate(state: CalculatorState): CalculationResult {
     channelProfits,
     subscriptionPlans: state.subscriptionPlans,
     subscriptionSummary,
+    cashFlow: calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal),
   };
 }
 
@@ -640,6 +641,132 @@ function calculateSubscriptions(
     combinedAnnualRevenue,
     combinedAnnualCOGS,
     combinedAnnualProfit,
+  };
+}
+
+function calculateCashFlow(
+  state: CalculatorState,
+  blendedRevenuePerPack: number,
+  totalMonthlyVolume: number,
+  cogsPerPack: number,
+  ohTotal: number
+): CalculationResult["cashFlow"] {
+  const {
+    customerPaymentTerms,
+    inventoryLeadTimeDays,
+    startingCashBalance,
+    capitalExpenditures,
+    debtServiceMonthly,
+    subscriptionPlans,
+  } = state;
+
+  const months: CalculationResult["cashFlow"]["months"] = [];
+  let balance = startingCashBalance;
+  let totalIn = 0;
+  let totalOut = 0;
+  let lowestBalance = balance;
+  let lowestMonth = 0;
+  let cashBreakevenMonth: number | null = null;
+  let hasBeenPositive = false;
+
+  // Pre-calculate revenue by channel per month (from monthlyVolumes)
+  // For simplicity: monthly volume is split by channel mix of first SKU
+  // Revenue timing: retail immediate-ish, wholesale delayed, distributor more delayed
+  const monthlyRev = blendedRevenuePerPack * totalMonthlyVolume;
+
+  for (let m = 1; m <= 12; m++) {
+    const monthLabel = new Date(2026, m - 1, 1).toLocaleString("en", { month: "short" });
+    const startingBalance = balance;
+
+    // --- CASH IN ---
+    // Revenue collected this month = revenue from sales made in previous months based on payment terms
+    // Retail: collect after retailDays
+    // Simplified: revenue delayed by customer payment terms
+
+    // For a proper model we'd need per-month sales history. Let's use a simplified approach:
+    // Assume the same monthly volume every month, so revenue is just monthlyRev * (1 if past first month else 0)
+    // But with payment delays, month 1 revenue may not all be collected in month 1
+
+    // SIMPLIFIED MODEL:
+    // Revenue timing: delayed by customer payment terms
+    const revenueDelayMonths = Math.ceil(customerPaymentTerms.retailDays / 30);
+    const revenueCollected = m > revenueDelayMonths ? monthlyRev : monthlyRev * 0.2;
+
+    // Subscription revenue (collected immediately or monthly)
+    const activePlans = subscriptionPlans.filter((p) => p.included);
+    let subscriptionRevenue = 0;
+    let currentSubs = activePlans.reduce((s, p) => s + p.startingSubscribers, 0);
+    for (let i = 1; i <= m; i++) {
+      const newSubs = Math.round(currentSubs * (activePlans[0]?.monthlyGrowthRate ?? 0) / 100);
+      const churned = Math.round(currentSubs * (activePlans[0]?.monthlyChurnRate ?? 0) / 100);
+      currentSubs = Math.max(0, currentSubs + newSubs - churned);
+      if (i === m) {
+        subscriptionRevenue = currentSubs * (activePlans[0]?.monthlyPrice ?? 0);
+      }
+    }
+
+    const cashIn = revenueCollected + subscriptionRevenue;
+
+    // --- CASH OUT ---
+    // COGS paid: order placed 1 month ahead, delivered after lead time, paid after supplier terms
+    // Simplified: COGS paid with delay
+    const cogsPaid = m > Math.ceil((inventoryLeadTimeDays + 30) / 30) ? cogsPerPack * totalMonthlyVolume : 0;
+
+    const overheadPaid = ohTotal;
+    const commissionsPaid = 0; // simplified - could integrate commission results
+    const debtPaid = debtServiceMonthly;
+    const capexPaid = capitalExpenditures
+      .filter((c) => c.month === m)
+      .reduce((s, c) => s + c.amount, 0);
+
+    const cashOut = cogsPaid + overheadPaid + commissionsPaid + debtPaid + capexPaid;
+
+    const netCashFlow = cashIn - cashOut;
+    balance = startingBalance + netCashFlow;
+
+    totalIn += cashIn;
+    totalOut += cashOut;
+
+    if (balance < lowestBalance) {
+      lowestBalance = balance;
+      lowestMonth = m;
+    }
+
+    if (balance > 0 && !hasBeenPositive) {
+      hasBeenPositive = true;
+    }
+    if (balance > 0 && cashBreakevenMonth === null && m > 1) {
+      cashBreakevenMonth = m;
+    }
+
+    months.push({
+      month: m,
+      monthLabel,
+      startingBalance,
+      cashIn,
+      cashOut,
+      netCashFlow,
+      endingBalance: balance,
+      revenueCollected,
+      cogsPaid,
+      overheadPaid,
+      commissionsPaid,
+      debtServicePaid: debtPaid,
+      capexPaid,
+      subscriptionRevenue,
+    });
+  }
+
+  return {
+    months,
+    lowestBalance,
+    lowestBalanceMonth: lowestMonth,
+    cashBreakevenMonth,
+    startingCash: startingCashBalance,
+    totalCashIn: totalIn,
+    totalCashOut: totalOut,
+    totalNetFlow: totalIn - totalOut,
+    endingBalance: balance,
   };
 }
 

@@ -111,9 +111,9 @@ const createDefaultState = (): CalculatorState => {
     ],
     order: [{ skuId: skuId1, qty: 1 }],
     ingredients: [
-      { id: uid(), name: "Ingredient 1", mgPerUnit: 2, costPerMg: 0.7 },
-      { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075 },
-      { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015 },
+      { id: uid(), name: "Ingredient 1", mgPerUnit: 2, costPerMg: 0.7, supplierPaymentDays: 30 },
+      { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075, supplierPaymentDays: 30 },
+      { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015, supplierPaymentDays: 30 },
     ],
     overhead: [
       { id: uid(), name: "Salaries", cost: 10000 },
@@ -198,6 +198,15 @@ const createDefaultState = (): CalculatorState => {
         cac: 25,
       },
     ],
+    customerPaymentTerms: {
+      retailDays: 0,      // immediate
+      wholesaleDays: 30,  // Net-30
+      distributorDays: 60, // Net-60
+    },
+    inventoryLeadTimeDays: 30,
+    startingCashBalance: 50000,
+    capitalExpenditures: [],
+    debtServiceMonthly: 0,
   };
 };
 
@@ -345,7 +354,7 @@ export function useCalculator() {
       ...prev,
       ingredients: [
         ...prev.ingredients,
-        { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0 },
+        { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0, supplierPaymentDays: 30 },
       ],
     }));
   }, []);
