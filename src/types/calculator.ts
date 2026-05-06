@@ -1,21 +1,23 @@
+export interface PackagingLayer {
+  id: string;
+  name: string;
+  costPerUnit: number;
+  unitsPerLayer: number;
+  included: boolean;
+}
+
 export interface Ingredient {
   id: string;
   name: string;
-  mgPerUnit: number; // mg per pill/unit
-  costPerMg: number; // $ per mg
+  mgPerUnit: number;
+  costPerMg: number;
 }
 
 export interface SKU {
   id: string;
   name: string;
-  unitsPerPack: number; // pills per pack (renamed from pills)
+  unitsPerPack: number;
   retailPrice: number;
-  innerPkgCost: number;
-  outerBoxCost: number;
-  displayBoxCost: number;
-  unitsPerDisplay: number;
-  shippingBoxCost: number;
-  unitsPerShipBox: number;
   mixR: number;
   mixW: number;
   mixD: number;
@@ -29,7 +31,7 @@ export interface OrderItem {
 export interface OverheadItem {
   id: string;
   name: string;
-  cost: number; // monthly
+  cost: number;
 }
 
 export interface MonthlyVolume {
@@ -114,13 +116,15 @@ export interface ChannelCalc {
   gm: number;
   op: number;
   om: number;
+  costPerUnit: number;
+  profitPerUnit: number;
 }
 
 export interface CalculationResult {
-  // Inputs snapshot
   skus: SKU[];
   order: OrderItem[];
   ingredients: Ingredient[];
+  packaging: PackagingLayer[];
   overhead: OverheadItem[];
   monthlyVolumes: MonthlyVolume[];
   wDisc: number;
@@ -136,17 +140,23 @@ export interface CalculationResult {
   includeD: boolean;
   beIncludeOverhead: boolean;
 
-  // Core costs
+  // Packaging costs per pack
+  packagingCosts: { id: string; name: string; costPerPack: number }[];
+  totalPackagingCostPerPack: number;
+
+  // Ingredient costs
   avgIngCostPerPack: number;
-  avgPackCostPerPack: number;
-  avgDisplayCostPerPack: number;
-  avgShipBoxCostPerPack: number;
+  totalIngCostPerPack: number;
+
+  // COGS
   cogsPerPack: number;
 
   // Channel prices
   retail: ChannelCalc;
   wholesale: ChannelCalc;
   distributor: ChannelCalc;
+
+  // Derived prices
   avgPriceR: number;
   avgPriceW: number;
   avgPriceD: number;
@@ -173,7 +183,7 @@ export interface CalculationResult {
   bomp: number;
   weightedUnitsPerPack: number;
 
-  // Per-unit metrics
+  // Per-unit
   costPerUnit: number;
   profitPerUnitR: number;
   profitPerUnitW: number;
@@ -203,6 +213,23 @@ export interface CalculationResult {
   totalPacks: number;
   totalUnits: number;
   totalMonthlyVolume: number;
+
+  // Chart data
+  costBreakdown: ChartSlice[];
+  channelProfits: ChartBar[];
+}
+
+export interface ChartSlice {
+  name: string;
+  value: number;
+  color: string;
+}
+
+export interface ChartBar {
+  name: string;
+  gp: number;
+  op: number;
+  revenue: number;
 }
 
 export interface POLineItem {
@@ -246,13 +273,13 @@ export interface Scenario {
   savedAt: string;
   label: string;
   inputs: CalculatorState;
-  outputs: Record<string, string>;
 }
 
 export interface CalculatorState {
   skus: SKU[];
   order: OrderItem[];
   ingredients: Ingredient[];
+  packaging: PackagingLayer[];
   overhead: OverheadItem[];
   monthlyVolumes: MonthlyVolume[];
   wDisc: number;

@@ -4,10 +4,10 @@ import type {
   CommissionResults,
   POGrandTotals,
   POLineItem,
+  PackagingLayer,
   SKU,
 } from "@/types/calculator";
 
-// ===== Number utilities =====
 export const num = (v: unknown): number => {
   const x = Number(v);
   return isFinite(x) ? x : 0;
@@ -22,18 +22,15 @@ export const money = (n: number): string => {
   return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 };
 
-// money3: up to 3 decimals, trims trailing zeros
 export const money3 = (n: number): string => {
   const x = Number(n || 0);
   if (!isFinite(x)) return "$0";
   const s = x.toFixed(3);
-  // Remove trailing zeros after decimal, then possibly the decimal point
   const trimmed = s.replace(/\.?0+$/, "");
   const out = trimmed.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return (x < 0 ? "-" : "") + "$" + out;
 };
 
-// ===== State helpers =====
 export const getSkuMonthlyVolume = (
   skuId: string,
   monthlyVolumes: { skuId: string; qty: number }[],
@@ -41,16 +38,26 @@ export const getSkuMonthlyVolume = (
 ): number => {
   const mv = monthlyVolumes.find((v) => v.skuId === skuId);
   if (mv) return Math.max(0, mv.qty);
-  // fallback: even split
   return skus.length > 0 ? 1 : 0;
 };
 
-// ===== Main calculation =====
+export function calculatePackagingCostPerPack(
+  layers: PackagingLayer[],
+  unitsPerPack: number
+): number {
+  return layers.reduce((sum, layer) => {
+    if (!layer.included) return sum;
+    const costPerPack = layer.costPerUnit * (unitsPerPack / Math.max(1, layer.unitsPerLayer));
+    return sum + costPerPack;
+  }, 0);
+}
+
 export function calculate(state: CalculatorState): CalculationResult {
   const {
     skus,
     order,
     ingredients,
+    packaging,
     overhead,
     monthlyVolumes,
     wDisc,
@@ -78,13 +85,18 @@ export function calculate(state: CalculatorState): CalculationResult {
   const manualOhTotal = overhead.reduce((a, x) => a + x.cost, 0);
   const ohTotal = manualOhTotal + (includeThirdParty ? thirdPartyTotal : 0);
 
+  // Packaging costs per pack for each SKU
+  const packagingCosts = packaging.map((layer) => ({
+    id: layer.id,
+    name: layer.name,
+    costPerPack: 0,
+  }));
+
   // Order-level accumulators
   let totalPacks = 0;
   let totalUnits = 0;
   let totalIngCost = 0;
-  let totalPackCost = 0;
-  let totalDispCost = 0;
-  let totalShipBoxCost = 0;
+  let totalPackagingCost = 0;
 
   let totalRevenueR = 0;
   let totalRevenueW = 0;
@@ -110,16 +122,20 @@ export function calculate(state: CalculatorState): CalculationResult {
       (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
       0
     );
-    const packPerPack = sku.innerPkgCost + sku.outerBoxCost;
-    const dispPerPack = sku.displayBoxCost / Math.max(1, sku.unitsPerDisplay);
-    const shipBoxPerPack =
-      sku.shippingBoxCost / Math.max(1, sku.unitsPerShipBox);
-    const cogsPerPack = ingPerPack + packPerPack + dispPerPack + shipBoxPerPack;
+    const pkgPerPack = calculatePackagingCostPerPack(packaging, sku.unitsPerPack);
+    const cogsPerPack = ingPerPack + pkgPerPack;
 
     totalIngCost += ingPerPack * orderQty;
-    totalPackCost += packPerPack * orderQty;
-    totalDispCost += dispPerPack * orderQty;
-    totalShipBoxCost += shipBoxPerPack * orderQty;
+    totalPackagingCost += pkgPerPack * orderQty;
+
+    // Accumulate per-layer costs
+    packaging.forEach((layer, idx) => {
+      if (layer.included) {
+        const layerCostPerPack =
+          layer.costPerUnit * (sku.unitsPerPack / Math.max(1, layer.unitsPerLayer));
+        packagingCosts[idx].costPerPack += layerCostPerPack * orderQty;
+      }
+    });
 
     const packsR = orderQty * (sku.mixR / 100);
     const packsW = orderQty * (sku.mixW / 100);
@@ -142,23 +158,21 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalGpD += (priceD - cogsPerPack) * packsD;
   });
 
-  const avgIngCostPerPack = totalPacks > 0 ? totalIngCost / totalPacks : 0;
-  const avgPackCostPerPack = totalPacks > 0 ? totalPackCost / totalPacks : 0;
-  const avgDisplayCostPerPack = totalPacks > 0 ? totalDispCost / totalPacks : 0;
-  const avgShipBoxCostPerPack =
-    totalPacks > 0 ? totalShipBoxCost / totalPacks : 0;
-  const cogsPerPack =
-    avgIngCostPerPack +
-    avgPackCostPerPack +
-    avgDisplayCostPerPack +
-    avgShipBoxCostPerPack;
+  // Normalize packaging costs to per-pack
+  packagingCosts.forEach((pc) => {
+    pc.costPerPack = totalPacks > 0 ? pc.costPerPack / totalPacks : 0;
+  });
 
-  // Channel prices (weighted)
+  const avgIngCostPerPack = totalPacks > 0 ? totalIngCost / totalPacks : 0;
+  const totalPackagingCostPerPack = totalPacks > 0 ? totalPackagingCost / totalPacks : 0;
+  const cogsPerPack = avgIngCostPerPack + totalPackagingCostPerPack;
+
+  // Channel prices
   const avgPriceR = totalPacksR > 0 ? totalRevenueR / totalPacksR : 0;
   const avgPriceW = totalPacksW > 0 ? totalRevenueW / totalPacksW : 0;
   const avgPriceD = totalPacksD > 0 ? totalRevenueD / totalPacksD : 0;
 
-  // Gross profit per pack per channel
+  // Gross profit per pack
   const gpR = totalPacksR > 0 ? totalGpR / totalPacksR : 0;
   const gpW = totalPacksW > 0 ? totalGpW / totalPacksW : 0;
   const gpD = totalPacksD > 0 ? totalGpD / totalPacksD : 0;
@@ -170,8 +184,7 @@ export function calculate(state: CalculatorState): CalculationResult {
 
   // Monthly volume
   const totalMonthlyVolume = skus.reduce(
-    (sum, sku) =>
-      sum + getSkuMonthlyVolume(sku.id, monthlyVolumes, skus),
+    (sum, sku) => sum + getSkuMonthlyVolume(sku.id, monthlyVolumes, skus),
     0
   );
   const safeMonthlyVolume = Math.max(1, totalMonthlyVolume);
@@ -194,21 +207,19 @@ export function calculate(state: CalculatorState): CalculationResult {
   const omW = avgPriceW > 0 ? opW / avgPriceW : 0;
   const omD = avgPriceD > 0 ? opD / avgPriceD : 0;
 
-  // Blended totals
+  // Blended
   const totalRevenue = totalRevenueR + totalRevenueW + totalRevenueD;
   const totalGp = totalGpR + totalGpW + totalGpD;
 
   const brev = totalPacks > 0 ? totalRevenue / totalPacks : 0;
   const bgpp = totalPacks > 0 ? totalGp / totalPacks : 0;
-  const bopp = brev > 0 ? bgpp - ohPerPack : 0; // operating profit blended
+  const bopp = brev > 0 ? bgpp - ohPerPack : 0;
   const bgmp = brev > 0 ? bgpp / brev : 0;
   const bomp = brev > 0 ? bopp / brev : 0;
 
-  // Retailer / distributor profit margins
   const retailerProfit = avgPriceR - avgPriceW;
   const distProfit = avgPriceW - avgPriceD;
 
-  // Weighted units per pack
   const weightedUnitsPerPack = totalPacks > 0 ? totalUnits / totalPacks : 0;
 
   // Ingredient cost metrics
@@ -219,26 +230,19 @@ export function calculate(state: CalculatorState): CalculationResult {
   const costPerMg = totalMgPerPack > 0 ? avgIngCostPerPack / totalMgPerPack : 0;
   const costPerGram = costPerMg * 1000;
 
-  // Per-unit (per pill) metrics
-  const costPerUnit =
-    weightedUnitsPerPack > 0 ? cogsPerPack / weightedUnitsPerPack : 0;
-  const profitPerUnitR =
-    weightedUnitsPerPack > 0 ? opR / weightedUnitsPerPack : 0;
-  const profitPerUnitW =
-    weightedUnitsPerPack > 0 ? opW / weightedUnitsPerPack : 0;
-  const profitPerUnitD =
-    weightedUnitsPerPack > 0 ? opD / weightedUnitsPerPack : 0;
-  const overheadPerUnit =
-    weightedUnitsPerPack > 0 ? ohPerPack / weightedUnitsPerPack : 0;
+  // Per-unit metrics
+  const costPerUnit = weightedUnitsPerPack > 0 ? cogsPerPack / weightedUnitsPerPack : 0;
+  const profitPerUnitR = weightedUnitsPerPack > 0 ? opR / weightedUnitsPerPack : 0;
+  const profitPerUnitW = weightedUnitsPerPack > 0 ? opW / weightedUnitsPerPack : 0;
+  const profitPerUnitD = weightedUnitsPerPack > 0 ? opD / weightedUnitsPerPack : 0;
+  const overheadPerUnit = weightedUnitsPerPack > 0 ? ohPerPack / weightedUnitsPerPack : 0;
 
   // Break-even
   const fixedCosts = beIncludeOverhead ? ohTotal : 0;
-
-  // Contribution margin per pack (before overhead)
-  const contribR = gpR - shipPerPack; // retail contribution after variable shipping
+  const contribR = gpR - shipPerPack;
   const contribW = gpW;
   const contribD = gpD;
-  const contribB = brev > 0 ? bopp + ohPerPack : 0; // blended contribution before overhead
+  const contribB = brev > 0 ? bopp + ohPerPack : 0;
 
   const beUnitsR = contribR > 0 ? fixedCosts / contribR : Infinity;
   const beUnitsW = contribW > 0 ? fixedCosts / contribW : Infinity;
@@ -272,14 +276,9 @@ export function calculate(state: CalculatorState): CalculationResult {
       (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
       0
     );
-    const cogsPerPack =
-      ingPerPack +
-      sku.innerPkgCost +
-      sku.outerBoxCost +
-      sku.displayBoxCost / Math.max(1, sku.unitsPerDisplay) +
-      sku.shippingBoxCost / Math.max(1, sku.unitsPerShipBox);
+    const pkgPerPack = calculatePackagingCostPerPack(packaging, sku.unitsPerPack);
+    const cogsPerPack = ingPerPack + pkgPerPack;
 
-    // For retail channel in PO, subtract shipping to match main calc
     const retailQty = orderItem.qty * (sku.mixR / 100);
     const wholesaleQty = orderItem.qty * (sku.mixW / 100);
     const distributorQty = orderItem.qty * (sku.mixD / 100);
@@ -321,7 +320,7 @@ export function calculate(state: CalculatorState): CalculationResult {
       ? poGrandTotals.totalProfit / poGrandTotals.totalUnits
       : 0;
 
-  // Commissions (FIXED BUG: use per-SP share of channel, not full channel × count)
+  // Commissions
   const commResults = calculateCommissions(
     state,
     {
@@ -337,12 +336,30 @@ export function calculate(state: CalculatorState): CalculationResult {
     shipPerPack
   );
 
+  // Chart data
+  const costBreakdown: CalculationResult["costBreakdown"] = [
+    { name: "Ingredients", value: avgIngCostPerPack, color: "#10b981" },
+    ...packagingCosts
+      .filter((p) => p.costPerPack > 0)
+      .map((p, i) => ({
+        name: p.name,
+        value: p.costPerPack,
+        color: ["#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899"][i % 6],
+      })),
+  ];
+
+  const channelProfits: CalculationResult["channelProfits"] = [
+    { name: "Retail", gp: gpR, op: opR, revenue: totalRevenueR },
+    { name: "Wholesale", gp: gpW, op: opW, revenue: totalRevenueW },
+    { name: "Distributor", gp: gpD, op: opD, revenue: totalRevenueD },
+  ];
+
   return {
     ...state,
+    packagingCosts,
+    totalPackagingCostPerPack,
     avgIngCostPerPack,
-    avgPackCostPerPack,
-    avgDisplayCostPerPack,
-    avgShipBoxCostPerPack,
+    totalIngCostPerPack: avgIngCostPerPack,
     cogsPerPack,
     retail: {
       price: avgPriceR,
@@ -350,6 +367,8 @@ export function calculate(state: CalculatorState): CalculationResult {
       gm: gmR,
       op: opR,
       om: omR,
+      costPerUnit,
+      profitPerUnit: profitPerUnitR,
     },
     wholesale: {
       price: avgPriceW,
@@ -357,6 +376,8 @@ export function calculate(state: CalculatorState): CalculationResult {
       gm: gmW,
       op: opW,
       om: omW,
+      costPerUnit,
+      profitPerUnit: profitPerUnitW,
     },
     distributor: {
       price: avgPriceD,
@@ -364,6 +385,8 @@ export function calculate(state: CalculatorState): CalculationResult {
       gm: gmD,
       op: opD,
       om: omD,
+      costPerUnit,
+      profitPerUnit: profitPerUnitD,
     },
     avgPriceR,
     avgPriceW,
@@ -405,10 +428,11 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalPacks,
     totalUnits,
     totalMonthlyVolume,
+    costBreakdown,
+    channelProfits,
   };
 }
 
-// ===== Commission calculation (BUG FIX: aggregate SP shares, not full channel × count) =====
 function calculateCommissions(
   state: CalculatorState,
   C: {
@@ -426,10 +450,8 @@ function calculateCommissions(
   const { commissions, skus, monthlyVolumes } = state;
   const { president, vps, rsms, sps } = commissions;
 
-  // Use Monthly projection multiplier (Monthly = 1)
   const periodMult = 1;
 
-  // Calculate monthly channel performance based on SKU volumes
   let totalPacksR = 0;
   let totalPacksW = 0;
   let totalPacksD = 0;
@@ -447,8 +469,6 @@ function calculateCommissions(
     D: { vol: totalPacksD, rev: totalPacksD * C.priceD, gp: totalPacksD * C.gpD },
   };
 
-  // Determine per-salesperson share of each channel
-  // Each SP gets an equal share of their assigned channel volume
   const activeSPsPerChannel = {
     R: sps.filter((sp) => sp.chR).length || 1,
     W: sps.filter((sp) => sp.chW).length || 1,
@@ -464,14 +484,13 @@ function calculateCommissions(
     return { vol, rev, gp };
   };
 
-  // 1. Salesperson base pay
   const spsWithPay = sps.map((sp) => {
     let units = 0;
     let grossRev = 0;
     let grossProfit = 0;
 
-    ["R", "W", "D"].forEach((ch) => {
-      const share = spShare(ch as "R" | "W" | "D", sp);
+    (["R", "W", "D"] as ("R" | "W" | "D")[]).forEach((ch) => {
+      const share = spShare(ch, sp);
       units += share.vol;
       grossRev += share.rev;
       grossProfit += share.gp;
@@ -503,70 +522,41 @@ function calculateCommissions(
     };
   });
 
-  // 2. RSM overrides (based on aggregate of assigned SPs' actual shares)
   const rsmsWithPay = rsms.map((rsm) => {
     const assignedSPs = spsWithPay.filter((sp) => sp.assignedRSM === rsm.id);
     let units = 0;
     let grossRev = 0;
 
     assignedSPs.forEach((sp) => {
-      if (rsm.chR) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
-      if (rsm.chW) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
-      if (rsm.chD) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
+      if (rsm.chR) { units += sp._units; grossRev += sp._grossRev; }
+      if (rsm.chW) { units += sp._units; grossRev += sp._grossRev; }
+      if (rsm.chD) { units += sp._units; grossRev += sp._grossRev; }
     });
 
     let override = 0;
     if (rsm.type === "pctGrossRev") override = grossRev * (rsm.val / 100);
     else if (rsm.type === "perPack") override = units * rsm.val;
 
-    return {
-      ...rsm,
-      overridePay: override,
-      totalPay: override,
-    };
+    return { ...rsm, overridePay: override, totalPay: override };
   });
 
-  // 3. VP overrides (based on channel-assigned SP shares)
   const vpsWithPay = vps.map((vp) => {
     let units = 0;
     let grossRev = 0;
 
     spsWithPay.forEach((sp) => {
-      if (vp.chR && sp.assignedVp_R === vp.id) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
-      if (vp.chW && sp.assignedVp_W === vp.id) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
-      if (vp.chD && sp.assignedVp_D === vp.id) {
-        units += sp._units;
-        grossRev += sp._grossRev;
-      }
+      if (vp.chR && sp.assignedVp_R === vp.id) { units += sp._units; grossRev += sp._grossRev; }
+      if (vp.chW && sp.assignedVp_W === vp.id) { units += sp._units; grossRev += sp._grossRev; }
+      if (vp.chD && sp.assignedVp_D === vp.id) { units += sp._units; grossRev += sp._grossRev; }
     });
 
     let override = 0;
     if (vp.type === "pctGrossRev") override = grossRev * (vp.val / 100);
     else if (vp.type === "perPack") override = units * vp.val;
 
-    return {
-      ...vp,
-      overridePay: override,
-      totalPay: override,
-    };
+    return { ...vp, overridePay: override, totalPay: override };
   });
 
-  // 4. President override (based on included VPs' SP aggregates)
   const includedVPs = vpsWithPay.filter((vp) => vp.includePres).map((vp) => vp.id);
 
   let presUnits = 0;
@@ -579,33 +569,18 @@ function calculateCommissions(
       includedVPs.includes(sp.assignedVp_D);
 
     if (belongsToIncludedVp) {
-      if (president.chR) {
-        presUnits += sp._units;
-        presGrossRev += sp._grossRev;
-      }
-      if (president.chW) {
-        presUnits += sp._units;
-        presGrossRev += sp._grossRev;
-      }
-      if (president.chD) {
-        presUnits += sp._units;
-        presGrossRev += sp._grossRev;
-      }
+      if (president.chR) { presUnits += sp._units; presGrossRev += sp._grossRev; }
+      if (president.chW) { presUnits += sp._units; presGrossRev += sp._grossRev; }
+      if (president.chD) { presUnits += sp._units; presGrossRev += sp._grossRev; }
     }
   });
 
   let presOverride = 0;
-  if (president.type === "pctGrossRev")
-    presOverride = presGrossRev * (president.val / 100);
+  if (president.type === "pctGrossRev") presOverride = presGrossRev * (president.val / 100);
   else if (president.type === "perPack") presOverride = presUnits * president.val;
 
-  const presidentWithPay = {
-    ...president,
-    overridePay: presOverride,
-    totalPay: presOverride,
-  };
+  const presidentWithPay = { ...president, overridePay: presOverride, totalPay: presOverride };
 
-  // Totals
   const totalRevenue = perf.R.rev + perf.W.rev + perf.D.rev;
   const totalOpProfit =
     (C.gpR - ohPerPack - shipPerPack) * totalPacksR +

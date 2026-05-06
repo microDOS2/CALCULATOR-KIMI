@@ -3,6 +3,7 @@ import type {
   CalculatorState,
   SKU,
   Ingredient,
+  PackagingLayer,
   OverheadItem,
   CommissionState,
   ThirdPartyCompany,
@@ -13,7 +14,6 @@ import { calculate } from "@/lib/calculator";
 let uidCounter = 0;
 const uid = () => `u${++uidCounter}`;
 
-// ===== Third Party default data =====
 const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
   {
     name: "Sales Company",
@@ -92,7 +92,14 @@ const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
   },
 ];
 
-// ===== Default state =====
+const defaultPackaging: PackagingLayer[] = [
+  { id: uid(), name: "Primary Container", costPerUnit: 1.75, unitsPerLayer: 1, included: true },
+  { id: uid(), name: "Inner Packaging", costPerUnit: 0.5, unitsPerLayer: 1, included: true },
+  { id: uid(), name: "Outer Box", costPerUnit: 1.5, unitsPerLayer: 1, included: true },
+  { id: uid(), name: "Display Packaging", costPerUnit: 0, unitsPerLayer: 1, included: false },
+  { id: uid(), name: "Shipping Box", costPerUnit: 1.5, unitsPerLayer: 1, included: true },
+];
+
 const createDefaultState = (): CalculatorState => {
   const skuId1 = uid();
   return {
@@ -102,12 +109,6 @@ const createDefaultState = (): CalculatorState => {
         name: "SKU-A",
         unitsPerPack: 10,
         retailPrice: 57.5,
-        innerPkgCost: 1.75,
-        outerBoxCost: 1.75,
-        displayBoxCost: 0,
-        unitsPerDisplay: 1,
-        shippingBoxCost: 1.5,
-        unitsPerShipBox: 1,
         mixR: 100,
         mixW: 0,
         mixD: 0,
@@ -119,6 +120,7 @@ const createDefaultState = (): CalculatorState => {
       { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075 },
       { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015 },
     ],
+    packaging: [...defaultPackaging],
     overhead: [
       { id: uid(), name: "Salaries", cost: 10000 },
       { id: uid(), name: "Rent", cost: 5000 },
@@ -192,7 +194,6 @@ const createDefaultState = (): CalculatorState => {
   };
 };
 
-// ===== URL encoding / decoding =====
 const encodeState = (state: CalculatorState): string => {
   try {
     const json = JSON.stringify(state);
@@ -211,7 +212,6 @@ const decodeState = (hash: string): CalculatorState | null => {
   }
 };
 
-// ===== localStorage scenarios =====
 const LS_KEY = "channel_calc_scenarios_v8";
 
 const loadScenarios = (): Scenario[] => {
@@ -229,13 +229,12 @@ const saveScenarios = (list: Scenario[]) => {
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(list));
   } catch {
-    // ignore storage errors
+    // ignore
   }
 };
 
 export function useCalculator() {
   const [state, setState] = useState<CalculatorState>(() => {
-    // Try to load from URL hash first
     if (typeof window !== "undefined" && window.location.hash) {
       const decoded = decodeState(window.location.hash);
       if (decoded) return decoded;
@@ -245,7 +244,6 @@ export function useCalculator() {
 
   const result = calculate(state);
 
-  // Update URL when state changes (debounced)
   useEffect(() => {
     const timer = setTimeout(() => {
       const encoded = encodeState(state);
@@ -256,11 +254,11 @@ export function useCalculator() {
     return () => clearTimeout(timer);
   }, [state]);
 
-  // ===== Actions =====
   const updateState = useCallback((patch: Partial<CalculatorState>) => {
     setState((prev) => ({ ...prev, ...patch }));
   }, []);
 
+  // SKU
   const addSKU = useCallback(() => {
     const id = uid();
     setState((prev) => {
@@ -269,12 +267,6 @@ export function useCalculator() {
         name: `SKU-${prev.skus.length + 1}`,
         unitsPerPack: 10,
         retailPrice: 57.5,
-        innerPkgCost: 1.75,
-        outerBoxCost: 1.75,
-        displayBoxCost: 0,
-        unitsPerDisplay: 1,
-        shippingBoxCost: 1.5,
-        unitsPerShipBox: 1,
         mixR: 100,
         mixW: 0,
         mixD: 0,
@@ -313,6 +305,7 @@ export function useCalculator() {
     }));
   }, []);
 
+  // Ingredients
   const addIngredient = useCallback(() => {
     setState((prev) => ({
       ...prev,
@@ -342,6 +335,37 @@ export function useCalculator() {
     }));
   }, []);
 
+  // Packaging
+  const addPackagingLayer = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      packaging: [
+        ...prev.packaging,
+        { id: uid(), name: "", costPerUnit: 0, unitsPerLayer: 1, included: true },
+      ],
+    }));
+  }, []);
+
+  const updatePackagingLayer = useCallback(
+    (id: string, patch: Partial<PackagingLayer>) => {
+      setState((prev) => ({
+        ...prev,
+        packaging: prev.packaging.map((p) =>
+          p.id === id ? { ...p, ...patch } : p
+        ),
+      }));
+    },
+    []
+  );
+
+  const removePackagingLayer = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      packaging: prev.packaging.filter((p) => p.id !== id),
+    }));
+  }, []);
+
+  // Overhead
   const addOverhead = useCallback(() => {
     setState((prev) => ({
       ...prev,
@@ -380,7 +404,7 @@ export function useCalculator() {
     []
   );
 
-  // ===== Commission actions =====
+  // Commissions
   const addVP = useCallback(() => {
     setState((prev) => ({
       ...prev,
@@ -543,12 +567,7 @@ export function useCalculator() {
                 ...s,
                 bonuses: [
                   ...s.bonuses,
-                  {
-                    id: uid(),
-                    metric: "units",
-                    thresh: 0,
-                    amt: 0,
-                  },
+                  { id: uid(), metric: "units", thresh: 0, amt: 0 },
                 ],
               }
             : s
@@ -613,7 +632,7 @@ export function useCalculator() {
     []
   );
 
-  // ===== Third Party =====
+  // Third Party
   const updateThirdParty = useCallback(
     (companyName: string, patch: Partial<ThirdPartyCompany>) => {
       setState((prev) => ({
@@ -645,7 +664,7 @@ export function useCalculator() {
     []
   );
 
-  // ===== Scenarios =====
+  // Scenarios
   const [scenarios, setScenarios] = useState<Scenario[]>(loadScenarios);
 
   const saveScenario = useCallback(
@@ -655,7 +674,6 @@ export function useCalculator() {
         savedAt: new Date().toLocaleString(),
         label: label.trim(),
         inputs: JSON.parse(JSON.stringify(state)),
-        outputs: {},
       };
       const next = [scenario, ...scenarios].slice(0, 50);
       setScenarios(next);
@@ -664,12 +682,9 @@ export function useCalculator() {
     [state, scenarios]
   );
 
-  const loadScenario = useCallback(
-    (scenario: Scenario) => {
-      setState(scenario.inputs);
-    },
-    []
-  );
+  const loadScenario = useCallback((scenario: Scenario) => {
+    setState(scenario.inputs);
+  }, []);
 
   const deleteScenario = useCallback(
     (id: string) => {
@@ -700,6 +715,9 @@ export function useCalculator() {
     addIngredient,
     updateIngredient,
     removeIngredient,
+    addPackagingLayer,
+    updatePackagingLayer,
+    removePackagingLayer,
     addOverhead,
     updateOverhead,
     removeOverhead,

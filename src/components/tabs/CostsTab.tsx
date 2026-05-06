@@ -1,0 +1,214 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, Trash2 } from "lucide-react";
+import type { CalculatorState, CalculationResult, OverheadItem } from "@/types/calculator";
+import { FormulaTooltip } from "@/components/FormulaTooltip";
+import { money, money3, pct } from "@/lib/calculator";
+
+interface CostsTabProps {
+  state: CalculatorState;
+  result: CalculationResult;
+  addOverhead: () => void;
+  updateOverhead: (id: string, patch: Partial<OverheadItem>) => void;
+  removeOverhead: (id: string) => void;
+  updateMonthlyVolume: (skuId: string, qty: number) => void;
+  updateState: (patch: Partial<CalculatorState>) => void;
+}
+
+function formatBE(units: number, rev: number): string {
+  if (!isFinite(units) || units <= 0) return "Unprofitable";
+  return `${Math.ceil(units).toLocaleString()} packs · ${money(rev)}`;
+}
+
+export function CostsTab({
+  state,
+  result,
+  addOverhead,
+  updateOverhead,
+  removeOverhead,
+  updateMonthlyVolume,
+  updateState,
+}: CostsTabProps) {
+  return (
+    <div className="space-y-6">
+      {/* Monthly Overhead */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">
+            Monthly Operating Overhead
+            <FormulaTooltip
+              label="Total Monthly Overhead"
+              formula={`Sum of all overhead items + Third Party (if included) = ${money(result.ohTotal)}`}
+            >
+              <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
+                Total: {money(result.ohTotal)}
+              </span>
+            </FormulaTooltip>
+          </CardTitle>
+          <Button size="sm" variant="outline" onClick={addOverhead}>
+            <Plus className="h-4 w-4 mr-1" /> Add Item
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Monthly Volume */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Monthly Volume per SKU</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {state.skus.map((sku) => {
+                const vol = state.monthlyVolumes.find((v) => v.skuId === sku.id);
+                return (
+                  <div key={sku.id} className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">{sku.name}</Label>
+                    <Input type="number" min={0} value={vol?.qty ?? 1000}
+                      onChange={(e) => updateMonthlyVolume(sku.id, Math.max(0, Number(e.target.value)))} className="h-8" />
+                  </div>
+                );
+              })}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <FormulaTooltip
+                label="Total Monthly Volume"
+                formula={`Sum of all SKU monthly volumes = ${result.totalMonthlyVolume.toLocaleString()}`}
+              >
+                <div className="cursor-help space-y-1">
+                  <Label className="text-xs text-muted-foreground">Total Monthly Volume</Label>
+                  <Input value={result.totalMonthlyVolume.toLocaleString()} readOnly className="h-8 bg-muted" />
+                </div>
+              </FormulaTooltip>
+              <FormulaTooltip
+                label="Overhead / Unit"
+                formula={`Total Overhead / Total Volume = ${money(result.ohTotal)} / ${result.totalMonthlyVolume} = ${money3(result.overheadPerUnit)} per unit`}
+              >
+                <div className="cursor-help space-y-1">
+                  <Label className="text-xs text-muted-foreground">Overhead / Unit</Label>
+                  <Input value={money3(result.overheadPerUnit)} readOnly className="h-8 bg-muted" />
+                </div>
+              </FormulaTooltip>
+            </div>
+          </div>
+
+          {/* Third Party Toggle */}
+          <Label className="flex items-center gap-2 text-sm cursor-pointer">
+            <Checkbox checked={state.includeThirdParty} onCheckedChange={(v) => updateState({ includeThirdParty: !!v })} />
+            Include Third Party Costs in Overhead
+            {state.includeThirdParty && result.thirdPartyTotal > 0 && (
+              <span className="text-xs text-muted-foreground ml-2">(+{money(result.thirdPartyTotal)})</span>
+            )}
+          </Label>
+
+          {/* Overhead Items */}
+          <div className="space-y-2">
+            {state.overhead.map((item) => (
+              <div key={item.id} className="flex items-center gap-2">
+                <Input placeholder="Name" value={item.name}
+                  onChange={(e) => updateOverhead(item.id, { name: e.target.value })} className="w-48 h-8" />
+                <Input type="number" step="0.01" placeholder="$/month" value={item.cost}
+                  onChange={(e) => updateOverhead(item.id, { cost: Number(e.target.value) })} className="w-32 h-8" />
+                <Button size="sm" variant="ghost" className="text-destructive h-8"
+                  onClick={() => removeOverhead(item.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 flex-wrap">
+            <Label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox checked={state.ohR} onCheckedChange={(v) => updateState({ ohR: !!v })} />
+              Include in Retail
+            </Label>
+            <Label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox checked={state.ohW} onCheckedChange={(v) => updateState({ ohW: !!v })} />
+              Include in Wholesale
+            </Label>
+            <Label className="flex items-center gap-2 text-sm cursor-pointer">
+              <Checkbox checked={state.ohD} onCheckedChange={(v) => updateState({ ohD: !!v })} />
+              Include in Distributor
+            </Label>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Break-Even */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">
+            Break-Even Analysis
+            <FormulaTooltip
+              label="Break-Even Formula"
+              formula={`Packs needed = Fixed Costs (${money(state.beIncludeOverhead ? result.ohTotal : 0)}) / Contribution Margin per Pack (GP before overhead)`}
+            >
+              <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
+                (hover for formula)
+              </span>
+            </FormulaTooltip>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Label className="flex items-center gap-2 text-sm cursor-pointer mb-4">
+            <Checkbox checked={state.beIncludeOverhead} onCheckedChange={(v) => updateState({ beIncludeOverhead: !!v })} />
+            Include Monthly Overhead in Calculation
+          </Label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {[
+              { title: "Retail", units: result.beUnitsR, rev: result.beRevR, contrib: result.retail.gp - result.shipPerPack },
+              { title: "Wholesale", units: result.beUnitsW, rev: result.beRevW, contrib: result.wholesale.gp },
+              { title: "Distributor", units: result.beUnitsD, rev: result.beRevD, contrib: result.distributor.gp },
+              { title: "Blended", units: result.beUnitsB, rev: result.beRevB, contrib: result.bopp + result.ohPerPack },
+            ].map((be) => (
+              <FormulaTooltip
+                key={be.title}
+                label={`${be.title} Break-Even`}
+                formula={`Fixed Costs / Contribution Margin = ${money(state.beIncludeOverhead ? result.ohTotal : 0)} / ${money3(be.contrib)} = ${isFinite(be.units) ? Math.ceil(be.units).toLocaleString() : "Unprofitable"} packs`}
+              >
+                <Card className="cursor-help">
+                  <CardContent className="p-4">
+                    <div className="text-xs text-muted-foreground mb-1">{be.title} Break-Even</div>
+                    <div className="text-lg font-bold tabular-nums">{formatBE(be.units, be.rev)}</div>
+                  </CardContent>
+                </Card>
+              </FormulaTooltip>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Blended KPIs */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Blended Key Performance Indicators</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {result.totalPacks === 0 ? (
+            <div className="text-center text-muted-foreground py-6">
+              Add quantities to the Order Composition to calculate Blended KPIs.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+              {[
+                { label: "Revenue / Pack", value: money3(result.brev), formula: `Weighted average revenue per pack across all channels = ${money3(result.brev)}` },
+                { label: "Gross Profit / Pack", value: money3(result.bgpp), formula: `Revenue − COGS = ${money3(result.brev)} − ${money3(result.cogsPerPack)} = ${money3(result.bgpp)}` },
+                { label: "Gross Margin", value: pct(result.bgmp), formula: `GP / Revenue = ${money3(result.bgpp)} / ${money3(result.brev)} = ${pct(result.bgmp)}` },
+                { label: "Overhead / Pack", value: money3(result.ohPerPack), formula: `Total Overhead / Monthly Volume = ${money(result.ohTotal)} / ${result.totalMonthlyVolume} = ${money3(result.ohPerPack)}` },
+                { label: "Operating Profit / Pack", value: money3(result.bopp), formula: `GP − Overhead = ${money3(result.bgpp)} − ${money3(result.ohPerPack)} = ${money3(result.bopp)}` },
+                { label: "Operating Margin", value: pct(result.bomp), formula: `OP / Revenue = ${money3(result.bopp)} / ${money3(result.brev)} = ${pct(result.bomp)}` },
+              ].map((kpi) => (
+                <FormulaTooltip key={kpi.label} label={kpi.label} formula={kpi.formula}>
+                  <Card className="cursor-help">
+                    <CardContent className="p-3">
+                      <div className="text-xs text-muted-foreground">{kpi.label}</div>
+                      <div className="text-xl font-bold tabular-nums">{kpi.value}</div>
+                    </CardContent>
+                  </Card>
+                </FormulaTooltip>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

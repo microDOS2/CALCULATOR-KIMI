@@ -1,10 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2 } from "lucide-react";
 import type { CalculationResult } from "@/types/calculator";
@@ -22,8 +19,7 @@ export function Header({ onSaveScenario, onReset, result }: HeaderProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
+    navigator.clipboard.writeText(window.location.href).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -34,65 +30,28 @@ export function Header({ onSaveScenario, onReset, result }: HeaderProps) {
       <div className="container flex h-16 items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <Calculator className="h-5 w-5" />
-          <h1 className="text-lg font-semibold tracking-tight">
-            Channel Calculator
-          </h1>
-          <span className="hidden sm:inline text-xs text-muted-foreground">
-            v8 · All-in
-          </span>
+          <h1 className="text-lg font-semibold tracking-tight">Channel Calculator</h1>
+          <span className="hidden sm:inline text-xs text-muted-foreground">v8 · All-in · Product-agnostic</span>
         </div>
-
         <div className="flex items-center gap-2 flex-wrap">
-          <Input
-            placeholder="Scenario label..."
-            className="w-40 h-8 text-sm"
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-          />
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => {
-              onSaveScenario(label);
-              setLabel("");
-            }}
-          >
-            <Save className="h-4 w-4 mr-1" />
-            Save
+          <Input placeholder="Scenario label..." className="w-40 h-8 text-sm" value={label} onChange={(e) => setLabel(e.target.value)} />
+          <Button size="sm" variant="default" onClick={() => { onSaveScenario(label); setLabel(""); }}>
+            <Save className="h-4 w-4 mr-1" /> Save
           </Button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Download className="h-4 w-4 mr-1" />
-                Export
-              </Button>
+              <Button size="sm" variant="outline"><Download className="h-4 w-4 mr-1" /> Export</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => exportResultCSV(result, label)}>
-                <FileText className="h-4 w-4 mr-2" />
-                Download CSV
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => exportPDF(result, label)}>
-                <FileText className="h-4 w-4 mr-2" />
-                Download PDF
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => exportExcel(result, label)}>
-                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                Download Excel
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportResultCSV(result, label)}><FileText className="h-4 w-4 mr-2" /> Download CSV</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportPDF(result, label)}><FileText className="h-4 w-4 mr-2" /> Download PDF</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => exportExcel(result, label)}><FileSpreadsheet className="h-4 w-4 mr-2" /> Download Excel</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
           <Button size="sm" variant="outline" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-1" />
-            {copied ? "Copied!" : "Share"}
+            <Share2 className="h-4 w-4 mr-1" /> {copied ? "Copied!" : "Share"}
           </Button>
-
-          <Button size="sm" variant="ghost" onClick={onReset}>
-            <RotateCcw className="h-4 w-4 mr-1" />
-            Reset
-          </Button>
+          <Button size="sm" variant="ghost" onClick={onReset}><RotateCcw className="h-4 w-4 mr-1" /> Reset</Button>
         </div>
       </div>
     </header>

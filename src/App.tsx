@@ -1,178 +1,137 @@
-import { Header } from "@/components/Header";
-import { ProductSpecs } from "@/components/ProductSpecs";
-import { OrderComposition } from "@/components/OrderComposition";
-import { IngredientsSection } from "@/components/IngredientsSection";
-import { SalesChannels } from "@/components/SalesChannels";
-import { MonthlyCosts } from "@/components/MonthlyCosts";
-import { BreakEven } from "@/components/BreakEven";
-import { BlendedKPIs } from "@/components/BlendedKPIs";
-import { PurchaseOrders } from "@/components/PurchaseOrders";
-import { Commissions } from "@/components/Commissions";
-import { ThirdParty } from "@/components/ThirdParty";
-import { ScenariosSection } from "@/components/ScenariosSection";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCalculator } from "@/hooks/useCalculator";
-import { Separator } from "@/components/ui/separator";
+import { Header } from "@/components/Header";
+import { ProductTab } from "@/components/tabs/ProductTab";
+import { ChannelsTab } from "@/components/tabs/ChannelsTab";
+import { CostsTab } from "@/components/tabs/CostsTab";
+import { PackagingTab } from "@/components/tabs/PackagingTab";
+import { POTab } from "@/components/tabs/POTab";
+import { CommissionsTab } from "@/components/tabs/CommissionsTab";
+import { ThirdPartyTab } from "@/components/tabs/ThirdPartyTab";
+import { ScenariosTab } from "@/components/tabs/ScenariosTab";
+import { ChartsTab } from "@/components/tabs/ChartsTab";
 
 function App() {
-  const {
-    state,
-    result,
-    updateState,
-    addSKU,
-    removeSKU,
-    updateSKU,
-    updateOrderQty,
-    addIngredient,
-    updateIngredient,
-    removeIngredient,
-    addOverhead,
-    updateOverhead,
-    removeOverhead,
-    updateMonthlyVolume,
-    commissions,
-    addVP,
-    removeVP,
-    updateVP,
-    addRSM,
-    removeRSM,
-    updateRSM,
-    addSP,
-    removeSP,
-    updateSP,
-    addBonus,
-    updateBonus,
-    removeBonus,
-    updatePresident,
-    thirdPartyCompanies,
-    updateThirdParty,
-    updateThirdPartyItem,
-    scenarios,
-    saveScenario,
-    loadScenario,
-    deleteScenario,
-    clearScenarios,
-    resetAll,
-  } = useCalculator();
+  const calc = useCalculator();
+  const [activeTab, setActiveTab] = useState("product");
 
   return (
     <div className="min-h-screen bg-background">
       <Header
-        onSaveScenario={saveScenario}
-        onReset={resetAll}
-        result={result}
+        onSaveScenario={calc.saveScenario}
+        onReset={calc.resetAll}
+        result={calc.result}
       />
 
-      <main className="container py-6 space-y-8">
-        {/* Left column content */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1.4fr_1fr] gap-8">
-          <div className="space-y-8">
-            <ProductSpecs
-              skus={state.skus}
-              onAdd={addSKU}
-              onRemove={removeSKU}
-              onUpdate={updateSKU}
+      <main className="container py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="w-full justify-start flex-wrap h-auto gap-1">
+            <TabsTrigger value="product">Product</TabsTrigger>
+            <TabsTrigger value="channels">Channels</TabsTrigger>
+            <TabsTrigger value="costs">Costs & Break-Even</TabsTrigger>
+            <TabsTrigger value="packaging">Packaging</TabsTrigger>
+            <TabsTrigger value="po">Purchase Orders</TabsTrigger>
+            <TabsTrigger value="commissions">Commissions</TabsTrigger>
+            <TabsTrigger value="thirdparty">Third Party</TabsTrigger>
+            <TabsTrigger value="charts">Charts</TabsTrigger>
+            <TabsTrigger value="scenarios">Scenarios</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="product">
+            <ProductTab
+              state={calc.state}
+              result={calc.result}
+              addSKU={calc.addSKU}
+              removeSKU={calc.removeSKU}
+              updateSKU={calc.updateSKU}
+              updateOrderQty={calc.updateOrderQty}
+              addIngredient={calc.addIngredient}
+              updateIngredient={calc.updateIngredient}
+              removeIngredient={calc.removeIngredient}
             />
+          </TabsContent>
 
-            <OrderComposition
-              skus={state.skus}
-              order={state.order}
-              onUpdateQty={updateOrderQty}
+          <TabsContent value="channels">
+            <ChannelsTab
+              state={calc.state}
+              result={calc.result}
+              updateState={calc.updateState}
             />
+          </TabsContent>
 
-            <IngredientsSection
-              ingredients={state.ingredients}
-              result={result}
-              onAdd={addIngredient}
-              onUpdate={updateIngredient}
-              onRemove={removeIngredient}
+          <TabsContent value="costs">
+            <CostsTab
+              state={calc.state}
+              result={calc.result}
+              addOverhead={calc.addOverhead}
+              updateOverhead={calc.updateOverhead}
+              removeOverhead={calc.removeOverhead}
+              updateMonthlyVolume={calc.updateMonthlyVolume}
+              updateState={calc.updateState}
             />
+          </TabsContent>
 
-            <SalesChannels
-              result={result}
-              wDisc={state.wDisc}
-              dDisc={state.dDisc}
-              includeShip={state.includeShip}
-              shippingPerPack={state.shippingPerPack}
-              includeR={state.includeR}
-              includeW={state.includeW}
-              includeD={state.includeD}
-              onUpdate={(patch) => updateState(patch as Record<string, unknown>)}
+          <TabsContent value="packaging">
+            <PackagingTab
+              state={calc.state}
+              result={calc.result}
+              addLayer={calc.addPackagingLayer}
+              updateLayer={calc.updatePackagingLayer}
+              removeLayer={calc.removePackagingLayer}
             />
-          </div>
+          </TabsContent>
 
-          <div className="space-y-8">
-            <MonthlyCosts
-              overhead={state.overhead}
-              monthlyVolumes={state.monthlyVolumes}
-              result={result}
-              ohR={state.ohR}
-              ohW={state.ohW}
-              ohD={state.ohD}
-              includeThirdParty={state.includeThirdParty}
-              thirdPartyTotal={result.thirdPartyTotal}
-              skus={state.skus}
-              onAddOverhead={addOverhead}
-              onUpdateOverhead={updateOverhead}
-              onRemoveOverhead={removeOverhead}
-              onUpdateVolume={updateMonthlyVolume}
-              onUpdate={(patch) => updateState(patch as Record<string, unknown>)}
+          <TabsContent value="po">
+            <POTab result={calc.result} />
+          </TabsContent>
+
+          <TabsContent value="commissions">
+            <CommissionsTab
+              commissions={calc.commissions}
+              result={calc.result}
+              onAddVP={calc.addVP}
+              onRemoveVP={calc.removeVP}
+              onUpdateVP={calc.updateVP}
+              onAddRSM={calc.addRSM}
+              onRemoveRSM={calc.removeRSM}
+              onUpdateRSM={calc.updateRSM}
+              onAddSP={calc.addSP}
+              onRemoveSP={calc.removeSP}
+              onUpdateSP={calc.updateSP}
+              onAddBonus={calc.addBonus}
+              onUpdateBonus={calc.updateBonus as (spId: string, bonusId: string, patch: { metric?: string; thresh?: number; amt?: number }) => void}
+              onRemoveBonus={calc.removeBonus}
+              onUpdatePresident={calc.updatePresident}
             />
+          </TabsContent>
 
-            <BreakEven
-              result={result}
-              beIncludeOverhead={state.beIncludeOverhead}
-              onUpdate={(patch) => updateState(patch as Record<string, unknown>)}
+          <TabsContent value="thirdparty">
+            <ThirdPartyTab
+              companies={calc.thirdPartyCompanies}
+              updateCompany={calc.updateThirdParty}
+              updateItem={calc.updateThirdPartyItem}
             />
+          </TabsContent>
 
-            <BlendedKPIs result={result} />
-          </div>
-        </div>
+          <TabsContent value="charts">
+            <ChartsTab result={calc.result} />
+          </TabsContent>
 
-        <Separator />
-
-        <PurchaseOrders result={result} />
-
-        <Separator />
-
-        <Commissions
-          commissions={commissions}
-          result={result}
-          onAddVP={addVP}
-          onRemoveVP={removeVP}
-          onUpdateVP={updateVP}
-          onAddRSM={addRSM}
-          onRemoveRSM={removeRSM}
-          onUpdateRSM={updateRSM}
-          onAddSP={addSP}
-          onRemoveSP={removeSP}
-          onUpdateSP={updateSP}
-          onAddBonus={addBonus}
-          onUpdateBonus={updateBonus}
-          onRemoveBonus={removeBonus}
-          onUpdatePresident={updatePresident}
-        />
-
-        <Separator />
-
-        <ThirdParty
-          companies={thirdPartyCompanies}
-          onUpdateCompany={updateThirdParty}
-          onUpdateItem={updateThirdPartyItem}
-        />
-
-        <Separator />
-
-        <ScenariosSection
-          scenarios={scenarios}
-          onLoad={loadScenario}
-          onDelete={deleteScenario}
-          onClear={clearScenarios}
-        />
+          <TabsContent value="scenarios">
+            <ScenariosTab
+              scenarios={calc.scenarios}
+              onLoad={calc.loadScenario}
+              onDelete={calc.deleteScenario}
+              onClear={calc.clearScenarios}
+            />
+          </TabsContent>
+        </Tabs>
       </main>
 
       <footer className="border-t py-6 mt-8">
         <div className="container text-center text-xs text-muted-foreground">
-          Channel Calculator v8 · All-in · Built with React + Tailwind + shadcn/ui
+          Channel Calculator v8 · All-in · Product-agnostic · Formula-driven
         </div>
       </footer>
     </div>
