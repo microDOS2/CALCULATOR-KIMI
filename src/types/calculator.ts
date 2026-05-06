@@ -3,6 +3,7 @@ export interface PackagingLayer {
   name: string;
   costPerUnit: number;
   unitsPerLayer: number;
+  weightPerUnit: number; // in grams
   included: boolean;
 }
 
@@ -191,6 +192,10 @@ export interface CalculationResult {
   costPerMg: number;
   costPerGram: number;
   totalMgPerPack: number;
+  totalWeightPerUnit: number; // total ingredient weight per unit (mg)
+  totalWeightPerPack: number; // total ingredient weight per pack (mg)
+  totalPackagingWeightPerPack: number; // total packaging weight per pack (grams)
+  totalUnitWeightPerPack: number; // combined ingredient + packaging weight per pack (grams)
 
   // Break-even
   beUnitsR: number;
@@ -276,6 +281,7 @@ export interface Scenario {
 }
 
 export interface CalculatorState {
+  unitSystem: 'mg' | 'oz';
   skus: SKU[];
   order: OrderItem[];
   ingredients: Ingredient[];

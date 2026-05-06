@@ -13,6 +13,35 @@ export const num = (v: unknown): number => {
   return isFinite(x) ? x : 0;
 };
 
+// Unit conversion constants
+export const MG_PER_OZ = 28349.5231;
+export const GRAMS_PER_OZ = 28.3495231;
+
+export const toOz = (mg: number): number => mg / MG_PER_OZ;
+export const fromOz = (oz: number): number => oz * MG_PER_OZ;
+export const gramsToOz = (g: number): number => g / GRAMS_PER_OZ;
+export const ozToGrams = (oz: number): number => oz * GRAMS_PER_OZ;
+
+export const weightLabel = (unitSystem: 'mg' | 'oz'): string =>
+  unitSystem === 'mg' ? 'mg' : 'oz';
+
+export const weightLabelLong = (unitSystem: 'mg' | 'oz'): string =>
+  unitSystem === 'mg' ? 'milligrams' : 'ounces';
+
+export const fmtWeight = (mg: number, unitSystem: 'mg' | 'oz'): string => {
+  if (unitSystem === 'mg') {
+    return `${mg.toLocaleString(undefined, { maximumFractionDigits: 2 })} mg`;
+  }
+  return `${toOz(mg).toFixed(4)} oz`;
+};
+
+export const fmtWeightGrams = (g: number, unitSystem: 'mg' | 'oz'): string => {
+  if (unitSystem === 'mg') {
+    return `${g.toLocaleString(undefined, { maximumFractionDigits: 2 })} g`;
+  }
+  return `${gramsToOz(g).toFixed(4)} oz`;
+};
+
 export const pct = (x: number): string => {
   if (!isFinite(x) || x === 0) return "0%";
   return (x * 100).toFixed(1).replace(/\.0$/, "") + "%";
@@ -49,6 +78,18 @@ export function calculatePackagingCostPerPack(
     if (!layer.included) return sum;
     const costPerPack = layer.costPerUnit * (unitsPerPack / Math.max(1, layer.unitsPerLayer));
     return sum + costPerPack;
+  }, 0);
+}
+
+export function calculatePackagingWeightPerPack(
+  layers: PackagingLayer[],
+  unitsPerPack: number
+): number {
+  // Returns weight in grams
+  return layers.reduce((sum, layer) => {
+    if (!layer.included) return sum;
+    const weightPerPack = layer.weightPerUnit * (unitsPerPack / Math.max(1, layer.unitsPerLayer));
+    return sum + weightPerPack;
   }, 0);
 }
 
@@ -227,8 +268,20 @@ export function calculate(state: CalculatorState): CalculationResult {
     (a, ing) => a + ing.mgPerUnit * weightedUnitsPerPack,
     0
   );
+  const totalWeightPerUnit = ingredients.reduce(
+    (a, ing) => a + ing.mgPerUnit,
+    0
+  );
+  const totalWeightPerPack = totalWeightPerUnit * weightedUnitsPerPack;
   const costPerMg = totalMgPerPack > 0 ? avgIngCostPerPack / totalMgPerPack : 0;
   const costPerGram = costPerMg * 1000;
+
+  // Packaging weight calculations (in grams)
+  const totalPackagingWeightPerPack = packaging.reduce((sum, layer) => {
+    if (!layer.included) return sum;
+    return sum + layer.weightPerUnit * (weightedUnitsPerPack / Math.max(1, layer.unitsPerLayer));
+  }, 0);
+  const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack; // ingredients in mg -> g + packaging in g
 
   // Per-unit metrics
   const costPerUnit = weightedUnitsPerPack > 0 ? cogsPerPack / weightedUnitsPerPack : 0;
@@ -414,6 +467,10 @@ export function calculate(state: CalculatorState): CalculationResult {
     costPerMg,
     costPerGram,
     totalMgPerPack,
+    totalWeightPerUnit,
+    totalWeightPerPack,
+    totalPackagingWeightPerPack,
+    totalUnitWeightPerPack,
     beUnitsR,
     beRevR,
     beUnitsW,

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2 } from "lucide-react";
+import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2, Scale } from "lucide-react";
 import type { CalculationResult } from "@/types/calculator";
 import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
 import { Guide } from "@/components/Guide";
@@ -13,9 +13,11 @@ interface HeaderProps {
   onSaveScenario: (label: string) => void;
   onReset: () => void;
   result: CalculationResult;
+  unitSystem: 'mg' | 'oz';
+  onToggleUnitSystem: () => void;
 }
 
-export function Header({ onSaveScenario, onReset, result }: HeaderProps) {
+export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem }: HeaderProps) {
   const [label, setLabel] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -36,6 +38,9 @@ export function Header({ onSaveScenario, onReset, result }: HeaderProps) {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Guide />
+          <Button size="sm" variant="outline" onClick={onToggleUnitSystem} title={`Switch to ${unitSystem === 'mg' ? 'ounces' : 'milligrams'}`}>
+            <Scale className="h-4 w-4 mr-1" /> {unitSystem === 'mg' ? 'mg' : 'oz'}
+          </Button>
           <div className="w-px h-6 bg-border mx-1" />
           <Input placeholder="Scenario label..." className="w-40 h-8 text-sm" value={label} onChange={(e) => setLabel(e.target.value)} />
           <Button size="sm" variant="default" onClick={() => { onSaveScenario(label); setLabel(""); }}>

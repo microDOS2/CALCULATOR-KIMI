@@ -93,16 +93,17 @@ const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
 ];
 
 const defaultPackaging: PackagingLayer[] = [
-  { id: uid(), name: "Primary Container", costPerUnit: 1.75, unitsPerLayer: 1, included: true },
-  { id: uid(), name: "Inner Packaging", costPerUnit: 0.5, unitsPerLayer: 1, included: true },
-  { id: uid(), name: "Outer Box", costPerUnit: 1.5, unitsPerLayer: 1, included: true },
-  { id: uid(), name: "Display Packaging", costPerUnit: 0, unitsPerLayer: 1, included: false },
-  { id: uid(), name: "Shipping Box", costPerUnit: 1.5, unitsPerLayer: 1, included: true },
+  { id: uid(), name: "Primary Container", costPerUnit: 1.75, unitsPerLayer: 1, weightPerUnit: 5, included: true },
+  { id: uid(), name: "Inner Packaging", costPerUnit: 0.5, unitsPerLayer: 1, weightPerUnit: 2, included: true },
+  { id: uid(), name: "Outer Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 15, included: true },
+  { id: uid(), name: "Display Packaging", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: false },
+  { id: uid(), name: "Shipping Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 50, included: true },
 ];
 
 const createDefaultState = (): CalculatorState => {
   const skuId1 = uid();
   return {
+    unitSystem: 'mg' as const,
     skus: [
       {
         id: skuId1,
@@ -341,7 +342,7 @@ export function useCalculator() {
       ...prev,
       packaging: [
         ...prev.packaging,
-        { id: uid(), name: "", costPerUnit: 0, unitsPerLayer: 1, included: true },
+        { id: uid(), name: "", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: true },
       ],
     }));
   }, []);
@@ -700,6 +701,13 @@ export function useCalculator() {
     saveScenarios([]);
   }, []);
 
+  const toggleUnitSystem = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      unitSystem: prev.unitSystem === 'mg' ? 'oz' : 'mg',
+    }));
+  }, []);
+
   const resetAll = useCallback(() => {
     setState(createDefaultState());
   }, []);
@@ -707,6 +715,8 @@ export function useCalculator() {
   return {
     state,
     result,
+    unitSystem: state.unitSystem,
+    toggleUnitSystem,
     updateState,
     addSKU,
     removeSKU,

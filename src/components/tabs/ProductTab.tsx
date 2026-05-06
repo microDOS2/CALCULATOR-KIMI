@@ -6,7 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { FormulaTooltip, FormulaBadge } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculatorState, CalculationResult, SKU } from "@/types/calculator";
-import { money3 } from "@/lib/calculator";
+import { money3, MG_PER_OZ, toOz, fmtWeight } from "@/lib/calculator";
 
 interface ProductTabProps {
   state: CalculatorState;
@@ -178,18 +178,28 @@ export function ProductTab({
         <CardContent className="space-y-3">
           <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center text-xs text-muted-foreground px-1">
             <span>Name</span>
-            <span>mg / unit</span>
-            <span>$ / mg</span>
+            <span>{state.unitSystem === 'mg' ? 'mg / unit' : 'oz / unit'}</span>
+            <span>{state.unitSystem === 'mg' ? '$ / mg' : '$ / oz'}</span>
             <span></span>
           </div>
           {state.ingredients.map((ing) => (
             <div key={ing.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
               <Input placeholder="Name" value={ing.name}
                 onChange={(e) => updateIngredient(ing.id, { name: e.target.value })} className="h-8" />
-              <Input type="number" step="0.0001" placeholder="mg" value={ing.mgPerUnit}
-                onChange={(e) => updateIngredient(ing.id, { mgPerUnit: Number(e.target.value) })} className="h-8 w-28" />
-              <Input type="number" step="0.000001" placeholder="$/mg" value={ing.costPerMg}
-                onChange={(e) => updateIngredient(ing.id, { costPerMg: Number(e.target.value) })} className="h-8 w-28" />
+              <Input type="number" step={state.unitSystem === 'mg' ? "0.0001" : "0.000001"}
+                placeholder={state.unitSystem === 'mg' ? 'mg' : 'oz'}
+                value={state.unitSystem === 'mg' ? ing.mgPerUnit : Number((ing.mgPerUnit / MG_PER_OZ).toFixed(6))}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  updateIngredient(ing.id, { mgPerUnit: state.unitSystem === 'mg' ? val : val * MG_PER_OZ });
+                }} className="h-8 w-28" />
+              <Input type="number" step={state.unitSystem === 'mg' ? "0.000001" : "0.0000001"}
+                placeholder={state.unitSystem === 'mg' ? '$/mg' : '$/oz'}
+                value={state.unitSystem === 'mg' ? ing.costPerMg : Number((ing.costPerMg * MG_PER_OZ).toFixed(7))}
+                onChange={(e) => {
+                  const val = Number(e.target.value);
+                  updateIngredient(ing.id, { costPerMg: state.unitSystem === 'mg' ? val : val / MG_PER_OZ });
+                }} className="h-8 w-28" />
               <Button size="sm" variant="ghost" className="text-destructive h-8"
                 onClick={() => removeIngredient(ing.id)}>
                 <Trash2 className="h-4 w-4" />
@@ -243,6 +253,18 @@ export function ProductTab({
                 <CardContent className="p-3">
                   <div className="text-xs text-muted-foreground">Cost / gram</div>
                   <div className="text-xl font-bold tabular-nums">{result.costPerGram > 0 ? money3(result.costPerGram) : "$0"}</div>
+                </CardContent>
+              </Card>
+            </FormulaTooltip>
+
+            <FormulaTooltip
+              label="Total Weight / Unit"
+              formula={`Sum of all ingredient weights per unit = ${state.unitSystem === 'mg' ? `${result.totalWeightPerUnit.toFixed(2)} mg` : `${toOz(result.totalWeightPerUnit).toFixed(4)} oz`}`}
+            >
+              <Card className="cursor-help bg-primary/5">
+                <CardContent className="p-3">
+                  <div className="text-xs text-muted-foreground">Total Weight / Unit</div>
+                  <div className="text-xl font-bold tabular-nums">{fmtWeight(result.totalWeightPerUnit, state.unitSystem)}</div>
                 </CardContent>
               </Card>
             </FormulaTooltip>

@@ -22,6 +22,8 @@ function App() {
         onSaveScenario={calc.saveScenario}
         onReset={calc.resetAll}
         result={calc.result}
+        unitSystem={calc.unitSystem}
+        onToggleUnitSystem={calc.toggleUnitSystem}
       />
 
       <main className="container py-6">
