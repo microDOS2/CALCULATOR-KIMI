@@ -434,6 +434,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     { name: "Distributor", gp: gpD, op: opD, revenue: totalRevenueD },
   ];
 
+  // Subscription projections
+  const subscriptionSummary = calculateSubscriptions(state, cogsPerPack);
+
   return {
     unitSystem: state.unitSystem,
     skus: state.skus,
@@ -533,6 +536,110 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalMonthlyVolume,
     costBreakdown,
     channelProfits,
+    subscriptionPlans: state.subscriptionPlans,
+    subscriptionSummary,
+  };
+}
+
+function calculateSubscriptions(
+  state: CalculatorState,
+  _blendedCOGSPerPack: number
+): CalculationResult["subscriptionSummary"] {
+  const { skus, subscriptionPlans } = state;
+  const activePlans = subscriptionPlans.filter((p) => p.included);
+
+  let totalMRR = 0;
+  let totalARR = 0;
+  let totalSubscribers = 0;
+  let combinedAnnualRevenue = 0;
+  let combinedAnnualCOGS = 0;
+  let combinedAnnualProfit = 0;
+
+  const planResults: CalculationResult["subscriptionSummary"]["plans"] = [];
+
+  activePlans.forEach((plan) => {
+    const months: CalculationResult["subscriptionSummary"]["plans"][0]["months"] = [];
+    let currentSubs = plan.startingSubscribers;
+    let cumulativeRevenue = 0;
+    let cumulativeProfit = 0;
+
+    // Calculate COGS per subscriber per month based on plan items
+    let cogsPerSubscriberMonth = 0;
+    plan.items.forEach((item) => {
+      const sku = skus.find((s) => s.id === item.skuId);
+      if (!sku) return;
+      const skuCogs = calculatePackagingCostPerPack(sku.packaging, sku.unitsPerPack);
+      const ingCost = state.ingredients.reduce(
+        (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg, 0
+      );
+      cogsPerSubscriberMonth += (skuCogs + ingCost) * item.packsPerMonth;
+    });
+
+    for (let m = 1; m <= 12; m++) {
+      const monthLabel = new Date(2026, m - 1, 1).toLocaleString("en", { month: "short" });
+      const newSubs = Math.round(currentSubs * (plan.monthlyGrowthRate / 100));
+      const churned = Math.round(currentSubs * (plan.monthlyChurnRate / 100));
+      const endingSubs = Math.max(0, currentSubs + newSubs - churned);
+      const monthlyRevenue = currentSubs * plan.monthlyPrice;
+      const monthlyCOGS = currentSubs * cogsPerSubscriberMonth;
+      const monthlyGrossProfit = monthlyRevenue - monthlyCOGS;
+
+      cumulativeRevenue += monthlyRevenue;
+      cumulativeProfit += monthlyGrossProfit;
+
+      months.push({
+        month: m,
+        monthLabel,
+        startingSubscribers: currentSubs,
+        newSubscribers: newSubs,
+        churnedSubscribers: churned,
+        endingSubscribers: endingSubs,
+        monthlyRevenue,
+        monthlyCOGS,
+        monthlyGrossProfit,
+        cumulativeRevenue,
+        cumulativeProfit,
+      });
+
+      currentSubs = endingSubs;
+    }
+
+    const mrr = months[0]?.monthlyRevenue ?? 0;
+    const arr = mrr * 12;
+    const avgMonthlyProfit = months.reduce((s, m) => s + m.monthlyGrossProfit, 0) / 12;
+    const ltv = plan.monthlyChurnRate > 0
+      ? (avgMonthlyProfit / (plan.monthlyChurnRate / 100))
+      : avgMonthlyProfit * 12;
+    const paybackMonths = avgMonthlyProfit > 0 ? plan.cac / avgMonthlyProfit : Infinity;
+
+    totalMRR += mrr;
+    totalARR += arr;
+    totalSubscribers += plan.startingSubscribers;
+    combinedAnnualRevenue += months[11]?.cumulativeRevenue ?? 0;
+    combinedAnnualCOGS += months.reduce((s, m) => s + m.monthlyCOGS, 0);
+    combinedAnnualProfit += months[11]?.cumulativeProfit ?? 0;
+
+    planResults.push({
+      planId: plan.id,
+      planName: plan.name,
+      monthlyPrice: plan.monthlyPrice,
+      mrr,
+      arr,
+      ltv,
+      paybackMonths,
+      cac: plan.cac,
+      months,
+    });
+  });
+
+  return {
+    plans: planResults,
+    totalMRR,
+    totalARR,
+    totalSubscribers,
+    combinedAnnualRevenue,
+    combinedAnnualCOGS,
+    combinedAnnualProfit,
   };
 }
 

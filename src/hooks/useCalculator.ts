@@ -184,6 +184,19 @@ const createDefaultState = (): CalculatorState => {
       ],
     },
     thirdPartyCompanies: defaultThirdPartyCompanies,
+    subscriptionPlans: [
+      {
+        id: uid(),
+        name: "Basic Monthly",
+        monthlyPrice: 49.99,
+        items: [{ skuId: skuId1, skuName: "SKU-A", packsPerMonth: 1 }],
+        startingSubscribers: 100,
+        monthlyGrowthRate: 5,
+        monthlyChurnRate: 3,
+        included: true,
+        cac: 25,
+      },
+    ],
   };
 };
 
@@ -373,6 +386,92 @@ export function useCalculator() {
         s.id === skuId
           ? { ...s, packaging: s.packaging.filter((p) => p.id !== layerId) }
           : s
+      ),
+    }));
+  }, []);
+
+  // Subscriptions
+  const addSubscriptionPlan = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      subscriptionPlans: [
+        ...prev.subscriptionPlans,
+        {
+          id: uid(),
+          name: `Plan ${prev.subscriptionPlans.length + 1}`,
+          monthlyPrice: 49.99,
+          items: prev.skus.length > 0
+            ? [{ skuId: prev.skus[0].id, skuName: prev.skus[0].name, packsPerMonth: 1 }]
+            : [],
+          startingSubscribers: 100,
+          monthlyGrowthRate: 5,
+          monthlyChurnRate: 3,
+          included: true,
+          cac: 25,
+        },
+      ],
+    }));
+  }, []);
+
+  const updateSubscriptionPlan = useCallback(
+    (id: string, patch: Partial<import("@/types/calculator").SubscriptionPlan>) => {
+      setState((prev) => ({
+        ...prev,
+        subscriptionPlans: prev.subscriptionPlans.map((p) =>
+          p.id === id ? { ...p, ...patch } : p
+        ),
+      }));
+    },
+    []
+  );
+
+  const removeSubscriptionPlan = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      subscriptionPlans: prev.subscriptionPlans.filter((p) => p.id !== id),
+    }));
+  }, []);
+
+  const addSubscriptionItem = useCallback((planId: string, skuId: string, skuName: string) => {
+    setState((prev) => ({
+      ...prev,
+      subscriptionPlans: prev.subscriptionPlans.map((p) =>
+        p.id === planId
+          ? {
+              ...p,
+              items: [...p.items, { skuId, skuName, packsPerMonth: 1 }],
+            }
+          : p
+      ),
+    }));
+  }, []);
+
+  const updateSubscriptionItem = useCallback(
+    (planId: string, skuId: string, patch: { packsPerMonth?: number }) => {
+      setState((prev) => ({
+        ...prev,
+        subscriptionPlans: prev.subscriptionPlans.map((p) =>
+          p.id === planId
+            ? {
+                ...p,
+                items: p.items.map((i) =>
+                  i.skuId === skuId ? { ...i, ...patch } : i
+                ),
+              }
+            : p
+        ),
+      }));
+    },
+    []
+  );
+
+  const removeSubscriptionItem = useCallback((planId: string, skuId: string) => {
+    setState((prev) => ({
+      ...prev,
+      subscriptionPlans: prev.subscriptionPlans.map((p) =>
+        p.id === planId
+          ? { ...p, items: p.items.filter((i) => i.skuId !== skuId) }
+          : p
       ),
     }));
   }, []);
@@ -766,5 +865,12 @@ export function useCalculator() {
     deleteScenario,
     clearScenarios,
     resetAll,
+    subscriptionPlans: state.subscriptionPlans,
+    addSubscriptionPlan,
+    updateSubscriptionPlan,
+    removeSubscriptionPlan,
+    addSubscriptionItem,
+    updateSubscriptionItem,
+    removeSubscriptionItem,
   };
 }

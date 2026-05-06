@@ -11,6 +11,7 @@ import { CommissionsTab } from "@/components/tabs/CommissionsTab";
 import { ThirdPartyTab } from "@/components/tabs/ThirdPartyTab";
 import { ScenariosTab } from "@/components/tabs/ScenariosTab";
 import { ChartsTab } from "@/components/tabs/ChartsTab";
+import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
 
 function App() {
   const calc = useCalculator();
@@ -37,7 +38,8 @@ function App() {
             <TabsTrigger value="commissions"><span className="text-xs text-muted-foreground mr-1 font-bold">6</span>Commissions</TabsTrigger>
             <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Subscriptions</TabsTrigger>
+            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Scenarios</TabsTrigger>
           </TabsList>
 
           <TabsContent value="product">
@@ -122,6 +124,20 @@ function App() {
 
           <TabsContent value="charts">
             <ChartsTab result={calc.result} />
+          </TabsContent>
+
+          <TabsContent value="subscriptions">
+            <SubscriptionsTab
+              skus={calc.state.skus}
+              plans={calc.subscriptionPlans}
+              summary={calc.result.subscriptionSummary}
+              addPlan={calc.addSubscriptionPlan}
+              updatePlan={calc.updateSubscriptionPlan}
+              removePlan={calc.removeSubscriptionPlan}
+              addItem={calc.addSubscriptionItem}
+              updateItem={calc.updateSubscriptionItem}
+              removeItem={calc.removeSubscriptionItem}
+            />
           </TabsContent>
 
           <TabsContent value="scenarios">

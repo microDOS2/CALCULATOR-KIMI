@@ -227,6 +227,10 @@ export interface CalculationResult {
   // Inherited from state
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
+
+  // Subscription projections
+  subscriptionPlans: SubscriptionPlan[];
+  subscriptionSummary: SubscriptionSummary;
 }
 
 export interface ChartSlice {
@@ -285,9 +289,63 @@ export interface Scenario {
   inputs: CalculatorState;
 }
 
+export interface SubscriptionPlanItem {
+  skuId: string;
+  skuName: string;
+  packsPerMonth: number;
+}
+
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  monthlyPrice: number;
+  items: SubscriptionPlanItem[];
+  startingSubscribers: number;
+  monthlyGrowthRate: number;
+  monthlyChurnRate: number;
+  included: boolean;
+  cac: number; // customer acquisition cost
+}
+
+export interface SubscriptionMonthProjection {
+  month: number;
+  monthLabel: string;
+  startingSubscribers: number;
+  newSubscribers: number;
+  churnedSubscribers: number;
+  endingSubscribers: number;
+  monthlyRevenue: number;
+  monthlyCOGS: number;
+  monthlyGrossProfit: number;
+  cumulativeRevenue: number;
+  cumulativeProfit: number;
+}
+
+export interface SubscriptionPlanResult {
+  planId: string;
+  planName: string;
+  monthlyPrice: number;
+  mrr: number;
+  arr: number;
+  ltv: number;
+  paybackMonths: number;
+  cac: number;
+  months: SubscriptionMonthProjection[];
+}
+
+export interface SubscriptionSummary {
+  plans: SubscriptionPlanResult[];
+  totalMRR: number;
+  totalARR: number;
+  totalSubscribers: number;
+  combinedAnnualRevenue: number;
+  combinedAnnualCOGS: number;
+  combinedAnnualProfit: number;
+}
+
 export interface CalculatorState {
   unitSystem: 'mg' | 'oz';
-  skus: SKU[]; // each SKU has its own packaging layers
+  skus: SKU[];
   order: OrderItem[];
   ingredients: Ingredient[];
   overhead: OverheadItem[];
@@ -306,4 +364,5 @@ export interface CalculatorState {
   beIncludeOverhead: boolean;
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
+  subscriptionPlans: SubscriptionPlan[];
 }

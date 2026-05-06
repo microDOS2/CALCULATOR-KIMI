@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,7 +10,7 @@ import { Plus, Trash2 } from "lucide-react";
 import type { SKU, PackagingLayer } from "@/types/calculator";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import { money3, fmtWeightGrams } from "@/lib/calculator";
+import { money3, fmtWeightGrams, calculatePackagingCostPerPack, calculatePackagingWeightPerPack } from "@/lib/calculator";
 
 interface PackagingTabProps {
   skus: SKU[];
@@ -37,7 +37,17 @@ export function PackagingTab({
 }: PackagingTabProps) {
   const [selectedSkuId, setSelectedSkuId] = useState(skus[0]?.id ?? "");
   const selectedSku = skus.find((s) => s.id === selectedSkuId);
-  const selectedPkgCosts = skuPackagingCosts.find((p) => p.skuId === selectedSkuId);
+
+  // Real-time per-SKU totals from raw SKU data (not order-dependent)
+  const liveSkuTotals = useMemo(() => {
+    if (!selectedSku) return null;
+    return {
+      costPerPack: calculatePackagingCostPerPack(selectedSku.packaging, selectedSku.unitsPerPack),
+      weightPerPack: calculatePackagingWeightPerPack(selectedSku.packaging, selectedSku.unitsPerPack),
+      includedCount: selectedSku.packaging.filter((l) => l.included).length,
+      totalCount: selectedSku.packaging.length,
+    };
+  }, [selectedSku]);
 
   return (
     <div className="space-y-6">
@@ -48,11 +58,11 @@ export function PackagingTab({
             <div className="flex items-center gap-2 flex-wrap">
               <CardTitle className="text-base">
                 Packaging by SKU
-                <InfoTooltip text="Each SKU can have its own unique packaging configuration. Select an SKU to edit its packaging layers. Different products often need different containers, boxes, and shipping materials." label="Per-SKU Packaging" />
+                <InfoTooltip text="Each SKU can have its own unique packaging configuration. Select an SKU to edit its packaging layers. Toggle Include on/off to see costs update in real time." label="Per-SKU Packaging" />
               </CardTitle>
               <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Required</span>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">Each SKU has its own packaging. Select an SKU to edit its layers.</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">Each SKU has its own packaging. Select an SKU to edit its layers. Toggle Include to see live cost changes.</p>
           </div>
           <Select value={selectedSkuId} onValueChange={setSelectedSkuId}>
             <SelectTrigger className="w-48 h-8">
@@ -71,6 +81,11 @@ export function PackagingTab({
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
                 Editing packaging for <strong>{selectedSku.name}</strong> · {selectedSku.unitsPerPack} units per pack
+                {liveSkuTotals && (
+                  <span className="ml-2 text-xs">
+                    ({liveSkuTotals.includedCount}/{liveSkuTotals.totalCount} layers included)
+                  </span>
+                )}
               </div>
               <Button size="sm" variant="outline" onClick={() => addLayer(selectedSku.id)}>
                 <Plus className="h-4 w-4 mr-1" /> Add Layer
@@ -86,7 +101,12 @@ export function PackagingTab({
               <span></span>
             </div>
             {selectedSku.packaging.map((layer) => (
-              <div key={layer.id} className="grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-2 items-center">
+              <div
+                key={layer.id}
+                className={`grid grid-cols-[1fr_auto_auto_auto_auto_auto] gap-2 items-center rounded px-1 py-0.5 transition-opacity ${
+                  layer.included ? 'opacity-100' : 'opacity-50 bg-muted/30'
+                }`}
+              >
                 <Input placeholder="Layer name" value={layer.name}
                   onChange={(e) => updateLayer(selectedSku.id, layer.id, { name: e.target.value })} className="h-8" />
                 <Input type="number" step="0.01" min={0} value={layer.costPerUnit}
@@ -95,8 +115,10 @@ export function PackagingTab({
                   onChange={(e) => updateLayer(selectedSku.id, layer.id, { unitsPerLayer: Math.max(1, Number(e.target.value)) })} className="h-8 w-24" />
                 <Input type="number" step="0.1" min={0} value={layer.weightPerUnit}
                   onChange={(e) => updateLayer(selectedSku.id, layer.id, { weightPerUnit: Math.max(0, Number(e.target.value)) })} className="h-8 w-24" title="Weight in grams per unit" />
-                <Checkbox checked={layer.included}
-                  onCheckedChange={(v) => updateLayer(selectedSku.id, layer.id, { included: !!v })} />
+                <div className="flex justify-center">
+                  <Checkbox checked={layer.included}
+                    onCheckedChange={(v) => updateLayer(selectedSku.id, layer.id, { included: !!v })} />
+                </div>
                 <Button size="sm" variant="ghost" className="text-destructive h-8"
                   onClick={() => removeLayer(selectedSku.id, layer.id)}>
                   <Trash2 className="h-4 w-4" />
@@ -104,28 +126,39 @@ export function PackagingTab({
               </div>
             ))}
 
-            {/* Per-SKU totals */}
-            {selectedPkgCosts && (
+            {/* Live per-SKU totals — always visible, not order-dependent */}
+            {liveSkuTotals && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-2 border-t">
                 <FormulaTooltip
                   label={`${selectedSku.name} Packaging Cost / Pack`}
-                  formula={`Total packaging cost for ${selectedSku.name} = ${money3(selectedPkgCosts.totalCostPerPack)}`}
+                  formula={`Sum of included layers: cost/unit x (units/pack / units/layer) = ${money3(liveSkuTotals.costPerPack)}`}
                 >
                   <Card className="cursor-help bg-muted/30">
                     <CardContent className="p-3">
                       <div className="text-xs text-muted-foreground">Packaging Cost / Pack</div>
-                      <div className="text-lg font-bold tabular-nums">{money3(selectedPkgCosts.totalCostPerPack)}</div>
+                      <div className="text-lg font-bold tabular-nums">{money3(liveSkuTotals.costPerPack)}</div>
                     </CardContent>
                   </Card>
                 </FormulaTooltip>
                 <FormulaTooltip
                   label={`${selectedSku.name} Packaging Weight / Pack`}
-                  formula={`Total packaging weight for ${selectedSku.name} = ${fmtWeightGrams(selectedPkgCosts.totalWeightPerPack, unitSystem)}`}
+                  formula={`Sum of included layers: weight x (units/pack / units/layer) = ${fmtWeightGrams(liveSkuTotals.weightPerPack, unitSystem)}`}
                 >
                   <Card className="cursor-help bg-blue-50 dark:bg-blue-900/20">
                     <CardContent className="p-3">
                       <div className="text-xs text-muted-foreground">Packaging Weight / Pack</div>
-                      <div className="text-lg font-bold tabular-nums">{fmtWeightGrams(selectedPkgCosts.totalWeightPerPack, unitSystem)}</div>
+                      <div className="text-lg font-bold tabular-nums">{fmtWeightGrams(liveSkuTotals.weightPerPack, unitSystem)}</div>
+                    </CardContent>
+                  </Card>
+                </FormulaTooltip>
+                <FormulaTooltip
+                  label="Included Layers"
+                  formula={`${liveSkuTotals.includedCount} of ${liveSkuTotals.totalCount} layers are included in cost calculations`}
+                >
+                  <Card className="cursor-help">
+                    <CardContent className="p-3">
+                      <div className="text-xs text-muted-foreground">Included Layers</div>
+                      <div className="text-lg font-bold tabular-nums">{liveSkuTotals.includedCount} / {liveSkuTotals.totalCount}</div>
                     </CardContent>
                   </Card>
                 </FormulaTooltip>
@@ -136,13 +169,13 @@ export function PackagingTab({
       </Card>
 
       {/* All SKUs Overview */}
-      {skuPackagingCosts.length > 1 && (
+      {skuPackagingCosts.length > 0 ? (
         <Card>
           <CardHeader>
             <div className="space-y-1">
               <CardTitle className="text-base">
-                Packaging Comparison Across SKUs
-                <InfoTooltip text="This table compares packaging costs and weights for all SKUs in your order, so you can see how different products contribute to overall packaging expenses." label="SKU Comparison" />
+                Packaging Comparison Across SKUs (Order-based)
+                <InfoTooltip text="These are weighted by your Order Composition quantities. SKUs with 0 order quantity won't appear here." label="SKU Comparison" />
               </CardTitle>
             </div>
           </CardHeader>
@@ -160,6 +193,12 @@ export function PackagingTab({
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-4 text-center text-sm text-muted-foreground">
+            Add quantities to Order Composition to see SKU comparison cards.
+          </CardContent>
+        </Card>
       )}
 
       {/* Weight Summary */}
@@ -168,7 +207,7 @@ export function PackagingTab({
           <div className="space-y-1">
             <CardTitle className="text-base">
               Weight Summary (Weighted Average)
-              <InfoTooltip text="These are weighted-average weights across all SKUs based on your order composition. The total unit weight combines ingredient weight and packaging weight per pack." label="Weight Summary" />
+              <InfoTooltip text="These are weighted-average weights across all SKUs based on your order composition." label="Weight Summary" />
             </CardTitle>
           </div>
         </CardHeader>
