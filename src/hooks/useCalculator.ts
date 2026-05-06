@@ -10,6 +10,7 @@ import type {
   Scenario,
 } from "@/types/calculator";
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
+import { useSensitivity } from "./useSensitivity";
 
 let uidCounter = 0;
 const uid = () => `u${++uidCounter}`;
@@ -265,6 +266,16 @@ export function useCalculator() {
   });
 
   const result = calculate(state);
+
+  // Sensitivity / simulation shadow state
+  const sensitivity = useSensitivity(state, result);
+
+  useEffect(() => {
+    if (!sensitivity.isActive) {
+      sensitivity.reset();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, sensitivity.isActive]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -888,5 +899,6 @@ export function useCalculator() {
     addSubscriptionItem,
     updateSubscriptionItem,
     removeSubscriptionItem,
+    sensitivity,
   };
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCalculator } from "@/hooks/useCalculator";
 import { Header } from "@/components/Header";
+import { SensitivityPanel } from "@/components/SensitivityPanel";
 import { ProductTab } from "@/components/tabs/ProductTab";
 import { ChannelsTab } from "@/components/tabs/ChannelsTab";
 import { CostsTab } from "@/components/tabs/CostsTab";
@@ -12,10 +13,24 @@ import { ThirdPartyTab } from "@/components/tabs/ThirdPartyTab";
 import { ScenariosTab } from "@/components/tabs/ScenariosTab";
 import { ChartsTab } from "@/components/tabs/ChartsTab";
 import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
+import { SimulateTab } from "@/components/tabs/SimulateTab";
 
 function App() {
   const calc = useCalculator();
   const [activeTab, setActiveTab] = useState("product");
+  const [simulateOpen, setSimulateOpen] = useState(false);
+
+  const handleSimulateClick = () => {
+    if (!calc.sensitivity.isActive) {
+      calc.sensitivity.enable();
+    }
+    setSimulateOpen(true);
+  };
+
+  const handleApply = () => {
+    const newState = calc.sensitivity.applyToModel();
+    calc.updateState(newState);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,6 +40,25 @@ function App() {
         result={calc.result}
         unitSystem={calc.unitSystem}
         onToggleUnitSystem={calc.toggleUnitSystem}
+        onSimulateClick={handleSimulateClick}
+      />
+
+      {/* Floating Sensitivity Panel */}
+      <SensitivityPanel
+        baseState={calc.state}
+        baseResult={calc.result}
+        shadowState={calc.sensitivity.shadowState}
+        shadowResult={calc.sensitivity.shadowResult}
+        isOpen={simulateOpen}
+        onOpenChange={(open) => {
+          setSimulateOpen(open);
+          if (!open) calc.sensitivity.disable();
+        }}
+        onUpdateSku={calc.sensitivity.updateSku}
+        onUpdatePlan={calc.sensitivity.updatePlan}
+        onUpdateGlobal={calc.sensitivity.updateShadow}
+        onReset={calc.sensitivity.reset}
+        onApply={handleApply}
       />
 
       <main className="container mx-auto py-6 px-4 sm:px-6">
@@ -40,6 +74,8 @@ function App() {
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
             <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Subscriptions</TabsTrigger>
             <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Scenarios</TabsTrigger>
+            <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
+            <TabsTrigger value="simulate"><span className="text-xs text-primary mr-1 font-bold">●</span>Simulate</TabsTrigger>
           </TabsList>
 
           <TabsContent value="product">
@@ -146,6 +182,20 @@ function App() {
               onLoad={calc.loadScenario}
               onDelete={calc.deleteScenario}
               onClear={calc.clearScenarios}
+            />
+          </TabsContent>
+
+          <TabsContent value="simulate">
+            <SimulateTab
+              baseState={calc.state}
+              baseResult={calc.result}
+              shadowState={calc.sensitivity.shadowState}
+              shadowResult={calc.sensitivity.shadowResult}
+              onUpdateSku={calc.sensitivity.updateSku}
+              onUpdatePlan={calc.sensitivity.updatePlan}
+              onUpdateGlobal={calc.sensitivity.updateShadow}
+              onReset={calc.sensitivity.reset}
+              onApply={handleApply}
             />
           </TabsContent>
         </Tabs>

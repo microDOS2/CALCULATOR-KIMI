@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2, Scale } from "lucide-react";
+import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2, Scale, TrendingUp } from "lucide-react";
 import type { CalculationResult } from "@/types/calculator";
 import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
 import { Guide } from "@/components/Guide";
@@ -15,9 +15,10 @@ interface HeaderProps {
   result: CalculationResult;
   unitSystem: 'mg' | 'oz';
   onToggleUnitSystem: () => void;
+  onSimulateClick: () => void;
 }
 
-export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem }: HeaderProps) {
+export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem, onSimulateClick }: HeaderProps) {
   const [label, setLabel] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -38,6 +39,9 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Guide />
+          <Button size="sm" variant="outline" onClick={onSimulateClick}>
+            <TrendingUp className="h-4 w-4 mr-1" /> Simulate
+          </Button>
           <Button size="sm" variant="outline" onClick={onToggleUnitSystem} title={`Switch to ${unitSystem === 'mg' ? 'ounces' : 'milligrams'}`}>
             <Scale className="h-4 w-4 mr-1" /> {unitSystem === 'mg' ? 'mg' : 'oz'}
           </Button>
