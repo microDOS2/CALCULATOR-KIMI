@@ -73,3 +73,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Ensure container centers on all screen sizes */
+.container {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Prevent tables from causing horizontal scroll */
+.overflow-x-auto {
+  max-width: 100%;
+}
+
+/* Ensure tab content fills available space evenly */
+.tabs-content {
+  width: 100%;
+}

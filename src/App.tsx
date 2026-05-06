@@ -27,9 +27,9 @@ function App() {
         onToggleUnitSystem={calc.toggleUnitSystem}
       />
 
-      <main className="container py-6">
+      <main className="container mx-auto py-6 px-4 sm:px-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="w-full justify-start flex-wrap h-auto gap-1">
+          <TabsList className="w-full justify-center flex-wrap h-auto gap-1">
             <TabsTrigger value="product"><span className="text-xs text-muted-foreground mr-1 font-bold">1</span>Product</TabsTrigger>
             <TabsTrigger value="packaging"><span className="text-xs text-muted-foreground mr-1 font-bold">2</span>Packaging</TabsTrigger>
             <TabsTrigger value="channels"><span className="text-xs text-muted-foreground mr-1 font-bold">3</span>Channels</TabsTrigger>
@@ -152,7 +152,7 @@ function App() {
       </main>
 
       <footer className="border-t py-6 mt-8">
-        <div className="container text-center text-xs text-muted-foreground">
+        <div className="container mx-auto px-4 sm:px-6 text-center text-xs text-muted-foreground">
           Channel Calculator v8 · All-in · Product-agnostic · Formula-driven
         </div>
       </footer>
