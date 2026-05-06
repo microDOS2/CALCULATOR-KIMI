@@ -27,15 +27,15 @@ function App() {
       <main className="container py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="w-full justify-start flex-wrap h-auto gap-1">
-            <TabsTrigger value="product"><span className="text-[10px] text-muted-foreground mr-1">①</span>Product</TabsTrigger>
-            <TabsTrigger value="packaging"><span className="text-[10px] text-muted-foreground mr-1">②</span>Packaging</TabsTrigger>
-            <TabsTrigger value="channels"><span className="text-[10px] text-muted-foreground mr-1">③</span>Channels</TabsTrigger>
-            <TabsTrigger value="costs"><span className="text-[10px] text-muted-foreground mr-1">④</span>Costs</TabsTrigger>
-            <TabsTrigger value="po"><span className="text-[10px] text-muted-foreground mr-1">⑤</span>Purchase Orders</TabsTrigger>
-            <TabsTrigger value="commissions"><span className="text-[10px] text-muted-foreground mr-1">⑥</span>Commissions</TabsTrigger>
-            <TabsTrigger value="thirdparty"><span className="text-[10px] text-muted-foreground mr-1">⑦</span>Third Party</TabsTrigger>
-            <TabsTrigger value="charts"><span className="text-[10px] text-muted-foreground mr-1">⑧</span>Charts</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-[10px] text-muted-foreground mr-1">⑨</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="product"><span className="text-xs text-muted-foreground mr-1 font-bold">1</span>Product</TabsTrigger>
+            <TabsTrigger value="packaging"><span className="text-xs text-muted-foreground mr-1 font-bold">2</span>Packaging</TabsTrigger>
+            <TabsTrigger value="channels"><span className="text-xs text-muted-foreground mr-1 font-bold">3</span>Channels</TabsTrigger>
+            <TabsTrigger value="costs"><span className="text-xs text-muted-foreground mr-1 font-bold">4</span>Costs</TabsTrigger>
+            <TabsTrigger value="po"><span className="text-xs text-muted-foreground mr-1 font-bold">5</span>Orders</TabsTrigger>
+            <TabsTrigger value="commissions"><span className="text-xs text-muted-foreground mr-1 font-bold">6</span>Commissions</TabsTrigger>
+            <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
+            <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
+            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Scenarios</TabsTrigger>
           </TabsList>
 
           <TabsContent value="product">
