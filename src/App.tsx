@@ -221,7 +221,7 @@ function App() {
 
       <footer className="border-t py-6 mt-8">
         <div className="container mx-auto px-4 sm:px-6 text-center text-xs text-muted-foreground">
-          Channel Calculator v9 · Subscriptions · Per-SKU Packaging · mg/oz Toggle · Formula-driven
+          Channel Calculator v10 · Simulate · Cash Flow · Per-SKU Packaging · mg/oz Toggle · Formula-driven
         </div>
       </footer>
     </div>

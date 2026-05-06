@@ -35,7 +35,7 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
         <div className="flex items-center gap-3">
           <Calculator className="h-5 w-5" />
           <h1 className="text-lg font-semibold tracking-tight">Channel Calculator</h1>
-          <span className="hidden sm:inline text-xs text-muted-foreground">v9 · Subscriptions · Per-SKU Packaging · mg/oz Toggle</span>
+          <span className="hidden sm:inline text-xs text-muted-foreground">v10 · Simulate · Cash Flow · All Features</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Guide />
