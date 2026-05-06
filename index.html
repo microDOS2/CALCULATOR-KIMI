@@ -4,9 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Channel Calculator</title>
+    <script>
+      window.onerror = function(msg, url, line, col, err) {
+        var div = document.getElementById('error-log');
+        if (div) {
+          div.style.display = 'block';
+          div.innerHTML += '<p><b>Error:</b> ' + msg + '<br>at ' + url + ':' + line + '</p>';
+        }
+        console.error('Caught error:', msg, url, line, col, err);
+      };
+      window.addEventListener('unhandledrejection', function(e) {
+        var div = document.getElementById('error-log');
+        if (div) {
+          div.style.display = 'block';
+          div.innerHTML += '<p><b>Promise Error:</b> ' + e.reason + '</p>';
+        }
+        console.error('Unhandled rejection:', e.reason);
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
+    <div id="error-log" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fee;color:#900;padding:20px;font-family:monospace;font-size:14px;z-index:99999;max-height:50%;overflow:auto;border-top:3px solid #c00;">
+      <b style="font-size:16px;">JavaScript Errors:</b>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
