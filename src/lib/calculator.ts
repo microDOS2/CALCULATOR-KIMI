@@ -6,6 +6,7 @@ import type {
   POLineItem,
   PackagingLayer,
   SKU,
+  CashFlowWeek,
 } from "@/types/calculator";
 
 export const num = (v: unknown): number => {
@@ -757,8 +758,31 @@ function calculateCashFlow(
     });
   }
 
+  // Build weekly interpolation from monthly data
+  const weekly: CashFlowWeek[] = [];
+  let weekBalance = startingCashBalance;
+  for (let w = 1; w <= 52; w++) {
+    const mIdx = Math.min(11, Math.floor((w - 1) / 4.33));
+    const monthData = months[mIdx];
+    const weekIn = monthData ? monthData.cashIn / 4.33 : 0;
+    const weekOut = monthData ? monthData.cashOut / 4.33 : 0;
+    const weekNet = weekIn - weekOut;
+    const weekStart = weekBalance;
+    weekBalance += weekNet;
+    weekly.push({
+      week: w,
+      monthLabel: monthData?.monthLabel ?? "",
+      startingBalance: weekStart,
+      cashIn: weekIn,
+      cashOut: weekOut,
+      netCashFlow: weekNet,
+      endingBalance: weekBalance,
+    });
+  }
+
   return {
     months,
+    weekly,
     lowestBalance,
     lowestBalanceMonth: lowestMonth,
     cashBreakevenMonth,

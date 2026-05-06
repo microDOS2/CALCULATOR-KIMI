@@ -20,6 +20,7 @@ function App() {
   const calc = useCalculator();
   const [activeTab, setActiveTab] = useState("product");
   const [simulateOpen, setSimulateOpen] = useState(false);
+  const [cashFlowWeekly, setCashFlowWeekly] = useState(false);
 
   const handleSimulateClick = () => {
     if (!calc.sensitivity.isActive) {
@@ -181,8 +182,8 @@ function App() {
           <TabsContent value="cashflow">
             <CashFlowTab
               result={calc.result}
-              isWeekly={false}
-              onToggleWeekly={() => {}}
+              isWeekly={cashFlowWeekly}
+              onToggleWeekly={() => setCashFlowWeekly((v) => !v)}
             />
           </TabsContent>
 

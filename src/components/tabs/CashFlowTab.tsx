@@ -135,11 +135,26 @@ export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabPro
               <TableHeader>
                 <TableRow>
                   <TableHead>{isWeekly ? "Week" : "Month"}</TableHead>
-                  <TableHead className="text-right">Starting</TableHead>
-                  <TableHead className="text-right text-green-600">Cash In</TableHead>
-                  <TableHead className="text-right text-red-500">Cash Out</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead className="text-right">Ending</TableHead>
+                  <TableHead className="text-right">
+                    Starting
+                    <InfoTooltip text="Bank balance at the start of this period. Carried forward from the previous period's ending balance." label="Starting Balance" />
+                  </TableHead>
+                  <TableHead className="text-right text-green-600">
+                    Cash In
+                    <InfoTooltip text="All cash received this period: revenue from sales (after payment term delays) plus subscription payments." label="Cash In" />
+                  </TableHead>
+                  <TableHead className="text-right text-red-500">
+                    Cash Out
+                    <InfoTooltip text="All cash paid this period: COGS (after lead time + supplier terms), overhead, debt, commissions, and capital expenditures." label="Cash Out" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    Net
+                    <InfoTooltip text="Net cash flow = Cash In minus Cash Out. Positive means more money came in than went out." label="Net Cash Flow" />
+                  </TableHead>
+                  <TableHead className="text-right">
+                    Ending
+                    <InfoTooltip text="Bank balance at end of this period = Starting + Net. Rolls forward as next period's starting balance." label="Ending Balance" />
+                  </TableHead>
                   {!isWeekly && (
                     <>
                       <TableHead className="text-right text-xs">Revenue</TableHead>

@@ -15,7 +15,7 @@ const steps = [
   {
     num: "1",
     title: "Product",
-    desc: "Define your Stock Keeping Units (SKUs). Each SKU is a distinct product variant with its own units per pack, retail price, and channel sales mix. Add ingredients (raw materials) with mg per unit and cost per mg. The calculator shows total weight per unit, cost per mg, and cost per gram. Use the Order Composition to set how many packs of each SKU you're ordering.",
+    desc: "Define your Stock Keeping Units (SKUs). Each SKU is a distinct product variant with its own units per pack, retail price, and channel sales mix. Add ingredients (raw materials) with mg per unit, cost per mg, and supplier payment terms. The calculator shows total weight per unit, cost per mg, and cost per gram. Use the Order Composition to set how many packs of each SKU you're ordering.",
     required: true,
   },
   {
@@ -33,7 +33,7 @@ const steps = [
   {
     num: "4",
     title: "Costs & Break-Even",
-    desc: "Add fixed monthly overhead (salaries, rent, insurance, etc.). Set monthly volume per SKU — this drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs. Check 'Include Monthly Overhead' to factor overhead into break-even.",
+    desc: "Add fixed monthly overhead (salaries, rent, insurance, etc.) and cash flow settings (starting cash, payment terms, lead times, debt service, CapEx). Set monthly volume per SKU — this drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs.",
     required: true,
   },
   {
@@ -68,6 +68,12 @@ const steps = [
   },
   {
     num: "10",
+    title: "Cash Flow",
+    desc: "Tracks when money actually enters and leaves your bank account — not just when revenue is earned. Models customer payment terms (retail immediate, wholesale Net-30, distributor Net-60), supplier lead times, inventory delays, debt service, and one-time CapEx. Shows your cash trough, breakeven month, and 12-month net flow. Toggle between monthly and weekly views.",
+    required: false,
+  },
+  {
+    num: "11",
     title: "Scenarios",
     desc: "Save a complete snapshot of your entire calculator configuration. Load past scenarios to compare different business models. Export results as CSV, PDF, or Excel. Share via URL — the link encodes your entire model so anyone who opens it sees exactly what you see.",
     required: false,
@@ -89,6 +95,10 @@ const tips = [
   "Toggle the unit switch (mg/oz) in the header to display weights in your preferred unit system.",
   "Subscription plans can include multiple SKUs — create product bundles like 'Basic' (1 SKU) or 'Premium' (3 SKUs).",
   "Lower churn rate + higher monthly price = higher LTV and faster CAC payback.",
+  "Cash Flow tracks actual bank balance — a business can be profitable on paper but run out of cash. Watch your lowest balance month.",
+  "The Simulate panel lets you drag sliders to explore 'what-if' scenarios without changing your saved model.",
+  "Payment terms create cash gaps — you may pay suppliers in 30 days but customers pay you in 60 days. That's a 30-day cash gap.",
+  "Use the Simulate tab for deep analysis — it shows all 12 key metrics side-by-side as you adjust levers.",
   "The info badges (i circles) explain what each section does — hover over them for educational context.",
 ];
 
@@ -122,8 +132,9 @@ export function Guide() {
                 A business modeling tool for any physical product. Calculate per-pack profitability
                 across retail, wholesale, and distributor channels. Model per-SKU packaging costs,
                 ingredient costs, overhead allocation, break-even points, purchase orders, sales
-                commissions, and subscription revenue. Supports mg/oz unit toggle, multiple SKUs
-                with independent packaging, product bundle subscriptions, and scenario save/load.
+                commissions, subscription revenue, and cash flow timing. Features sensitivity sliders
+                for strategy exploration, mg/oz unit toggle, multiple SKUs with independent packaging,
+                product bundle subscriptions, and scenario save/load with URL sharing.
               </p>
             </section>
 
@@ -152,6 +163,30 @@ export function Guide() {
               </div>
             </section>
 
+            {/* Tools (unnumbered) */}
+            <section>
+              <h3 className="font-semibold text-sm mb-2">Tools & Modes</h3>
+              <div className="space-y-2">
+                <div className="flex gap-3 items-start">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold mt-0.5">
+                    ●
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-sm">Simulate</span>
+                      <Badge variant="outline" className="text-xs h-4 px-1">Tool</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
+                      Explore "what-if" scenarios with draggable sliders. Adjust retail price, discounts, volume,
+                      subscription growth, and churn — watch all metrics update in real-time. Available as a
+                      floating side panel (quick exploration) or a dedicated full-screen tab (deep analysis).
+                      Changes don't affect your saved model until you click Apply. Use Reset to snap back anytime.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* Features Overview */}
             <section>
               <h3 className="font-semibold text-sm mb-2">Key Features</h3>
@@ -167,6 +202,14 @@ export function Guide() {
                 <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
                   <span className="text-primary flex-shrink-0">•</span>
                   <strong>Subscription Projections</strong> — Model MRR, churn, growth, and 12-month forecasts with product bundles
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Cash Flow Forecasting</strong> — Track actual bank balance with payment terms, lead times, debt, and CapEx. Monthly and weekly views.
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Strategy Simulator</strong> — Drag sliders to explore scenarios without changing your saved model. Panel + tab modes.
                 </li>
                 <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
                   <span className="text-primary flex-shrink-0">•</span>
