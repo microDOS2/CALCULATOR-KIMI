@@ -15,55 +15,61 @@ const steps = [
   {
     num: "1",
     title: "Product",
-    desc: "Define your Stock Keeping Units (SKUs). Each SKU is a distinct product variant. Set units per pack, retail price, and what % sells through each channel. These must total 100%.",
+    desc: "Define your Stock Keeping Units (SKUs). Each SKU is a distinct product variant with its own units per pack, retail price, and channel sales mix. Add ingredients (raw materials) with mg per unit and cost per mg. The calculator shows total weight per unit, cost per mg, and cost per gram. Use the Order Composition to set how many packs of each SKU you're ordering.",
     required: true,
   },
   {
     num: "2",
     title: "Packaging",
-    desc: "Add each physical packaging layer your product needs: primary container (what the product sits in), inner packaging, outer box, display packaging, and shipping box. Set cost per unit and how many units fit in each layer.",
+    desc: "Each SKU has its own packaging layers — primary container, inner packaging, outer box, display packaging, shipping box. Set cost per unit, units per layer, and weight in grams for each layer. Toggle Include on/off to see costs update live. The total packaging cost and weight feed into COGS and shipping calculations.",
     required: true,
   },
   {
     num: "3",
     title: "Channels",
-    desc: "Set your wholesale discount (how much retailers pay below retail) and distributor discount (how much distributors pay below wholesale). The cascade is: Retail Price → Wholesale Price → Distributor Price. Toggle which channels to include.",
+    desc: "Set your wholesale discount (how much retailers pay below retail) and distributor discount (how much distributors pay below wholesale). The cascade is: Retail Price → Wholesale Price → Distributor Price. Toggle which channels to include. Retail can optionally include a per-pack shipping cost.",
     required: true,
   },
   {
     num: "4",
     title: "Costs & Break-Even",
-    desc: "Add your fixed monthly overhead (salaries, rent, insurance, etc.). Set monthly volume per SKU — this is critical as it drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs.",
+    desc: "Add fixed monthly overhead (salaries, rent, insurance, etc.). Set monthly volume per SKU — this drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs. Check 'Include Monthly Overhead' to factor overhead into break-even.",
     required: true,
   },
   {
     num: "5",
-    title: "Order Composition",
-    desc: "Within the Product tab, enter how many packs of each SKU you are ordering. This order mix drives the Purchase Order analysis and weighted-average calculations across all channels.",
+    title: "Orders",
+    desc: "Shows the profitability of your Order Composition as a Purchase Order. Breaks down profit by channel for each SKU line item. Calculates total GP, monthly overhead impact, net impact, average cost per unit, and average profit per unit. Based on your Product tab order quantities.",
     required: false,
   },
   {
     num: "6",
     title: "Commissions",
-    desc: "Optional — set up your sales commission hierarchy (President → VP → RSM → Salesperson). Define override percentages or per-pack amounts. Assign team members. Add performance bonuses. This only affects projections, not core profitability.",
+    desc: "Set up a 4-tier sales commission hierarchy: President → VP → RSM → Salesperson. Define override percentages or per-pack amounts. Assign team members. Add performance bonuses with thresholds. View projected commission payouts. This only affects projections, not core profitability.",
     required: false,
   },
   {
     num: "7",
     title: "Third Party",
-    desc: "Optional — add external service provider costs (Sales, Operations, Fulfillment, Business Management, Marketing). Check 'Include' to fold these into your monthly overhead. Each category has 25 pre-filled line items.",
+    desc: "Add external service provider costs across 5 categories (Sales, Operations, Fulfillment, Business Management, Marketing) with 25 line items each. Check 'Include' to fold into monthly overhead. Model outsourced vs. in-house operations and see impact on per-pack profitability.",
     required: false,
   },
   {
     num: "8",
     title: "Charts",
-    desc: "Visual breakdown of your cost structure (pie chart) and channel profitability comparison (bar chart). Use these to quickly identify your biggest costs and most profitable channel.",
+    desc: "Visual analytics — a pie chart breaks down your cost structure (ingredients, packaging layers), and a bar chart compares revenue, gross profit, and operating profit across all three channels. Quickly identify your biggest cost drivers and most profitable channel.",
     required: false,
   },
   {
     num: "9",
+    title: "Subscriptions",
+    desc: "Model monthly recurring revenue (MRR) with subscription plans. Each plan includes one or more SKUs that subscribers receive monthly. Set growth rate, churn rate, starting subscribers, and CAC. View 12-month projections with subscriber counts, revenue, COGS, and cumulative figures. Compare multiple plans.",
+    required: false,
+  },
+  {
+    num: "10",
     title: "Scenarios",
-    desc: "Save a complete snapshot of your calculator configuration with a label. Load past scenarios to compare different business models. Export results as CSV, PDF, or Excel. Share via URL — the link encodes your entire model.",
+    desc: "Save a complete snapshot of your entire calculator configuration. Load past scenarios to compare different business models. Export results as CSV, PDF, or Excel. Share via URL — the link encodes your entire model so anyone who opens it sees exactly what you see.",
     required: false,
   },
 ];
@@ -72,13 +78,18 @@ const tips = [
   "Channel Mix % must total 100% for each SKU — the calculator enforces this automatically.",
   "Monthly Volume is critical — without it, break-even shows 'Unprofitable' and overhead per pack is artificially high.",
   "Order Composition is separate from Monthly Volume — order qty drives PO analysis; monthly volume drives overhead allocation.",
-  "Hover over any ƒ badge to see the exact formula used to calculate that result.",
-  "Hover over any ⓘ badge to see explanatory text about what a section or field means.",
-  "The ƒ (formula) tooltips show actual numbers — they update live as you change inputs.",
+  "Hover over any info badge (i) to see what a section or field means.",
+  "Hover over any formula badge (f) to see the exact calculation with live numbers.",
+  "The formula tooltips show actual numbers — they update live as you change inputs.",
   "Use 'Share' to copy a URL that contains your entire model — anyone who opens it sees exactly what you see.",
   "Check 'Include Monthly Overhead' in Break-Even to see how many packs you need to cover fixed costs.",
   "Third Party costs only affect calculations when 'Include' is checked AND 'Include Third Party' in Costs is also checked.",
   "Generic defaults (SKU-A, Ingredient 1) mean this works for any physical product — supplements, electronics, apparel, food, etc.",
+  "Each SKU has its own packaging — select an SKU in the Packaging tab to edit its layers independently.",
+  "Toggle the unit switch (mg/oz) in the header to display weights in your preferred unit system.",
+  "Subscription plans can include multiple SKUs — create product bundles like 'Basic' (1 SKU) or 'Premium' (3 SKUs).",
+  "Lower churn rate + higher monthly price = higher LTV and faster CAC payback.",
+  "The info badges (i circles) explain what each section does — hover over them for educational context.",
 ];
 
 export function Guide() {
@@ -109,9 +120,10 @@ export function Guide() {
               <h3 className="font-semibold text-sm mb-2">What This Calculator Does</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 A business modeling tool for any physical product. Calculate per-pack profitability
-                across retail, wholesale, and distributor channels. Model packaging costs, ingredient
-                costs, overhead allocation, break-even points, purchase order profitability, and sales
-                commissions. Run what-if scenarios and compare outcomes.
+                across retail, wholesale, and distributor channels. Model per-SKU packaging costs,
+                ingredient costs, overhead allocation, break-even points, purchase orders, sales
+                commissions, and subscription revenue. Supports mg/oz unit toggle, multiple SKUs
+                with independent packaging, product bundle subscriptions, and scenario save/load.
               </p>
             </section>
 
@@ -138,6 +150,37 @@ export function Guide() {
                   </div>
                 ))}
               </div>
+            </section>
+
+            {/* Features Overview */}
+            <section>
+              <h3 className="font-semibold text-sm mb-2">Key Features</h3>
+              <ul className="space-y-1.5">
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Per-SKU Packaging</strong> — Each product has its own packaging layers with independent costs and weights
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Unit Toggle (mg/oz)</strong> — Switch between milligrams and ounces for ingredient and weight displays
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Subscription Projections</strong> — Model MRR, churn, growth, and 12-month forecasts with product bundles
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Formula Tooltips</strong> — Hover over (f) badges to see live calculations with actual numbers
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Educational Tooltips</strong> — Hover over (i) badges to learn what each section and field means
+                </li>
+                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
+                  <span className="text-primary flex-shrink-0">•</span>
+                  <strong>Required/Optional Indicators</strong> — Red badges for required fields, gray for optional
+                </li>
+              </ul>
             </section>
 
             {/* Quick Tips */}
