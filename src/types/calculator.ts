@@ -22,6 +22,7 @@ export interface SKU {
   mixR: number;
   mixW: number;
   mixD: number;
+  packaging: PackagingLayer[];
 }
 
 export interface OrderItem {
@@ -122,10 +123,10 @@ export interface ChannelCalc {
 }
 
 export interface CalculationResult {
+  unitSystem: 'mg' | 'oz';
   skus: SKU[];
   order: OrderItem[];
   ingredients: Ingredient[];
-  packaging: PackagingLayer[];
   overhead: OverheadItem[];
   monthlyVolumes: MonthlyVolume[];
   wDisc: number;
@@ -141,9 +142,9 @@ export interface CalculationResult {
   includeD: boolean;
   beIncludeOverhead: boolean;
 
-  // Packaging costs per pack
-  packagingCosts: { id: string; name: string; costPerPack: number }[];
-  totalPackagingCostPerPack: number;
+  // Per-SKU packaging costs
+  skuPackagingCosts: { skuId: string; skuName: string; packagingCosts: { id: string; name: string; costPerPack: number }[]; totalCostPerPack: number; totalWeightPerPack: number }[];
+  totalPackagingCostPerPack: number; // weighted average across SKUs
 
   // Ingredient costs
   avgIngCostPerPack: number;
@@ -222,6 +223,10 @@ export interface CalculationResult {
   // Chart data
   costBreakdown: ChartSlice[];
   channelProfits: ChartBar[];
+
+  // Inherited from state
+  commissions: CommissionState;
+  thirdPartyCompanies: ThirdPartyCompany[];
 }
 
 export interface ChartSlice {
@@ -282,10 +287,9 @@ export interface Scenario {
 
 export interface CalculatorState {
   unitSystem: 'mg' | 'oz';
-  skus: SKU[];
+  skus: SKU[]; // each SKU has its own packaging layers
   order: OrderItem[];
   ingredients: Ingredient[];
-  packaging: PackagingLayer[];
   overhead: OverheadItem[];
   monthlyVolumes: MonthlyVolume[];
   wDisc: number;

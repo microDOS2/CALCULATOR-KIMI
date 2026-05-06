@@ -76,8 +76,12 @@ function App() {
 
           <TabsContent value="packaging">
             <PackagingTab
-              state={calc.state}
-              result={calc.result}
+              skus={calc.state.skus}
+              unitSystem={calc.unitSystem}
+              skuPackagingCosts={calc.result.skuPackagingCosts}
+              totalPackagingCostPerPack={calc.result.totalPackagingCostPerPack}
+              totalPackagingWeightPerPack={calc.result.totalPackagingWeightPerPack}
+              totalUnitWeightPerPack={calc.result.totalUnitWeightPerPack}
               addLayer={calc.addPackagingLayer}
               updateLayer={calc.updatePackagingLayer}
               removeLayer={calc.removePackagingLayer}

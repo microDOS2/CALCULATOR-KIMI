@@ -93,12 +93,25 @@ export function calculatePackagingWeightPerPack(
   }, 0);
 }
 
+// Default packaging layers for new SKUs
+let _pkgUid = 0;
+const pkgUid = () => `p${++_pkgUid}`;
+
+export function createDefaultPackaging(): PackagingLayer[] {
+  return [
+    { id: pkgUid(), name: "Primary Container", costPerUnit: 1.75, unitsPerLayer: 1, weightPerUnit: 5, included: true },
+    { id: pkgUid(), name: "Inner Packaging", costPerUnit: 0.5, unitsPerLayer: 1, weightPerUnit: 2, included: true },
+    { id: pkgUid(), name: "Outer Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 15, included: true },
+    { id: pkgUid(), name: "Display Packaging", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: false },
+    { id: pkgUid(), name: "Shipping Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 50, included: true },
+  ];
+}
+
 export function calculate(state: CalculatorState): CalculationResult {
   const {
     skus,
     order,
     ingredients,
-    packaging,
     overhead,
     monthlyVolumes,
     wDisc,
@@ -126,18 +139,15 @@ export function calculate(state: CalculatorState): CalculationResult {
   const manualOhTotal = overhead.reduce((a, x) => a + x.cost, 0);
   const ohTotal = manualOhTotal + (includeThirdParty ? thirdPartyTotal : 0);
 
-  // Packaging costs per pack for each SKU
-  const packagingCosts = packaging.map((layer) => ({
-    id: layer.id,
-    name: layer.name,
-    costPerPack: 0,
-  }));
+  // Per-SKU packaging tracking
+  const skuPackagingCosts: CalculationResult["skuPackagingCosts"] = [];
 
   // Order-level accumulators
   let totalPacks = 0;
   let totalUnits = 0;
   let totalIngCost = 0;
   let totalPackagingCost = 0;
+  let totalPackagingWeight = 0; // in grams
 
   let totalRevenueR = 0;
   let totalRevenueW = 0;
@@ -163,19 +173,33 @@ export function calculate(state: CalculatorState): CalculationResult {
       (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
       0
     );
-    const pkgPerPack = calculatePackagingCostPerPack(packaging, sku.unitsPerPack);
+    const pkgPerPack = calculatePackagingCostPerPack(sku.packaging, sku.unitsPerPack);
+    const pkgWeightPerPack = calculatePackagingWeightPerPack(sku.packaging, sku.unitsPerPack);
     const cogsPerPack = ingPerPack + pkgPerPack;
 
     totalIngCost += ingPerPack * orderQty;
     totalPackagingCost += pkgPerPack * orderQty;
+    totalPackagingWeight += pkgWeightPerPack * orderQty;
 
-    // Accumulate per-layer costs
-    packaging.forEach((layer, idx) => {
+    // Per-layer cost tracking for this SKU
+    const skuPkgCosts = sku.packaging.map((layer) => ({
+      id: layer.id,
+      name: layer.name,
+      costPerPack: 0,
+    }));
+    sku.packaging.forEach((layer, idx) => {
       if (layer.included) {
-        const layerCostPerPack =
+        skuPkgCosts[idx].costPerPack =
           layer.costPerUnit * (sku.unitsPerPack / Math.max(1, layer.unitsPerLayer));
-        packagingCosts[idx].costPerPack += layerCostPerPack * orderQty;
       }
+    });
+
+    skuPackagingCosts.push({
+      skuId: sku.id,
+      skuName: sku.name,
+      packagingCosts: skuPkgCosts,
+      totalCostPerPack: pkgPerPack,
+      totalWeightPerPack: pkgWeightPerPack,
     });
 
     const packsR = orderQty * (sku.mixR / 100);
@@ -199,13 +223,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalGpD += (priceD - cogsPerPack) * packsD;
   });
 
-  // Normalize packaging costs to per-pack
-  packagingCosts.forEach((pc) => {
-    pc.costPerPack = totalPacks > 0 ? pc.costPerPack / totalPacks : 0;
-  });
-
   const avgIngCostPerPack = totalPacks > 0 ? totalIngCost / totalPacks : 0;
   const totalPackagingCostPerPack = totalPacks > 0 ? totalPackagingCost / totalPacks : 0;
+  const totalPackagingWeightPerPack = totalPacks > 0 ? totalPackagingWeight / totalPacks : 0;
   const cogsPerPack = avgIngCostPerPack + totalPackagingCostPerPack;
 
   // Channel prices
@@ -276,12 +296,8 @@ export function calculate(state: CalculatorState): CalculationResult {
   const costPerMg = totalMgPerPack > 0 ? avgIngCostPerPack / totalMgPerPack : 0;
   const costPerGram = costPerMg * 1000;
 
-  // Packaging weight calculations (in grams)
-  const totalPackagingWeightPerPack = packaging.reduce((sum, layer) => {
-    if (!layer.included) return sum;
-    return sum + layer.weightPerUnit * (weightedUnitsPerPack / Math.max(1, layer.unitsPerLayer));
-  }, 0);
-  const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack; // ingredients in mg -> g + packaging in g
+  // Combined weight: ingredients (mg -> g) + packaging (g)
+  const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack;
 
   // Per-unit metrics
   const costPerUnit = weightedUnitsPerPack > 0 ? cogsPerPack / weightedUnitsPerPack : 0;
@@ -329,7 +345,7 @@ export function calculate(state: CalculatorState): CalculationResult {
       (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
       0
     );
-    const pkgPerPack = calculatePackagingCostPerPack(packaging, sku.unitsPerPack);
+    const pkgPerPack = calculatePackagingCostPerPack(sku.packaging, sku.unitsPerPack);
     const cogsPerPack = ingPerPack + pkgPerPack;
 
     const retailQty = orderItem.qty * (sku.mixR / 100);
@@ -389,14 +405,25 @@ export function calculate(state: CalculatorState): CalculationResult {
     shipPerPack
   );
 
-  // Chart data
+  // Aggregate packaging costs across SKUs for chart (weighted by order qty)
+  const aggPackaging: Record<string, number> = {};
+  order.forEach((orderItem) => {
+    const sku = skus.find((s) => s.id === orderItem.skuId);
+    if (!sku || orderItem.qty <= 0) return;
+    sku.packaging.forEach((layer) => {
+      if (!layer.included) return;
+      const costPerPack = layer.costPerUnit * (sku.unitsPerPack / Math.max(1, layer.unitsPerLayer));
+      aggPackaging[layer.name] = (aggPackaging[layer.name] || 0) + costPerPack * orderItem.qty;
+    });
+  });
+
   const costBreakdown: CalculationResult["costBreakdown"] = [
     { name: "Ingredients", value: avgIngCostPerPack, color: "#10b981" },
-    ...packagingCosts
-      .filter((p) => p.costPerPack > 0)
-      .map((p, i) => ({
-        name: p.name,
-        value: p.costPerPack,
+    ...Object.entries(aggPackaging)
+      .filter(([, v]) => v > 0)
+      .map(([name, totalCost], i) => ({
+        name,
+        value: totalPacks > 0 ? totalCost / totalPacks : 0,
         color: ["#3b82f6", "#8b5cf6", "#f59e0b", "#ef4444", "#06b6d4", "#ec4899"][i % 6],
       })),
   ];
@@ -408,8 +435,27 @@ export function calculate(state: CalculatorState): CalculationResult {
   ];
 
   return {
-    ...state,
-    packagingCosts,
+    unitSystem: state.unitSystem,
+    skus: state.skus,
+    order: state.order,
+    ingredients: state.ingredients,
+    overhead: state.overhead,
+    monthlyVolumes: state.monthlyVolumes,
+    wDisc: state.wDisc,
+    dDisc: state.dDisc,
+    includeShip: state.includeShip,
+    shippingPerPack: state.shippingPerPack,
+    ohR: state.ohR,
+    ohW: state.ohW,
+    ohD: state.ohD,
+    includeThirdParty: state.includeThirdParty,
+    includeR: state.includeR,
+    includeW: state.includeW,
+    includeD: state.includeD,
+    beIncludeOverhead: state.beIncludeOverhead,
+    commissions: state.commissions,
+    thirdPartyCompanies: state.thirdPartyCompanies,
+    skuPackagingCosts,
     totalPackagingCostPerPack,
     avgIngCostPerPack,
     totalIngCostPerPack: avgIngCostPerPack,

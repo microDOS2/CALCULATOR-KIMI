@@ -9,7 +9,7 @@ import type {
   ThirdPartyCompany,
   Scenario,
 } from "@/types/calculator";
-import { calculate } from "@/lib/calculator";
+import { calculate, createDefaultPackaging } from "@/lib/calculator";
 
 let uidCounter = 0;
 const uid = () => `u${++uidCounter}`;
@@ -92,14 +92,6 @@ const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
   },
 ];
 
-const defaultPackaging: PackagingLayer[] = [
-  { id: uid(), name: "Primary Container", costPerUnit: 1.75, unitsPerLayer: 1, weightPerUnit: 5, included: true },
-  { id: uid(), name: "Inner Packaging", costPerUnit: 0.5, unitsPerLayer: 1, weightPerUnit: 2, included: true },
-  { id: uid(), name: "Outer Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 15, included: true },
-  { id: uid(), name: "Display Packaging", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: false },
-  { id: uid(), name: "Shipping Box", costPerUnit: 1.5, unitsPerLayer: 1, weightPerUnit: 50, included: true },
-];
-
 const createDefaultState = (): CalculatorState => {
   const skuId1 = uid();
   return {
@@ -113,6 +105,7 @@ const createDefaultState = (): CalculatorState => {
         mixR: 100,
         mixW: 0,
         mixD: 0,
+        packaging: createDefaultPackaging(),
       },
     ],
     order: [{ skuId: skuId1, qty: 1 }],
@@ -121,7 +114,6 @@ const createDefaultState = (): CalculatorState => {
       { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075 },
       { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015 },
     ],
-    packaging: [...defaultPackaging],
     overhead: [
       { id: uid(), name: "Salaries", cost: 10000 },
       { id: uid(), name: "Rent", cost: 5000 },
@@ -271,6 +263,7 @@ export function useCalculator() {
         mixR: 100,
         mixW: 0,
         mixD: 0,
+        packaging: createDefaultPackaging(),
       };
       return {
         ...prev,
@@ -336,33 +329,51 @@ export function useCalculator() {
     }));
   }, []);
 
-  // Packaging
-  const addPackagingLayer = useCallback(() => {
+  // Packaging (per-SKU)
+  const addPackagingLayer = useCallback((skuId: string) => {
     setState((prev) => ({
       ...prev,
-      packaging: [
-        ...prev.packaging,
-        { id: uid(), name: "", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: true },
-      ],
+      skus: prev.skus.map((s) =>
+        s.id === skuId
+          ? {
+              ...s,
+              packaging: [
+                ...s.packaging,
+                { id: uid(), name: "", costPerUnit: 0, unitsPerLayer: 1, weightPerUnit: 0, included: true },
+              ],
+            }
+          : s
+      ),
     }));
   }, []);
 
   const updatePackagingLayer = useCallback(
-    (id: string, patch: Partial<PackagingLayer>) => {
+    (skuId: string, layerId: string, patch: Partial<PackagingLayer>) => {
       setState((prev) => ({
         ...prev,
-        packaging: prev.packaging.map((p) =>
-          p.id === id ? { ...p, ...patch } : p
+        skus: prev.skus.map((s) =>
+          s.id === skuId
+            ? {
+                ...s,
+                packaging: s.packaging.map((p) =>
+                  p.id === layerId ? { ...p, ...patch } : p
+                ),
+              }
+            : s
         ),
       }));
     },
     []
   );
 
-  const removePackagingLayer = useCallback((id: string) => {
+  const removePackagingLayer = useCallback((skuId: string, layerId: string) => {
     setState((prev) => ({
       ...prev,
-      packaging: prev.packaging.filter((p) => p.id !== id),
+      skus: prev.skus.map((s) =>
+        s.id === skuId
+          ? { ...s, packaging: s.packaging.filter((p) => p.id !== layerId) }
+          : s
+      ),
     }));
   }, []);
 
