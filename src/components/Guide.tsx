@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,48 +26,42 @@ const steps = [
   },
   {
     num: "3",
-    title: "Ingredients / Components",
-    desc: "List the raw materials in each unit of your product. Enter milligrams per unit and cost per milligram. The calculator multiplies these to get total ingredient cost per pack.",
-    required: false,
-  },
-  {
-    num: "4",
     title: "Channels",
     desc: "Set your wholesale discount (how much retailers pay below retail) and distributor discount (how much distributors pay below wholesale). The cascade is: Retail Price → Wholesale Price → Distributor Price. Toggle which channels to include.",
     required: true,
   },
   {
-    num: "5",
+    num: "4",
     title: "Costs & Break-Even",
     desc: "Add your fixed monthly overhead (salaries, rent, insurance, etc.). Set monthly volume per SKU — this is critical as it drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs.",
     required: true,
   },
   {
-    num: "6",
+    num: "5",
     title: "Order Composition",
-    desc: "Within the Product tab, enter how many packs of each SKU you're ordering. This order mix drives the Purchase Order analysis and weighted-average calculations across all channels.",
+    desc: "Within the Product tab, enter how many packs of each SKU you are ordering. This order mix drives the Purchase Order analysis and weighted-average calculations across all channels.",
     required: false,
   },
   {
-    num: "7",
+    num: "6",
     title: "Commissions",
     desc: "Optional — set up your sales commission hierarchy (President → VP → RSM → Salesperson). Define override percentages or per-pack amounts. Assign team members. Add performance bonuses. This only affects projections, not core profitability.",
     required: false,
   },
   {
-    num: "8",
+    num: "7",
     title: "Third Party",
     desc: "Optional — add external service provider costs (Sales, Operations, Fulfillment, Business Management, Marketing). Check 'Include' to fold these into your monthly overhead. Each category has 25 pre-filled line items.",
     required: false,
   },
   {
-    num: "9",
+    num: "8",
     title: "Charts",
     desc: "Visual breakdown of your cost structure (pie chart) and channel profitability comparison (bar chart). Use these to quickly identify your biggest costs and most profitable channel.",
     required: false,
   },
   {
-    num: "10",
+    num: "9",
     title: "Scenarios",
     desc: "Save a complete snapshot of your calculator configuration with a label. Load past scenarios to compare different business models. Export results as CSV, PDF, or Excel. Share via URL — the link encodes your entire model.",
     required: false,
@@ -87,12 +82,20 @@ const tips = [
 ];
 
 export function Guide() {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1">
+        <Button
+          size="sm"
+          variant="outline"
+          className="gap-1 shrink-0"
+          onClick={() => setOpen(true)}
+          type="button"
+        >
           <HelpCircle className="h-4 w-4" />
-          Guide
+          <span className="hidden sm:inline">Guide</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] p-0">
@@ -125,9 +128,9 @@ export function Guide() {
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">{step.title}</span>
                         {step.required ? (
-                          <Badge variant="destructive" className="text-[10px] h-4">Required</Badge>
+                          <Badge variant="destructive" className="text-xs h-4 px-1">Required</Badge>
                         ) : (
-                          <Badge variant="secondary" className="text-[10px] h-4">Optional</Badge>
+                          <Badge variant="secondary" className="text-xs h-4 px-1">Optional</Badge>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{step.desc}</p>

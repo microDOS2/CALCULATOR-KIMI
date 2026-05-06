@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import type { CalculationResult } from "@/types/calculator";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import { money, money3 } from "@/lib/calculator";
 
 interface POTabProps {
@@ -22,6 +23,18 @@ export function POTab({ result }: POTabProps) {
   if (!poLineItems.length) {
     return (
       <Card>
+        <CardHeader>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Purchase Order Analysis
+                <InfoTooltip text="Purchase Order (PO) Analysis shows the profitability of a specific order based on your Order Composition quantities. It breaks down profit by channel for each SKU line item and calculates the total gross profit of the order. Compare this to your monthly overhead to see if the order is profitable overall." label="Purchase Order" />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Auto</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Add order quantities in the Product tab to see PO analysis.</p>
+          </div>
+        </CardHeader>
         <CardContent className="p-6 text-center text-muted-foreground">
           Add quantities to the Order Composition to see Purchase Order analysis.
         </CardContent>
@@ -33,7 +46,16 @@ export function POTab({ result }: POTabProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Purchase Order Line Items</CardTitle>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Purchase Order Line Items
+                <InfoTooltip text="Each line item shows one SKU in your order. For each SKU, you see the total quantity ordered and the gross profit if sold through each channel (Retail, Wholesale, Distributor). The Total GP column sums all channels. This lets you see which SKUs and channels contribute most to order profitability." label="PO Line Items" />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Auto-calculated</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Profit by channel for each SKU in your order. Based on Order Composition inputs.</p>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto rounded-lg border">

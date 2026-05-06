@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { FormulaTooltip, FormulaBadge } from "@/components/FormulaTooltip";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculatorState, CalculationResult, SKU } from "@/types/calculator";
 import { money3 } from "@/lib/calculator";
 
@@ -55,8 +56,17 @@ export function ProductTab({
     <div className="space-y-6">
       {/* SKU Editor */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">Product Specifications (SKUs)</CardTitle>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Product Specifications (SKUs)
+                <InfoTooltip text="A Stock Keeping Unit (SKU) is a unique product variant. Define your product(s) here — what goes in each pack, the retail price, and how sales split across channels. You can add multiple SKUs to compare different product variants." label="SKUs" />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Required</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Define each product variant, units per pack, retail price, and channel sales mix.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={addSKU}>
             <Plus className="h-4 w-4 mr-1" /> Add SKU
           </Button>
@@ -117,7 +127,16 @@ export function ProductTab({
       {/* Order Composition */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Order Composition</CardTitle>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Order Composition
+                <InfoTooltip text="Order Composition defines how many packs of each SKU you are ordering in a single purchase order. This drives the Purchase Order analysis and blended (weighted-average) calculations across all channels. Set quantities to 0 for SKUs not in this order." label="Order Composition" />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Optional</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Set how many packs of each SKU you are ordering. Drives PO and blended calculations.</p>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -137,14 +156,21 @@ export function ProductTab({
 
       {/* Ingredients */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">
-            Ingredients / Components
-            <FormulaBadge
-              label="Ingredients"
-              formula={`Define components per unit. Cost is per milligram. Total ingredient cost = Σ(mg/unit × units/pack × $/mg)`}
-            />
-          </CardTitle>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Ingredients / Components
+                <InfoTooltip text="Ingredients are the raw materials that go into each unit of your product. Enter the amount per unit (in milligrams) and the cost per milligram. The calculator multiplies these to get your total ingredient cost per pack. This is your raw material / direct material cost." label="Ingredients / Components" />
+                <FormulaBadge
+                  label="Ingredients"
+                  formula={`Define components per unit. Cost is per milligram. Total ingredient cost = Σ(mg/unit × units/pack × $/mg)`}
+                />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Required</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">List raw materials per unit. Enter mg per unit and cost per mg. Drives COGS calculation.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={addIngredient}>
             <Plus className="h-4 w-4 mr-1" /> Add
           </Button>

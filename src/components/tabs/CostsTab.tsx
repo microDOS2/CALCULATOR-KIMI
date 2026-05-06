@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import type { CalculatorState, CalculationResult, OverheadItem } from "@/types/calculator";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import { money, money3, pct } from "@/lib/calculator";
 
 interface CostsTabProps {
@@ -36,18 +37,25 @@ export function CostsTab({
     <div className="space-y-6">
       {/* Monthly Overhead */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">
-            Monthly Operating Overhead
-            <FormulaTooltip
-              label="Total Monthly Overhead"
-              formula={`Sum of all overhead items + Third Party (if included) = ${money(result.ohTotal)}`}
-            >
-              <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
-                Total: {money(result.ohTotal)}
-              </span>
-            </FormulaTooltip>
-          </CardTitle>
+        <CardHeader className="flex flex-row items-start justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Monthly Operating Overhead
+                <InfoTooltip text="Monthly overhead is all your fixed business costs that don't change with production volume — salaries, rent, insurance, utilities, software subscriptions, etc. These costs are divided across your total monthly volume to calculate an overhead cost per pack. This is critical for accurate profitability analysis." label="Monthly Overhead" />
+                <FormulaTooltip
+                  label="Total Monthly Overhead"
+                  formula={`Sum of all overhead items + Third Party (if included) = ${money(result.ohTotal)}`}
+                >
+                  <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
+                    Total: {money(result.ohTotal)}
+                  </span>
+                </FormulaTooltip>
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-destructive/10 text-destructive">Required</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Fixed monthly costs (salaries, rent, insurance, etc.). Divided by volume to get overhead per pack.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={addOverhead}>
             <Plus className="h-4 w-4 mr-1" /> Add Item
           </Button>
@@ -55,7 +63,13 @@ export function CostsTab({
         <CardContent className="space-y-4">
           {/* Monthly Volume */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium">Monthly Volume per SKU</Label>
+            <div className="space-y-1">
+              <Label className="text-sm font-medium">
+                Monthly Volume per SKU
+                <InfoTooltip text="Monthly volume is how many packs of each SKU you expect to sell in a typical month. This is used to allocate your fixed overhead across units. Higher volume = lower overhead per pack. This is a forecast/estimate, not your order quantity." label="Monthly Volume" />
+              </Label>
+              <p className="text-xs text-muted-foreground">Forecast monthly sales per SKU. Drives overhead allocation and break-even.</p>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {state.skus.map((sku) => {
                 const vol = state.monthlyVolumes.find((v) => v.skuId === sku.id);
@@ -135,17 +149,24 @@ export function CostsTab({
       {/* Break-Even */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">
-            Break-Even Analysis
-            <FormulaTooltip
-              label="Break-Even Formula"
-              formula={`Packs needed = Fixed Costs (${money(state.beIncludeOverhead ? result.ohTotal : 0)}) / Contribution Margin per Pack (GP before overhead)`}
-            >
-              <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
-                (hover for formula)
-              </span>
-            </FormulaTooltip>
-          </CardTitle>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Break-Even Analysis
+                <InfoTooltip text="Break-even analysis tells you the minimum number of packs you need to sell to cover all your costs. It divides your fixed costs by the contribution margin (profit per pack before fixed costs). Below this number, you lose money. Above it, you profit. A key metric for any product business." label="Break-Even" />
+                <FormulaTooltip
+                  label="Break-Even Formula"
+                  formula={`Packs needed = Fixed Costs (${money(state.beIncludeOverhead ? result.ohTotal : 0)}) / Contribution Margin per Pack (GP before overhead)`}
+                >
+                  <span className="ml-2 text-sm font-normal text-muted-foreground cursor-help">
+                    (hover for formula)
+                  </span>
+                </FormulaTooltip>
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Optional</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Minimum packs to sell to cover costs. Below = loss, above = profit.</p>
+          </div>
         </CardHeader>
         <CardContent>
           <Label className="flex items-center gap-2 text-sm cursor-pointer mb-4">
@@ -179,7 +200,15 @@ export function CostsTab({
       {/* Blended KPIs */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Blended Key Performance Indicators</CardTitle>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Blended Key Performance Indicators
+                <InfoTooltip text="Blended KPIs are weighted averages across all channels based on your Order Composition. They show your overall profitability per pack when you factor in the mix of retail, wholesale, and distributor sales. These numbers represent your true per-pack economics." label="Blended KPIs" />
+              </CardTitle>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Weighted-average profitability across all channels, based on order mix.</p>
+          </div>
         </CardHeader>
         <CardContent>
           {result.totalPacks === 0 ? (

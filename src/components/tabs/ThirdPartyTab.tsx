@@ -1,6 +1,6 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -10,6 +10,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import type { ThirdPartyCompany } from "@/types/calculator";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import { money } from "@/lib/calculator";
 
 interface ThirdPartyTabProps {
@@ -25,26 +26,42 @@ export function ThirdPartyTab({ companies, updateCompany, updateItem }: ThirdPar
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="bg-muted/30">
-          <CardContent className="p-3">
-            <div className="text-xs text-muted-foreground">Total Monthly</div>
-            <div className="text-xl font-bold tabular-nums">{money(totalMonthly)}</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-muted/30">
-          <CardContent className="p-3">
-            <div className="text-xs text-muted-foreground">Total Weekly</div>
-            <div className="text-xl font-bold tabular-nums">{money(totalMonthly / 4.33)}</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-muted/30">
-          <CardContent className="p-3">
-            <div className="text-xs text-muted-foreground">Total Daily</div>
-            <div className="text-xl font-bold tabular-nums">{money(totalMonthly / 30.44)}</div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardHeader>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <CardTitle className="text-base">
+                Third Party Service Providers
+                <InfoTooltip text="Third Party providers are external companies you hire to handle business functions — Sales, Operations, Fulfillment, Business Management, and Marketing. Each category has 25 line items of typical services. Check 'Include' to add that provider's total cost into your monthly overhead. Use this to model outsourced vs. in-house operations and understand their impact on per-pack profitability." label="Third Party" />
+              </CardTitle>
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Optional</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">External service costs. Check Include to fold into monthly overhead. Affects per-pack profitability.</p>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-3">
+            <Card className="bg-muted/30">
+              <CardContent className="p-3">
+                <div className="text-xs text-muted-foreground">Total Monthly (Included)</div>
+                <div className="text-xl font-bold tabular-nums">{money(totalMonthly)}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-muted/30">
+              <CardContent className="p-3">
+                <div className="text-xs text-muted-foreground">Total Weekly</div>
+                <div className="text-xl font-bold tabular-nums">{money(totalMonthly / 4.33)}</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-muted/30">
+              <CardContent className="p-3">
+                <div className="text-xs text-muted-foreground">Total Daily</div>
+                <div className="text-xl font-bold tabular-nums">{money(totalMonthly / 30.44)}</div>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="space-y-3">
         {companies.map((company) => {

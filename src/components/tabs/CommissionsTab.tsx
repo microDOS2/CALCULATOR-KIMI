@@ -10,6 +10,7 @@ import {
 import { Plus, Trash2 } from "lucide-react";
 import type { CommissionState, CalculationResult } from "@/types/calculator";
 import { money, pct } from "@/lib/calculator";
+import { InfoTooltip } from "@/components/InfoTooltip";
 
 interface CommissionsTabProps {
   commissions: CommissionState;
@@ -54,7 +55,14 @@ export function CommissionsTab(props: CommissionsTabProps) {
       {/* President */}
       <Card>
         <CardContent className="p-4 space-y-3">
-          <div className="font-semibold text-sm">President of Sales</div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-sm">President of Sales</span>
+              <InfoTooltip text="The President of Sales sits at the top of the commission hierarchy and earns an override — a percentage of revenue or a fixed amount per pack sold across all channels they are assigned to. This is a leadership commission paid on top of the team they manage. Set their compensation type (% of revenue or $/pack) and which channels they earn on." label="President of Sales" />
+              <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground">Optional</span>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Top of commission hierarchy. Earns override on assigned channels.</p>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Input value={president.name} onChange={(e) => onUpdatePresident({ name: e.target.value })} className="h-8" />
             <Select value={president.type} onValueChange={(v) => onUpdatePresident({ type: v as "pctGrossRev" | "perPack" })}>
@@ -73,7 +81,13 @@ export function CommissionsTab(props: CommissionsTabProps) {
       {/* VPs */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">VPs of Sales</h3>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm font-semibold">VPs of Sales</h3>
+              <InfoTooltip text="Vice Presidents of Sales manage Regional Sales Managers. Each VP can earn an override commission (percentage of revenue or $/pack) on the channels they are assigned to. You can assign which RSMs report to each VP. Check 'Include in President's Override' if the President should also earn on this VP's sales." label="VPs of Sales" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Manage RSMs. Earn override on assigned channels.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={onAddVP}><Plus className="h-4 w-4 mr-1" /> Add VP</Button>
         </div>
         {vps.map((vp) => (
@@ -106,7 +120,13 @@ export function CommissionsTab(props: CommissionsTabProps) {
       {/* RSMs */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Regional Sales Managers</h3>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm font-semibold">Regional Sales Managers</h3>
+              <InfoTooltip text="Regional Sales Managers (RSMs) oversee Salespersons in a specific geographic area or market segment. Each RSM earns an override commission on the channels they cover. Assign each RSM to a VP so the commission hierarchy flows correctly (President → VP → RSM → Salesperson)." label="RSMs" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Oversee salespersons. Earn override. Assign to a VP.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={onAddRSM}><Plus className="h-4 w-4 mr-1" /> Add RSM</Button>
         </div>
         {rsms.map((rsm) => (
@@ -142,7 +162,13 @@ export function CommissionsTab(props: CommissionsTabProps) {
       {/* Salespersons */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">Salespersons</h3>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm font-semibold">Salespersons</h3>
+              <InfoTooltip text="Salespersons are the front-line sellers who directly generate revenue. They earn base commission on each sale (percentage of revenue or fixed $/pack) plus performance bonuses when they hit targets. Assign each salesperson to an RSM and optionally to channel-specific VPs. Add target bonuses to incentivize hitting sales milestones." label="Salespersons" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Front-line sellers. Base commission + target bonuses. Assign to RSM.</p>
+          </div>
           <Button size="sm" variant="outline" onClick={onAddSP}><Plus className="h-4 w-4 mr-1" /> Add</Button>
         </div>
         {sps.map((sp) => (
@@ -216,7 +242,13 @@ export function CommissionsTab(props: CommissionsTabProps) {
       {/* Commission Projections Table */}
       <Card>
         <CardContent className="p-4 space-y-3">
-          <h3 className="text-sm font-semibold">Commission Projections</h3>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm font-semibold">Commission Projections</h3>
+              <InfoTooltip text="This table projects total commission payouts based on your current inputs. It shows base pay, bonuses, and override amounts for each role in the hierarchy. The hierarchy view (indented rows) shows how commissions flow up: Salespersons earn base + bonuses, RSMs and VPs earn overrides on their team's sales, and the President earns the top-level override. Use this to understand your total sales compensation cost." label="Commission Projections" />
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">Projected payouts by role. Shows base, bonus, and override amounts.</p>
+          </div>
           <div className="overflow-x-auto rounded-lg border">
             <Table>
               <TableHeader>
