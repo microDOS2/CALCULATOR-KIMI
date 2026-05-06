@@ -248,14 +248,14 @@ export function Commissions({
                     className="h-8"
                   />
                   <Select
-                    value={rsm.assignedVP}
-                    onValueChange={(v) => onUpdateRSM(rsm.id, { assignedVP: v })}
+                    value={rsm.assignedVP || "__none__"}
+                    onValueChange={(v) => onUpdateRSM(rsm.id, { assignedVP: v === "__none__" ? "" : v })}
                   >
                     <SelectTrigger className="h-8">
                       <SelectValue placeholder="Assign to VP" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="__none__">Unassigned</SelectItem>
                       {vps.map((vp) => (
                         <SelectItem key={vp.id} value={vp.id}>
                           {vp.name}
@@ -327,16 +327,16 @@ export function Commissions({
                     className="h-8"
                   />
                   <Select
-                    value={sp.assignedRSM}
+                    value={sp.assignedRSM || "__none__"}
                     onValueChange={(v) =>
-                      onUpdateSP(sp.id, { assignedRSM: v })
+                      onUpdateSP(sp.id, { assignedRSM: v === "__none__" ? "" : v })
                     }
                   >
                     <SelectTrigger className="h-8">
                       <SelectValue placeholder="Assign to RSM" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Unassigned</SelectItem>
+                      <SelectItem value="__none__">Unassigned</SelectItem>
                       {rsms.map((rsm) => (
                         <SelectItem key={rsm.id} value={rsm.id}>
                           {rsm.name}
@@ -362,16 +362,16 @@ export function Commissions({
               />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <Select
-                  value={sp.assignedVp_R}
+                  value={sp.assignedVp_R || "__none__"}
                   onValueChange={(v) =>
-                    onUpdateSP(sp.id, { assignedVp_R: v })
+                    onUpdateSP(sp.id, { assignedVp_R: v === "__none__" ? "" : v })
                   }
                 >
                   <SelectTrigger className="h-8">
                     <SelectValue placeholder="Retail → VP" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {vps.map((vp) => (
                       <SelectItem key={vp.id} value={vp.id}>
                         {vp.name}
@@ -380,16 +380,16 @@ export function Commissions({
                   </SelectContent>
                 </Select>
                 <Select
-                  value={sp.assignedVp_W}
+                  value={sp.assignedVp_W || "__none__"}
                   onValueChange={(v) =>
-                    onUpdateSP(sp.id, { assignedVp_W: v })
+                    onUpdateSP(sp.id, { assignedVp_W: v === "__none__" ? "" : v })
                   }
                 >
                   <SelectTrigger className="h-8">
                     <SelectValue placeholder="Wholesale → VP" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {vps.map((vp) => (
                       <SelectItem key={vp.id} value={vp.id}>
                         {vp.name}
@@ -398,16 +398,16 @@ export function Commissions({
                   </SelectContent>
                 </Select>
                 <Select
-                  value={sp.assignedVp_D}
+                  value={sp.assignedVp_D || "__none__"}
                   onValueChange={(v) =>
-                    onUpdateSP(sp.id, { assignedVp_D: v })
+                    onUpdateSP(sp.id, { assignedVp_D: v === "__none__" ? "" : v })
                   }
                 >
                   <SelectTrigger className="h-8">
                     <SelectValue placeholder="Distributor → VP" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {vps.map((vp) => (
                       <SelectItem key={vp.id} value={vp.id}>
                         {vp.name}
