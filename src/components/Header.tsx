@@ -6,6 +6,7 @@ import {
 import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2 } from "lucide-react";
 import type { CalculationResult } from "@/types/calculator";
 import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
+import { Guide } from "@/components/Guide";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -34,6 +35,8 @@ export function Header({ onSaveScenario, onReset, result }: HeaderProps) {
           <span className="hidden sm:inline text-xs text-muted-foreground">v8 · All-in · Product-agnostic</span>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <Guide />
+          <div className="w-px h-6 bg-border mx-1" />
           <Input placeholder="Scenario label..." className="w-40 h-8 text-sm" value={label} onChange={(e) => setLabel(e.target.value)} />
           <Button size="sm" variant="default" onClick={() => { onSaveScenario(label); setLabel(""); }}>
             <Save className="h-4 w-4 mr-1" /> Save
