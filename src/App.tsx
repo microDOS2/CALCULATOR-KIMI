@@ -34,6 +34,13 @@ function App() {
     calc.updateState(newState);
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "simulate" && !calc.sensitivity.isActive) {
+      calc.sensitivity.enable();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -64,7 +71,7 @@ function App() {
       />
 
       <main className="container mx-auto py-6 px-4 sm:px-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
           <TabsList className="w-full justify-center flex-wrap h-auto gap-1">
             <TabsTrigger value="product"><span className="text-xs text-muted-foreground mr-1 font-bold">1</span>Product</TabsTrigger>
             <TabsTrigger value="packaging"><span className="text-xs text-muted-foreground mr-1 font-bold">2</span>Packaging</TabsTrigger>

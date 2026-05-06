@@ -111,7 +111,9 @@ export function SimulateTab({
     return (
       <Card>
         <CardContent className="p-6 text-center text-muted-foreground">
-          Simulation mode is not active. Open the Simulate side panel or reload this tab.
+          <TrendingUp className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
+          <p className="text-sm">Loading simulation data...</p>
+          <p className="text-xs mt-1">Click the Simulate button in the header or wait a moment.</p>
         </CardContent>
       </Card>
     );
