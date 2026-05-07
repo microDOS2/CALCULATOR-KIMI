@@ -1,14 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import type { CalculationResult } from "@/types/calculator";
+import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { InfoTooltip } from "@/components/InfoTooltip";
+import { TornadoChart } from "@/components/TornadoChart";
 import { money3 } from "@/lib/calculator";
 
 interface ChartsTabProps {
+  state: CalculatorState;
   result: CalculationResult;
 }
 
-export function ChartsTab({ result }: ChartsTabProps) {
+export function ChartsTab({ state, result }: ChartsTabProps) {
   if (result.totalPacks === 0) {
     return (
       <Card>
@@ -33,6 +35,9 @@ export function ChartsTab({ result }: ChartsTabProps) {
 
   return (
     <div className="space-y-6">
+      {/* Sensitivity Tornado */}
+      <TornadoChart state={state} />
+
       {/* Cost Breakdown Pie */}
       <Card>
         <CardHeader>

@@ -206,7 +206,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="charts">
-            <ChartsTab result={calc.result} />
+            <ChartsTab state={calc.state} result={calc.result} />
           </TabsContent>
 
           <TabsContent value="dashboard">
