@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { TrendingUp, RotateCcw, Check } from "lucide-react";
 import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3 } from "@/lib/calculator";
@@ -86,12 +86,6 @@ export function SensitivityPanel({
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
-      <SheetTrigger asChild>
-        <Button size="sm" variant="outline" className="gap-1">
-          <TrendingUp className="h-4 w-4" />
-          <span className="hidden sm:inline">Simulate</span>
-        </Button>
-      </SheetTrigger>
       <SheetContent side="right" className="w-[380px] sm:w-[420px] p-0">
         <SheetHeader className="p-4 pb-2">
           <SheetTitle className="text-base flex items-center gap-2">
