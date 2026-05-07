@@ -6,6 +6,9 @@ import type {
   POLineItem,
   PackagingLayer,
   SKU,
+  Ingredient,
+  ShippingRateBracket,
+  Campaign,
   CashFlowWeek,
 } from "@/types/calculator";
 
@@ -22,6 +25,83 @@ export const toOz = (mg: number): number => mg / MG_PER_OZ;
 export const fromOz = (oz: number): number => oz * MG_PER_OZ;
 export const gramsToOz = (g: number): number => g / GRAMS_PER_OZ;
 export const ozToGrams = (oz: number): number => oz * GRAMS_PER_OZ;
+
+export function getEffectiveCostPerMg(ing: Ingredient, totalMgOrdered: number): number {
+  if (!ing.moqTiers || ing.moqTiers.length === 0) return ing.costPerMg;
+  const sorted = [...ing.moqTiers].sort((a, b) => b.minOrderMg - a.minOrderMg);
+  for (const tier of sorted) {
+    if (totalMgOrdered >= tier.minOrderMg) return tier.costPerMg;
+  }
+  return ing.costPerMg;
+}
+
+export function getShippingFromRateTable(weightGrams: number, brackets: ShippingRateBracket[]): number {
+  if (!brackets || brackets.length === 0) return 0;
+  const sorted = [...brackets].sort((a, b) => a.maxWeightGrams - b.maxWeightGrams);
+  for (const bracket of sorted) {
+    if (weightGrams <= bracket.maxWeightGrams) return bracket.cost;
+  }
+  return sorted[sorted.length - 1].cost;
+}
+
+export function calculateCampaignImpact(
+  campaigns: Campaign[],
+  baseResult: Pick<CalculationResult, 'retail' | 'wholesale' | 'distributor' | 'totalMonthlyVolume'>
+): CalculationResult['campaignImpact'] {
+  if (!campaigns || campaigns.length === 0) {
+    return { totalRevenueAtRisk: 0, totalMarginCompression: 0, netAnnualEffect: 0, affectedChannels: [] };
+  }
+
+  const weeksPerYear = 52;
+  let totalRevenueAtRisk = 0;
+  let totalMarginCompression = 0;
+  let netAnnualEffect = 0;
+  const affectedChannels = new Set<string>();
+
+  for (const campaign of campaigns) {
+    const weeks = Math.min(campaign.durationWeeks, weeksPerYear);
+    const volumeMultiplier = 1 + (campaign.expectedVolumeUplift / 100);
+
+    // Normal weekly volume
+    const normalWeeklyVolume = baseResult.totalMonthlyVolume / 4.33;
+    const campaignWeeklyVolume = normalWeeklyVolume * volumeMultiplier;
+
+    if (campaign.affectedChannels.retail) {
+      affectedChannels.add("Retail");
+      const normalRev = normalWeeklyVolume * baseResult.retail.price * weeks;
+      const discountedPrice = baseResult.retail.price * (1 - campaign.discountPercent / 100);
+      const campaignRev = campaignWeeklyVolume * discountedPrice * weeks;
+      totalRevenueAtRisk += normalRev - campaignRev;
+      totalMarginCompression += (baseResult.retail.price - discountedPrice) * campaignWeeklyVolume * weeks;
+      netAnnualEffect += campaignRev - normalRev;
+    }
+    if (campaign.affectedChannels.wholesale) {
+      affectedChannels.add("Wholesale");
+      const normalRev = normalWeeklyVolume * baseResult.wholesale.price * weeks;
+      const discountedPrice = baseResult.wholesale.price * (1 - campaign.discountPercent / 100);
+      const campaignRev = campaignWeeklyVolume * discountedPrice * weeks;
+      totalRevenueAtRisk += normalRev - campaignRev;
+      totalMarginCompression += (baseResult.wholesale.price - discountedPrice) * campaignWeeklyVolume * weeks;
+      netAnnualEffect += campaignRev - normalRev;
+    }
+    if (campaign.affectedChannels.distributor) {
+      affectedChannels.add("Distributor");
+      const normalRev = normalWeeklyVolume * baseResult.distributor.price * weeks;
+      const discountedPrice = baseResult.distributor.price * (1 - campaign.discountPercent / 100);
+      const campaignRev = campaignWeeklyVolume * discountedPrice * weeks;
+      totalRevenueAtRisk += normalRev - campaignRev;
+      totalMarginCompression += (baseResult.distributor.price - discountedPrice) * campaignWeeklyVolume * weeks;
+      netAnnualEffect += campaignRev - normalRev;
+    }
+  }
+
+  return {
+    totalRevenueAtRisk,
+    totalMarginCompression,
+    netAnnualEffect,
+    affectedChannels: Array.from(affectedChannels),
+  };
+}
 
 export const weightLabel = (unitSystem: 'mg' | 'oz'): string =>
   unitSystem === 'mg' ? 'mg' : 'oz';
@@ -140,6 +220,22 @@ export function calculate(state: CalculatorState): CalculationResult {
   const manualOhTotal = overhead.reduce((a, x) => a + x.cost, 0);
   const ohTotal = manualOhTotal + (includeThirdParty ? thirdPartyTotal : 0);
 
+  // Pre-calculate effective ingredient costs based on MOQ tiers
+  const ingredientTotalMg: Record<string, number> = {};
+  order.forEach((orderItem) => {
+    const sku = skus.find((s) => s.id === orderItem.skuId);
+    if (!sku || orderItem.qty <= 0) return;
+    ingredients.forEach((ing) => {
+      const mg = ing.mgPerUnit * sku.unitsPerPack * orderItem.qty;
+      ingredientTotalMg[ing.id] = (ingredientTotalMg[ing.id] || 0) + mg;
+    });
+  });
+
+  const effectiveCosts: Record<string, number> = {};
+  ingredients.forEach((ing) => {
+    effectiveCosts[ing.id] = getEffectiveCostPerMg(ing, ingredientTotalMg[ing.id] || 0);
+  });
+
   // Per-SKU packaging tracking
   const skuPackagingCosts: CalculationResult["skuPackagingCosts"] = [];
 
@@ -171,7 +267,7 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalUnits += sku.unitsPerPack * orderQty;
 
     const ingPerPack = ingredients.reduce(
-      (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
+      (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * effectiveCosts[ing.id],
       0
     );
     const pkgPerPack = calculatePackagingCostPerPack(sku.packaging, sku.unitsPerPack);
@@ -244,6 +340,12 @@ export function calculate(state: CalculatorState): CalculationResult {
   const gmW = avgPriceW > 0 ? gpW / avgPriceW : 0;
   const gmD = avgPriceD > 0 ? gpD / avgPriceD : 0;
 
+  // Tax & regulatory calculations
+  const retailPriceWithTax = avgPriceR * (1 + state.retailSalesTaxRate / 100);
+  const retailTaxAmount = avgPriceR * (state.retailSalesTaxRate / 100);
+  const distributorImportDuty = avgPriceD * (state.distributorImportDutyRate / 100);
+  const distributorCostWithDuty = cogsPerPack + distributorImportDuty;
+
   // Monthly volume
   const totalMonthlyVolume = skus.reduce(
     (sum, sku) => sum + getSkuMonthlyVolume(sku.id, monthlyVolumes, skus),
@@ -257,7 +359,18 @@ export function calculate(state: CalculatorState): CalculationResult {
   const ohPerPackW = ohW ? ohPerPack : 0;
   const ohPerPackD = ohD ? ohPerPack : 0;
 
-  const shipPerPack = includeShip ? shippingPerPack : 0;
+  // Compute total unit weight for shipping rate lookup
+  const totalWeightPerUnit = ingredients.reduce((a, ing) => a + ing.mgPerUnit, 0);
+  const weightedUnitsPerPack = totalPacks > 0 ? totalUnits / totalPacks : 0;
+  const totalWeightPerPack = totalWeightPerUnit * weightedUnitsPerPack;
+  const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack;
+
+  // Shipping cost: use rate table if enabled, otherwise flat rate
+  const shipPerPack = includeShip
+    ? (state.useShippingRateTable && state.shippingRateBrackets.length > 0
+      ? getShippingFromRateTable(totalUnitWeightPerPack, state.shippingRateBrackets)
+      : shippingPerPack)
+    : 0;
 
   // Operating profit per pack
   const opR = gpR - ohPerPackR - shipPerPack;
@@ -282,23 +395,13 @@ export function calculate(state: CalculatorState): CalculationResult {
   const retailerProfit = avgPriceR - avgPriceW;
   const distProfit = avgPriceW - avgPriceD;
 
-  const weightedUnitsPerPack = totalPacks > 0 ? totalUnits / totalPacks : 0;
-
-  // Ingredient cost metrics
+  // Ingredient cost metrics (weight metrics already computed earlier for shipping)
   const totalMgPerPack = ingredients.reduce(
     (a, ing) => a + ing.mgPerUnit * weightedUnitsPerPack,
     0
   );
-  const totalWeightPerUnit = ingredients.reduce(
-    (a, ing) => a + ing.mgPerUnit,
-    0
-  );
-  const totalWeightPerPack = totalWeightPerUnit * weightedUnitsPerPack;
   const costPerMg = totalMgPerPack > 0 ? avgIngCostPerPack / totalMgPerPack : 0;
   const costPerGram = costPerMg * 1000;
-
-  // Combined weight: ingredients (mg -> g) + packaging (g)
-  const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack;
 
   // Per-unit metrics
   const costPerUnit = weightedUnitsPerPack > 0 ? cogsPerPack / weightedUnitsPerPack : 0;
@@ -343,7 +446,7 @@ export function calculate(state: CalculatorState): CalculationResult {
     if (!sku || orderItem.qty <= 0) return;
 
     const ingPerPack = ingredients.reduce(
-      (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * ing.costPerMg,
+      (a, ing) => a + ing.mgPerUnit * sku.unitsPerPack * effectiveCosts[ing.id],
       0
     );
     const pkgPerPack = calculatePackagingCostPerPack(sku.packaging, sku.unitsPerPack);
@@ -449,6 +552,8 @@ export function calculate(state: CalculatorState): CalculationResult {
     dDisc: state.dDisc,
     includeShip: state.includeShip,
     shippingPerPack: state.shippingPerPack,
+    shippingRateBrackets: state.shippingRateBrackets,
+    useShippingRateTable: state.useShippingRateTable,
     ohR: state.ohR,
     ohW: state.ohW,
     ohD: state.ohD,
@@ -457,6 +562,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     includeW: state.includeW,
     includeD: state.includeD,
     beIncludeOverhead: state.beIncludeOverhead,
+    retailSalesTaxRate: state.retailSalesTaxRate,
+    distributorImportDutyRate: state.distributorImportDutyRate,
+    campaigns: state.campaigns,
     commissions: state.commissions,
     thirdPartyCompanies: state.thirdPartyCompanies,
     skuPackagingCosts,
@@ -491,6 +599,10 @@ export function calculate(state: CalculatorState): CalculationResult {
       costPerUnit,
       profitPerUnit: profitPerUnitD,
     },
+    retailPriceWithTax,
+    retailTaxAmount,
+    distributorImportDuty,
+    distributorCostWithDuty,
     avgPriceR,
     avgPriceW,
     avgPriceD,
@@ -540,6 +652,12 @@ export function calculate(state: CalculatorState): CalculationResult {
     subscriptionPlans: state.subscriptionPlans,
     subscriptionSummary,
     cashFlow: calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal),
+    campaignImpact: calculateCampaignImpact(state.campaigns, {
+      retail: { price: avgPriceR, gp: gpR, gm: gmR, op: opR, om: omR, costPerUnit, profitPerUnit: profitPerUnitR },
+      wholesale: { price: avgPriceW, gp: gpW, gm: gmW, op: opW, om: omW, costPerUnit, profitPerUnit: profitPerUnitW },
+      distributor: { price: avgPriceD, gp: gpD, gm: gmD, op: opD, om: omD, costPerUnit, profitPerUnit: profitPerUnitD },
+      totalMonthlyVolume,
+    }),
   };
 }
 

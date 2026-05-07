@@ -5,8 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { FormulaTooltip, FormulaBadge } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import type { CalculatorState, CalculationResult, SKU } from "@/types/calculator";
+import type { CalculatorState, CalculationResult, SKU, Ingredient } from "@/types/calculator";
 import { money3, MG_PER_OZ, toOz, fmtWeight } from "@/lib/calculator";
+import { CsvImportSection } from "@/components/CsvImportSection";
+import { useState } from "react";
 
 interface ProductTabProps {
   state: CalculatorState;
@@ -16,7 +18,8 @@ interface ProductTabProps {
   updateSKU: (id: string, patch: Partial<SKU>) => void;
   updateOrderQty: (skuId: string, qty: number) => void;
   addIngredient: () => void;
-  updateIngredient: (id: string, patch: Partial<{ name?: string; mgPerUnit?: number; costPerMg?: number }>) => void;
+  setIngredients: (ingredients: Ingredient[]) => void;
+  updateIngredient: (id: string, patch: Partial<{ name?: string; mgPerUnit?: number; costPerMg?: number; moqTiers?: { minOrderMg: number; costPerMg: number }[] }>) => void;
   removeIngredient: (id: string) => void;
 }
 
@@ -49,6 +52,7 @@ export function ProductTab({
   updateSKU,
   updateOrderQty,
   addIngredient,
+  setIngredients,
   updateIngredient,
   removeIngredient,
 }: ProductTabProps) {
@@ -182,30 +186,115 @@ export function ProductTab({
             <span>{state.unitSystem === 'mg' ? '$ / mg' : '$ / oz'}</span>
             <span></span>
           </div>
-          {state.ingredients.map((ing) => (
-            <div key={ing.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
-              <Input placeholder="Name" value={ing.name}
-                onChange={(e) => updateIngredient(ing.id, { name: e.target.value })} className="h-8" />
-              <Input type="number" step={state.unitSystem === 'mg' ? "0.0001" : "0.000001"}
-                placeholder={state.unitSystem === 'mg' ? 'mg' : 'oz'}
-                value={state.unitSystem === 'mg' ? ing.mgPerUnit : Number((ing.mgPerUnit / MG_PER_OZ).toFixed(6))}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  updateIngredient(ing.id, { mgPerUnit: state.unitSystem === 'mg' ? val : val * MG_PER_OZ });
-                }} className="h-8 w-28" />
-              <Input type="number" step={state.unitSystem === 'mg' ? "0.000001" : "0.0000001"}
-                placeholder={state.unitSystem === 'mg' ? '$/mg' : '$/oz'}
-                value={state.unitSystem === 'mg' ? ing.costPerMg : Number((ing.costPerMg * MG_PER_OZ).toFixed(7))}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  updateIngredient(ing.id, { costPerMg: state.unitSystem === 'mg' ? val : val / MG_PER_OZ });
-                }} className="h-8 w-28" />
-              <Button size="sm" variant="ghost" className="text-destructive h-8"
-                onClick={() => removeIngredient(ing.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+          {state.ingredients.map((ing) => {
+            const [showTiers, setShowTiers] = useState(false);
+            return (
+            <div key={ing.id} className="space-y-2">
+              <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
+                <Input placeholder="Name" value={ing.name}
+                  onChange={(e) => updateIngredient(ing.id, { name: e.target.value })} className="h-8" />
+                <Input type="number" step={state.unitSystem === 'mg' ? "0.0001" : "0.000001"}
+                  placeholder={state.unitSystem === 'mg' ? 'mg' : 'oz'}
+                  value={state.unitSystem === 'mg' ? ing.mgPerUnit : Number((ing.mgPerUnit / MG_PER_OZ).toFixed(6))}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    updateIngredient(ing.id, { mgPerUnit: state.unitSystem === 'mg' ? val : val * MG_PER_OZ });
+                  }} className="h-8 w-28" />
+                <Input type="number" step={state.unitSystem === 'mg' ? "0.000001" : "0.0000001"}
+                  placeholder={state.unitSystem === 'mg' ? '$/mg' : '$/oz'}
+                  value={state.unitSystem === 'mg' ? ing.costPerMg : Number((ing.costPerMg * MG_PER_OZ).toFixed(7))}
+                  onChange={(e) => {
+                    const val = Number(e.target.value);
+                    updateIngredient(ing.id, { costPerMg: state.unitSystem === 'mg' ? val : val / MG_PER_OZ });
+                  }} className="h-8 w-28" />
+                <Button size="sm" variant="ghost" className="text-destructive h-8"
+                  onClick={() => removeIngredient(ing.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* MOQ Tier Editor */}
+              <div className="pl-2">
+                <button
+                  onClick={() => setShowTiers(!showTiers)}
+                  className="text-xs text-muted-foreground hover:text-foreground underline"
+                >
+                  {showTiers ? "Hide" : "Edit"} volume pricing tiers
+                  {ing.moqTiers && ing.moqTiers.length > 0 && (
+                    <span className="ml-1 text-primary font-medium">({ing.moqTiers.length} tiers)</span>
+                  )}
+                </button>
+                {showTiers && (
+                  <div className="mt-2 space-y-2 border-l-2 border-primary/20 pl-3">
+                    <div className="text-xs text-muted-foreground">
+                      Set lower cost-per-mg when ordering larger quantities. The calculator auto-selects the right tier based on total order volume.
+                    </div>
+                    {ing.moqTiers.map((tier, idx) => (
+                      <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                        <div className="space-y-0.5">
+                          <Label className="text-[10px] text-muted-foreground">Min Order (mg)</Label>
+                          <Input
+                            type="number"
+                            value={tier.minOrderMg}
+                            onChange={(e) => {
+                              const newTiers = [...ing.moqTiers];
+                              newTiers[idx] = { ...tier, minOrderMg: Math.max(0, Number(e.target.value)) };
+                              updateIngredient(ing.id, { moqTiers: newTiers });
+                            }}
+                            className="h-7 text-xs"
+                          />
+                        </div>
+                        <div className="space-y-0.5">
+                          <Label className="text-[10px] text-muted-foreground">Cost / mg ($)</Label>
+                          <Input
+                            type="number"
+                            step="0.000001"
+                            value={tier.costPerMg}
+                            onChange={(e) => {
+                              const newTiers = [...ing.moqTiers];
+                              newTiers[idx] = { ...tier, costPerMg: Math.max(0, Number(e.target.value)) };
+                              updateIngredient(ing.id, { moqTiers: newTiers });
+                            }}
+                            className="h-7 text-xs"
+                          />
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="text-destructive h-7"
+                          onClick={() => {
+                            const newTiers = ing.moqTiers.filter((_, i) => i !== idx);
+                            updateIngredient(ing.id, { moqTiers: newTiers });
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs"
+                      onClick={() => {
+                        const newTiers = [...ing.moqTiers, { minOrderMg: 1000, costPerMg: ing.costPerMg * 0.9 }];
+                        updateIngredient(ing.id, { moqTiers: newTiers });
+                      }}
+                    >
+                      <Plus className="h-3 w-3 mr-1" /> Add Tier
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-          ))}
+            );
+          })}
+
+          {/* CSV Bulk Import */}
+          <CsvImportSection
+            existingIngredients={state.ingredients}
+            unitSystem={state.unitSystem}
+            setIngredients={setIngredients}
+          />
 
           {/* Ingredient Result Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3">

@@ -7,12 +7,27 @@ export interface PackagingLayer {
   included: boolean;
 }
 
+export interface MoqTier {
+  minOrderMg: number; // minimum total order quantity in mg to qualify
+  costPerMg: number;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  discountPercent: number;
+  durationWeeks: number;
+  affectedChannels: { retail: boolean; wholesale: boolean; distributor: boolean };
+  expectedVolumeUplift: number;
+}
+
 export interface Ingredient {
   id: string;
   name: string;
   mgPerUnit: number;
   costPerMg: number;
   supplierPaymentDays: number; // days to pay supplier after delivery
+  moqTiers: MoqTier[];
 }
 
 export interface SKU {
@@ -134,6 +149,8 @@ export interface CalculationResult {
   dDisc: number;
   includeShip: boolean;
   shippingPerPack: number;
+  shippingRateBrackets: ShippingRateBracket[];
+  useShippingRateTable: boolean;
   ohR: boolean;
   ohW: boolean;
   ohD: boolean;
@@ -142,6 +159,9 @@ export interface CalculationResult {
   includeW: boolean;
   includeD: boolean;
   beIncludeOverhead: boolean;
+  retailSalesTaxRate: number;
+  distributorImportDutyRate: number;
+  campaigns: Campaign[];
 
   // Per-SKU packaging costs
   skuPackagingCosts: { skuId: string; skuName: string; packagingCosts: { id: string; name: string; costPerPack: number }[]; totalCostPerPack: number; totalWeightPerPack: number }[];
@@ -158,6 +178,12 @@ export interface CalculationResult {
   retail: ChannelCalc;
   wholesale: ChannelCalc;
   distributor: ChannelCalc;
+
+  // Tax & regulatory
+  retailPriceWithTax: number;
+  retailTaxAmount: number;
+  distributorImportDuty: number;
+  distributorCostWithDuty: number;
 
   // Derived prices
   avgPriceR: number;
@@ -228,6 +254,14 @@ export interface CalculationResult {
   // Inherited from state
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
+
+  // Campaign impact
+  campaignImpact: {
+    totalRevenueAtRisk: number;
+    totalMarginCompression: number;
+    netAnnualEffect: number;
+    affectedChannels: string[];
+  };
 
   // Subscription projections
   subscriptionPlans: SubscriptionPlan[];
@@ -347,7 +381,13 @@ export interface SubscriptionSummary {
   combinedAnnualProfit: number;
 }
 
+export interface ShippingRateBracket {
+  maxWeightGrams: number; // up to this weight in grams
+  cost: number; // shipping cost per pack at this weight
+}
+
 export interface CalculatorState {
+  schemaVersion: number; // for migration compatibility
   unitSystem: 'mg' | 'oz';
   skus: SKU[];
   order: OrderItem[];
@@ -358,6 +398,8 @@ export interface CalculatorState {
   dDisc: number;
   includeShip: boolean;
   shippingPerPack: number;
+  shippingRateBrackets: ShippingRateBracket[];
+  useShippingRateTable: boolean;
   ohR: boolean;
   ohW: boolean;
   ohD: boolean;
@@ -366,6 +408,8 @@ export interface CalculatorState {
   includeW: boolean;
   includeD: boolean;
   beIncludeOverhead: boolean;
+  retailSalesTaxRate: number; // % sales tax on retail (e.g., 8.5)
+  distributorImportDutyRate: number; // % import duty on distributor (e.g., 5)
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
   subscriptionPlans: SubscriptionPlan[];
@@ -379,6 +423,7 @@ export interface CalculatorState {
   startingCashBalance: number;
   capitalExpenditures: { id: string; name: string; amount: number; month: number }[];
   debtServiceMonthly: number;
+  campaigns: Campaign[];
 }
 
 // Cash Flow Types

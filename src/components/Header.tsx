@@ -3,10 +3,11 @@ import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calculator, Download, FileSpreadsheet, FileText, RotateCcw, Save, Share2, Scale, TrendingUp } from "lucide-react";
+import { Calculator, Download, FileSpreadsheet, FileText, Redo, RotateCcw, Save, Share2, Scale, TrendingUp, Undo } from "lucide-react";
 import type { CalculationResult } from "@/types/calculator";
 import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
 import { Guide } from "@/components/Guide";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -16,9 +17,13 @@ interface HeaderProps {
   unitSystem: 'mg' | 'oz';
   onToggleUnitSystem: () => void;
   onSimulateClick: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
-export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem, onSimulateClick }: HeaderProps) {
+export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem, onSimulateClick, onUndo, onRedo, canUndo, canRedo }: HeaderProps) {
   const [label, setLabel] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -39,9 +44,18 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Guide />
+          <OnboardingWizard />
           <Button size="sm" variant="outline" onClick={onSimulateClick}>
             <TrendingUp className="h-4 w-4 mr-1" /> Simulate
           </Button>
+          <div className="flex items-center gap-0.5">
+            <Button size="sm" variant="ghost" onClick={onUndo} disabled={!canUndo} title="Undo (Ctrl+Z)">
+              <Undo className="h-4 w-4" />
+            </Button>
+            <Button size="sm" variant="ghost" onClick={onRedo} disabled={!canRedo} title="Redo (Ctrl+Y)">
+              <Redo className="h-4 w-4" />
+            </Button>
+          </div>
           <Button size="sm" variant="outline" onClick={onToggleUnitSystem} title={`Switch to ${unitSystem === 'mg' ? 'ounces' : 'milligrams'}`}>
             <Scale className="h-4 w-4 mr-1" /> {unitSystem === 'mg' ? 'mg' : 'oz'}
           </Button>

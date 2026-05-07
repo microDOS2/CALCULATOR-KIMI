@@ -159,9 +159,79 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
                   <div className="flex items-center gap-2">
                     <Checkbox checked={state.includeShip} onCheckedChange={(v) => updateState({ includeShip: !!v })} />
                     <span className="text-sm">Include shipping</span>
-                    <Input type="number" step="0.01" className="w-20 h-7"
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Checkbox checked={state.useShippingRateTable} onCheckedChange={(v) => updateState({ useShippingRateTable: !!v })} />
+                    <span className="text-xs text-muted-foreground">Use weight-based rates</span>
+                    <InfoTooltip text="When enabled, shipping cost is determined by your package weight using the rate table below. When disabled, the flat rate above is used." label="Weight-Based Shipping" />
+                  </div>
+                  {!state.useShippingRateTable ? (
+                    <Input type="number" step="0.01" className="w-24 h-7"
                       value={state.shippingPerPack}
                       onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })} />
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="text-xs text-muted-foreground">
+                        Package weight: {(result.totalUnitWeightPerPack).toFixed(1)}g → Rate: {money3(result.shipPerPack)}
+                      </div>
+                      <div className="space-y-1">
+                        {state.shippingRateBrackets.map((bracket, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <Input type="number" step="1" className="w-20 h-6 text-xs"
+                              value={bracket.maxWeightGrams}
+                              onChange={(e) => {
+                                const newBrackets = [...state.shippingRateBrackets];
+                                newBrackets[idx] = { ...bracket, maxWeightGrams: Math.max(1, Number(e.target.value)) };
+                                updateState({ shippingRateBrackets: newBrackets });
+                              }} />
+                            <span className="text-xs text-muted-foreground">g =</span>
+                            <Input type="number" step="0.01" className="w-16 h-6 text-xs"
+                              value={bracket.cost}
+                              onChange={(e) => {
+                                const newBrackets = [...state.shippingRateBrackets];
+                                newBrackets[idx] = { ...bracket, cost: Math.max(0, Number(e.target.value)) };
+                                updateState({ shippingRateBrackets: newBrackets });
+                              }} />
+                            <span className="text-xs text-muted-foreground">$</span>
+                            <button
+                              className="text-xs text-destructive hover:underline"
+                              onClick={() => {
+                                const newBrackets = state.shippingRateBrackets.filter((_, i) => i !== idx);
+                                updateState({ shippingRateBrackets: newBrackets });
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          className="text-xs text-primary hover:underline"
+                          onClick={() => {
+                            const last = state.shippingRateBrackets[state.shippingRateBrackets.length - 1];
+                            const newBracket = last
+                              ? { maxWeightGrams: last.maxWeightGrams + 500, cost: last.cost + 2 }
+                              : { maxWeightGrams: 500, cost: 5 };
+                            updateState({ shippingRateBrackets: [...state.shippingRateBrackets, newBracket] });
+                          }}
+                        >
+                          + Add bracket
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {/* Retail Sales Tax */}
+                  <div className="space-y-1 pt-1">
+                    <Label className="text-xs text-muted-foreground">Sales Tax %</Label>
+                    <div className="flex items-center gap-2">
+                      <Input type="number" step="0.01" className="w-20 h-7"
+                        value={state.retailSalesTaxRate}
+                        onChange={(e) => updateState({ retailSalesTaxRate: Math.max(0, Number(e.target.value)) })} />
+                      {state.retailSalesTaxRate > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          Customer pays: {money3(result.retailPriceWithTax)}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               }
@@ -216,6 +286,20 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
                       <span className="font-medium tabular-nums">{money3(result.distProfit)}</span>
                     </div>
                   </FormulaTooltip>
+                  {/* Import Duty */}
+                  <div className="space-y-1 pt-1">
+                    <Label className="text-xs text-muted-foreground">Import Duty %</Label>
+                    <div className="flex items-center gap-2">
+                      <Input type="number" step="0.01" className="w-20 h-7"
+                        value={state.distributorImportDutyRate}
+                        onChange={(e) => updateState({ distributorImportDutyRate: Math.max(0, Number(e.target.value)) })} />
+                      {state.distributorImportDutyRate > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          Duty: {money3(result.distributorImportDuty)} | Cost: {money3(result.distributorCostWithDuty)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               }
             />

@@ -13,6 +13,7 @@ import {
 import { Plus, Trash2 } from "lucide-react";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
+import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 import type { SKU, SubscriptionPlan, SubscriptionSummary } from "@/types/calculator";
 import { money3, money } from "@/lib/calculator";
 
@@ -169,68 +170,95 @@ export function SubscriptionsTab({
                   </FormulaTooltip>
                 </div>
                 <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-16">
-                          Month
-                          <InfoTooltip text="Calendar month of the projection (Jan-Dec)." label="Month" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Starting
-                          <InfoTooltip text="Number of subscribers at the start of this month (carried forward from last month's ending count)." label="Starting Subscribers" />
-                        </TableHead>
-                        <TableHead className="text-right text-green-600">
-                          +New
-                          <InfoTooltip text="New subscribers acquired this month = Starting Subscribers x Growth Rate %. These are added to the base before churn is applied. Growth compounds monthly." label="New Subscribers" />
-                        </TableHead>
-                        <TableHead className="text-right text-red-500">
-                          -Churn
-                          <InfoTooltip text="Subscribers who cancelled this month = Starting Subscribers x Churn Rate %. Applied after new subscribers are added. Lower churn = more stable recurring revenue." label="Churned Subscribers" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Ending
-                          <InfoTooltip text="Subscribers remaining at month end = Starting + New - Churn. This becomes next month's starting count." label="Ending Subscribers" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Revenue
-                          <InfoTooltip text={`Monthly revenue = Starting Subscribers x Monthly Price ($${plan.monthlyPrice.toFixed(2)}). Based on subscribers at the start of the month.`} label="Monthly Revenue" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          COGS
-                          <InfoTooltip text="Monthly COGS = Starting Subscribers x per-subscriber COGS. Per-subscriber COGS is calculated from the SKUs and packs per month in this plan, using each SKU's ingredient and packaging costs." label="Monthly COGS" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Gross Profit
-                          <InfoTooltip text="Monthly Gross Profit = Revenue - COGS. This is before overhead, commissions, or other operating costs." label="Monthly Gross Profit" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Cum. Rev
-                          <InfoTooltip text="Running total of all revenue from month 1 through this month." label="Cumulative Revenue" />
-                        </TableHead>
-                        <TableHead className="text-right">
-                          Cum. Profit
-                          <InfoTooltip text="Running total of all gross profit from month 1 through this month." label="Cumulative Profit" />
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {plan.months.map((m) => (
-                        <TableRow key={m.month}>
-                          <TableCell className="font-medium">{m.monthLabel}</TableCell>
-                          <TableCell className="text-right">{m.startingSubscribers.toLocaleString()}</TableCell>
-                          <TableCell className="text-right text-green-600">+{m.newSubscribers.toLocaleString()}</TableCell>
-                          <TableCell className="text-right text-red-500">-{m.churnedSubscribers.toLocaleString()}</TableCell>
-                          <TableCell className="text-right font-medium">{m.endingSubscribers.toLocaleString()}</TableCell>
-                          <TableCell className="text-right">{money(m.monthlyRevenue)}</TableCell>
-                          <TableCell className="text-right">{money(m.monthlyCOGS)}</TableCell>
-                          <TableCell className="text-right font-medium">{money(m.monthlyGrossProfit)}</TableCell>
-                          <TableCell className="text-right">{money(m.cumulativeRevenue)}</TableCell>
-                          <TableCell className="text-right">{money(m.cumulativeProfit)}</TableCell>
+                  <DesktopTable>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-16">
+                            Month
+                            <InfoTooltip text="Calendar month of the projection (Jan-Dec)." label="Month" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Starting
+                            <InfoTooltip text="Number of subscribers at the start of this month (carried forward from last month's ending count)." label="Starting Subscribers" />
+                          </TableHead>
+                          <TableHead className="text-right text-green-600">
+                            +New
+                            <InfoTooltip text="New subscribers acquired this month = Starting Subscribers x Growth Rate %. These are added to the base before churn is applied. Growth compounds monthly." label="New Subscribers" />
+                          </TableHead>
+                          <TableHead className="text-right text-red-500">
+                            -Churn
+                            <InfoTooltip text="Subscribers who cancelled this month = Starting Subscribers x Churn Rate %. Applied after new subscribers are added. Lower churn = more stable recurring revenue." label="Churned Subscribers" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Ending
+                            <InfoTooltip text="Subscribers remaining at month end = Starting + New - Churn. This becomes next month's starting count." label="Ending Subscribers" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Revenue
+                            <InfoTooltip text={`Monthly revenue = Starting Subscribers x Monthly Price ($${plan.monthlyPrice.toFixed(2)}). Based on subscribers at the start of the month.`} label="Monthly Revenue" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            COGS
+                            <InfoTooltip text="Monthly COGS = Starting Subscribers x per-subscriber COGS. Per-subscriber COGS is calculated from the SKUs and packs per month in this plan, using each SKU's ingredient and packaging costs." label="Monthly COGS" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Gross Profit
+                            <InfoTooltip text="Monthly Gross Profit = Revenue - COGS. This is before overhead, commissions, or other operating costs." label="Monthly Gross Profit" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Cum. Rev
+                            <InfoTooltip text="Running total of all revenue from month 1 through this month." label="Cumulative Revenue" />
+                          </TableHead>
+                          <TableHead className="text-right">
+                            Cum. Profit
+                            <InfoTooltip text="Running total of all gross profit from month 1 through this month." label="Cumulative Profit" />
+                          </TableHead>
                         </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {plan.months.map((m) => (
+                          <TableRow key={m.month}>
+                            <TableCell className="font-medium">{m.monthLabel}</TableCell>
+                            <TableCell className="text-right">{m.startingSubscribers.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-green-600">+{m.newSubscribers.toLocaleString()}</TableCell>
+                            <TableCell className="text-right text-red-500">-{m.churnedSubscribers.toLocaleString()}</TableCell>
+                            <TableCell className="text-right font-medium">{m.endingSubscribers.toLocaleString()}</TableCell>
+                            <TableCell className="text-right">{money(m.monthlyRevenue)}</TableCell>
+                            <TableCell className="text-right">{money(m.monthlyCOGS)}</TableCell>
+                            <TableCell className="text-right font-medium">{money(m.monthlyGrossProfit)}</TableCell>
+                            <TableCell className="text-right">{money(m.cumulativeRevenue)}</TableCell>
+                            <TableCell className="text-right">{money(m.cumulativeProfit)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </DesktopTable>
+
+                  <MobileOnly>
+                    <div className="space-y-3">
+                      {plan.months.map((m) => (
+                        <Card key={m.month} className="border-l-4 border-l-primary">
+                          <CardContent className="p-3 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-sm">{m.monthLabel}</span>
+                              <span className="text-xs text-muted-foreground">Ending: {m.endingSubscribers.toLocaleString()}</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div><span className="text-muted-foreground">Starting:</span> {m.startingSubscribers.toLocaleString()}</div>
+                              <div><span className="text-green-600">+New:</span> {m.newSubscribers.toLocaleString()}</div>
+                              <div><span className="text-red-500">-Churn:</span> {m.churnedSubscribers.toLocaleString()}</div>
+                              <div><span className="text-muted-foreground">Revenue:</span> {money(m.monthlyRevenue)}</div>
+                              <div><span className="text-muted-foreground">COGS:</span> {money(m.monthlyCOGS)}</div>
+                              <div><span className="font-medium">Gross Profit:</span> {money(m.monthlyGrossProfit)}</div>
+                              <div><span className="text-muted-foreground">Cum. Rev:</span> {money(m.cumulativeRevenue)}</div>
+                              <div><span className="font-medium">Cum. Profit:</span> {money(m.cumulativeProfit)}</div>
+                            </div>
+                          </CardContent>
+                        </Card>
                       ))}
-                    </TableBody>
-                  </Table>
+                    </div>
+                  </MobileOnly>
                 </div>
               </div>
             ))}

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import type {
   CalculatorState,
   SKU,
@@ -11,9 +11,12 @@ import type {
 } from "@/types/calculator";
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
+import { useUndoRedo } from "./useUndoRedo";
 
 let uidCounter = 0;
 const uid = () => `u${++uidCounter}`;
+
+const AUTOSAVE_KEY = "channel_calc_autosave_v10";
 
 const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
   {
@@ -96,6 +99,7 @@ const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
 const createDefaultState = (): CalculatorState => {
   const skuId1 = uid();
   return {
+    schemaVersion: 1,
     unitSystem: 'mg' as const,
     skus: [
       {
@@ -111,9 +115,9 @@ const createDefaultState = (): CalculatorState => {
     ],
     order: [{ skuId: skuId1, qty: 1 }],
     ingredients: [
-      { id: uid(), name: "Ingredient 1", mgPerUnit: 2, costPerMg: 0.7, supplierPaymentDays: 30 },
-      { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075, supplierPaymentDays: 30 },
-      { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015, supplierPaymentDays: 30 },
+      { id: uid(), name: "Ingredient 1", mgPerUnit: 2, costPerMg: 0.7, supplierPaymentDays: 30, moqTiers: [] },
+      { id: uid(), name: "Ingredient 2", mgPerUnit: 800, costPerMg: 0.000075, supplierPaymentDays: 30, moqTiers: [] },
+      { id: uid(), name: "Ingredient 3", mgPerUnit: 198, costPerMg: 0.00015, supplierPaymentDays: 30, moqTiers: [] },
     ],
     overhead: [
       { id: uid(), name: "Salaries", cost: 10000 },
@@ -126,6 +130,15 @@ const createDefaultState = (): CalculatorState => {
     dDisc: 25,
     includeShip: true,
     shippingPerPack: 2.5,
+    shippingRateBrackets: [
+      { maxWeightGrams: 100, cost: 3.50 },
+      { maxWeightGrams: 250, cost: 4.50 },
+      { maxWeightGrams: 500, cost: 5.75 },
+      { maxWeightGrams: 1000, cost: 7.50 },
+      { maxWeightGrams: 2000, cost: 10.00 },
+      { maxWeightGrams: 5000, cost: 15.00 },
+    ],
+    useShippingRateTable: false,
     ohR: true,
     ohW: true,
     ohD: true,
@@ -134,6 +147,8 @@ const createDefaultState = (): CalculatorState => {
     includeW: true,
     includeD: true,
     beIncludeOverhead: true,
+    retailSalesTaxRate: 0,
+    distributorImportDutyRate: 0,
     commissions: {
       president: {
         name: "President of Sales",
@@ -207,6 +222,7 @@ const createDefaultState = (): CalculatorState => {
     startingCashBalance: 50000,
     capitalExpenditures: [],
     debtServiceMonthly: 0,
+    campaigns: [],
   };
 };
 
@@ -228,14 +244,58 @@ const decodeState = (hash: string): CalculatorState | null => {
   }
 };
 
-const LS_KEY = "channel_calc_scenarios_v8";
+const CURRENT_SCHEMA_VERSION = 1;
+
+/**
+ * Migration runner: takes any decoded/loaded state and ensures it matches
+ * the current schema version. Each new schema bump adds a case here.
+ */
+const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
+  const defaults = createDefaultState();
+  // v0 -> v1: Add schemaVersion, per-SKU packaging, subscriptionPlans,
+  //           cashFlow fields, capitalExpenditures, debtServiceMonthly
+  const migrated: CalculatorState = {
+    ...defaults,
+    ...raw,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
+    skus: (raw.skus ?? defaults.skus).map((sku) => ({
+      ...defaults.skus[0],
+      ...sku,
+      packaging: sku.packaging ?? createDefaultPackaging(),
+    })),
+    subscriptionPlans: raw.subscriptionPlans ?? defaults.subscriptionPlans,
+    customerPaymentTerms: raw.customerPaymentTerms ?? defaults.customerPaymentTerms,
+    inventoryLeadTimeDays: raw.inventoryLeadTimeDays ?? defaults.inventoryLeadTimeDays,
+    startingCashBalance: raw.startingCashBalance ?? defaults.startingCashBalance,
+    capitalExpenditures: raw.capitalExpenditures ?? defaults.capitalExpenditures,
+    debtServiceMonthly: raw.debtServiceMonthly ?? defaults.debtServiceMonthly,
+    shippingRateBrackets: raw.shippingRateBrackets ?? defaults.shippingRateBrackets,
+    useShippingRateTable: raw.useShippingRateTable ?? defaults.useShippingRateTable,
+    retailSalesTaxRate: raw.retailSalesTaxRate ?? defaults.retailSalesTaxRate,
+    distributorImportDutyRate: raw.distributorImportDutyRate ?? defaults.distributorImportDutyRate,
+    campaigns: raw.campaigns ?? defaults.campaigns,
+    ingredients: (raw.ingredients ?? defaults.ingredients).map((ing) => ({
+      ...ing,
+      moqTiers: ing.moqTiers ?? [],
+    })),
+  };
+
+  return migrated;
+};
+
+const LS_KEY = "channel_calc_scenarios_v10";
 
 const loadScenarios = (): Scenario[] => {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Migrate each scenario's inputs to current schema
+    return parsed.map((s: Scenario) => ({
+      ...s,
+      inputs: migrateState(s.inputs),
+    }));
   } catch {
     return [];
   }
@@ -250,29 +310,39 @@ const saveScenarios = (list: Scenario[]) => {
 };
 
 export function useCalculator() {
-  const [state, setState] = useState<CalculatorState>(() => {
+  // Compute initial state (URL hash or default)
+  const initialState = useMemo(() => {
     if (typeof window !== "undefined" && window.location.hash) {
       const decoded = decodeState(window.location.hash);
-      if (decoded) {
-        const defaults = createDefaultState();
-        // Merge with defaults for any missing/new fields
-        // Handle old SKUs without per-SKU packaging
-        const skus = decoded.skus?.map((sku) => ({
-          ...defaults.skus[0],
-          ...sku,
-          packaging: sku.packaging ?? createDefaultPackaging(),
-        })) ?? defaults.skus;
-
-        return {
-          ...defaults,
-          ...decoded,
-          skus,
-          subscriptionPlans: decoded.subscriptionPlans ?? defaults.subscriptionPlans,
-        };
-      }
+      if (decoded) return migrateState(decoded);
     }
     return createDefaultState();
-  });
+  }, []);
+
+  const { state, setState, undo, redo, canUndo, canRedo, reset: resetHistory } = useUndoRedo(initialState, { maxHistory: 50 });
+
+  // Recovery: check for auto-saved state on mount
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveredState, setRecoveredState] = useState<CalculatorState | null>(null);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(AUTOSAVE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as CalculatorState;
+      if (parsed.schemaVersion && parsed.schemaVersion >= 1) {
+        const migrated = migrateState(parsed);
+        const isSame = JSON.stringify(migrated) === JSON.stringify(state);
+        if (!isSame) {
+          setRecoveredState(migrated);
+          setShowRecovery(true);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const result = calculate(state);
 
@@ -294,6 +364,18 @@ export function useCalculator() {
       }
     }, 500);
     return () => clearTimeout(timer);
+  }, [state]);
+
+  // Auto-save every 30 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      try {
+        localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(state));
+      } catch {
+        // ignore
+      }
+    }, 30000);
+    return () => clearInterval(timer);
   }, [state]);
 
   const updateState = useCallback((patch: Partial<CalculatorState>) => {
@@ -354,8 +436,15 @@ export function useCalculator() {
       ...prev,
       ingredients: [
         ...prev.ingredients,
-        { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0, supplierPaymentDays: 30 },
+        { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0, supplierPaymentDays: 30, moqTiers: [] },
       ],
+    }));
+  }, []);
+
+  const setIngredients = useCallback((ingredients: Ingredient[]) => {
+    setState((prev) => ({
+      ...prev,
+      ingredients,
     }));
   }, []);
 
@@ -830,7 +919,7 @@ export function useCalculator() {
   );
 
   const loadScenario = useCallback((scenario: Scenario) => {
-    setState(scenario.inputs);
+    setState(migrateState(scenario.inputs));
   }, []);
 
   const deleteScenario = useCallback(
@@ -855,7 +944,20 @@ export function useCalculator() {
   }, []);
 
   const resetAll = useCallback(() => {
-    setState(createDefaultState());
+    resetHistory(createDefaultState());
+  }, [resetHistory]);
+
+  const recoverState = useCallback(() => {
+    if (recoveredState) {
+      resetHistory(recoveredState);
+      setShowRecovery(false);
+      setRecoveredState(null);
+    }
+  }, [recoveredState, resetHistory]);
+
+  const dismissRecovery = useCallback(() => {
+    setShowRecovery(false);
+    setRecoveredState(null);
   }, []);
 
   return {
@@ -869,6 +971,7 @@ export function useCalculator() {
     updateSKU,
     updateOrderQty,
     addIngredient,
+    setIngredients,
     updateIngredient,
     removeIngredient,
     addPackagingLayer,
@@ -901,6 +1004,13 @@ export function useCalculator() {
     deleteScenario,
     clearScenarios,
     resetAll,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    showRecovery,
+    recoverState,
+    dismissRecovery,
     subscriptionPlans: state.subscriptionPlans,
     addSubscriptionPlan,
     updateSubscriptionPlan,

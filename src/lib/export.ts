@@ -63,47 +63,129 @@ export const exportPDF = async (result: CalculationResult, label: string) => {
     const autoTable = (await import("jspdf-autotable")).default;
 
     const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("Channel Calculator Report", 14, 20);
-    doc.setFontSize(10);
-    doc.text(`Label: ${label || "N/A"}`, 14, 28);
-    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 34);
+    const primaryColor: [number, number, number] = [37, 99, 235]; // blue-600
 
-    const tableData = [
-      ["Blended Revenue / Pack", money3(result.brev)],
-      ["Blended Gross Profit / Pack", money3(result.bgpp)],
-      ["Blended Gross Margin", pct(result.bgmp)],
-      ["Blended Operating Profit / Pack", money3(result.bopp)],
-      ["Blended Operating Margin", pct(result.bomp)],
-      ["COGS / Pack", money3(result.cogsPerPack)],
-      ["Overhead / Pack", money3(result.ohPerPack)],
-      ["Retail Price", money3(result.retail.price)],
-      ["Retail GP / Pack", money3(result.retail.gp)],
-      ["Retail GM%", pct(result.retail.gm)],
-      ["Retail OP / Pack", money3(result.retail.op)],
-      ["Wholesale Price", money3(result.wholesale.price)],
-      ["Wholesale GP / Pack", money3(result.wholesale.gp)],
-      ["Wholesale GM%", pct(result.wholesale.gm)],
-      ["Distributor Price", money3(result.distributor.price)],
-      ["Distributor GP / Pack", money3(result.distributor.gp)],
-      ["Distributor GM%", pct(result.distributor.gm)],
-      ["Break-Even Retail (packs)", isFinite(result.beUnitsR) ? Math.ceil(result.beUnitsR).toLocaleString() : "Unprofitable"],
-      ["Break-Even Wholesale (packs)", isFinite(result.beUnitsW) ? Math.ceil(result.beUnitsW).toLocaleString() : "Unprofitable"],
-      ["Break-Even Blended (packs)", isFinite(result.beUnitsB) ? Math.ceil(result.beUnitsB).toLocaleString() : "Unprofitable"],
-      ["Total Commissions", money(result.commissionResults.totalComm)],
-      ["Commissions % of Revenue", pct(result.commissionResults.commPctGross)],
+    // Header
+    doc.setFillColor(...primaryColor);
+    doc.rect(0, 0, 210, 35, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(20);
+    doc.setFont("helvetica", "bold");
+    doc.text("Channel Calculator", 14, 20);
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Pitch Deck Summary${label ? ` — ${label}` : ""}`, 14, 28);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 160, 28, { align: "right" });
+
+    let y = 45;
+
+    // Executive Summary
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text("Executive Summary", 14, y);
+    y += 8;
+
+    const summaryData = [
+      ["Blended Gross Margin", pct(result.bgmp), result.bgmp > 0.3 ? "Strong" : result.bgmp > 0.15 ? "Moderate" : "Thin"],
+      ["Break-Even Revenue", money3(result.brev), isFinite(result.beUnitsB) ? `${Math.ceil(result.beUnitsB).toLocaleString()} packs` : "Unprofitable"],
+      ["Monthly Volume", result.totalMonthlyVolume.toLocaleString(), "Target: 1,000+ packs"],
+      ["COGS / Pack", money3(result.cogsPerPack), result.cogsPerPack < result.retail.price * 0.5 ? "Healthy" : "High"],
     ];
 
     autoTable(doc, {
-      startY: 40,
-      head: [["Metric", "Value"]],
-      body: tableData,
+      startY: y,
+      head: [["Metric", "Value", "Assessment"]],
+      body: summaryData,
       theme: "grid",
-      headStyles: { fillColor: [60, 60, 60] },
-      styles: { fontSize: 9 },
+      headStyles: { fillColor: primaryColor, textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 3 },
+      columnStyles: {
+        0: { fontStyle: "bold" },
+        2: { fontStyle: "italic" },
+      },
+      margin: { left: 14, right: 14 },
     });
 
-    doc.save(`calculator-report-${new Date().toISOString().slice(0, 10)}.pdf`);
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Channel Profitability
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Channel Profitability", 14, y);
+    y += 8;
+
+    const channelData = [
+      ["Retail", money3(result.retail.price), money3(result.retail.gp), pct(result.retail.gm), pct(result.retail.om)],
+      ["Wholesale", money3(result.wholesale.price), money3(result.wholesale.gp), pct(result.wholesale.gm), pct(result.wholesale.om)],
+      ["Distributor", money3(result.distributor.price), money3(result.distributor.gp), pct(result.distributor.gm), pct(result.distributor.om)],
+    ];
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Channel", "Price", "GP/Pack", "GM%", "OM%"]],
+      body: channelData,
+      theme: "grid",
+      headStyles: { fillColor: primaryColor, textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 3 },
+      margin: { left: 14, right: 14 },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Cost Breakdown
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Cost Structure", 14, y);
+    y += 8;
+
+    const costData = result.costBreakdown
+      .filter((c) => c.value > 0)
+      .map((c) => [c.name, money3(c.value), `${((c.value / result.cogsPerPack) * 100).toFixed(1)}%`]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [["Component", "Cost / Pack", "Share of COGS"]],
+      body: costData,
+      theme: "grid",
+      headStyles: { fillColor: primaryColor, textColor: 255 },
+      styles: { fontSize: 10, cellPadding: 3 },
+      margin: { left: 14, right: 14 },
+    });
+
+    y = (doc as any).lastAutoTable.finalY + 10;
+
+    // Break-Even Analysis
+    if (y < 250) {
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("Break-Even Analysis", 14, y);
+      y += 8;
+
+      const beData = [
+        ["Retail", isFinite(result.beUnitsR) ? Math.ceil(result.beUnitsR).toLocaleString() : "Unprofitable", isFinite(result.beRevR) ? money(result.beRevR) : "N/A"],
+        ["Wholesale", isFinite(result.beUnitsW) ? Math.ceil(result.beUnitsW).toLocaleString() : "Unprofitable", isFinite(result.beRevW) ? money(result.beRevW) : "N/A"],
+        ["Distributor", isFinite(result.beUnitsD) ? Math.ceil(result.beUnitsD).toLocaleString() : "Unprofitable", isFinite(result.beRevD) ? money(result.beRevD) : "N/A"],
+        ["Blended", isFinite(result.beUnitsB) ? Math.ceil(result.beUnitsB).toLocaleString() : "Unprofitable", isFinite(result.beRevB) ? money(result.beRevB) : "N/A"],
+      ];
+
+      autoTable(doc, {
+        startY: y,
+        head: [["Channel", "Packs Needed", "Revenue Needed"]],
+        body: beData,
+        theme: "grid",
+        headStyles: { fillColor: primaryColor, textColor: 255 },
+        styles: { fontSize: 10, cellPadding: 3 },
+        margin: { left: 14, right: 14 },
+      });
+    }
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(128, 128, 128);
+    doc.text("Generated by Channel Calculator | channelcalc.app", 14, 290);
+
+    doc.save(`pitch-deck-${label || "summary"}-${new Date().toISOString().slice(0, 10)}.pdf`);
   } catch (err) {
     console.error("PDF export failed:", err);
     alert("PDF export failed. Please try CSV export instead.");

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCalculator } from "@/hooks/useCalculator";
 import { Header } from "@/components/Header";
 import { SensitivityPanel } from "@/components/SensitivityPanel";
+import { RecoveryDialog } from "@/components/RecoveryDialog";
 import { ProductTab } from "@/components/tabs/ProductTab";
 import { ChannelsTab } from "@/components/tabs/ChannelsTab";
 import { CostsTab } from "@/components/tabs/CostsTab";
@@ -11,6 +12,9 @@ import { POTab } from "@/components/tabs/POTab";
 import { CommissionsTab } from "@/components/tabs/CommissionsTab";
 import { ThirdPartyTab } from "@/components/tabs/ThirdPartyTab";
 import { ScenariosTab } from "@/components/tabs/ScenariosTab";
+import { CompareTab } from "@/components/tabs/CompareTab";
+import { CampaignsTab } from "@/components/tabs/CampaignsTab";
+import { ExecutiveDashboard } from "@/components/tabs/ExecutiveDashboard";
 import { ChartsTab } from "@/components/tabs/ChartsTab";
 import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
 import { SimulateTab } from "@/components/tabs/SimulateTab";
@@ -41,6 +45,25 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) {
+          calc.redo();
+        } else {
+          calc.undo();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'y') {
+        e.preventDefault();
+        calc.redo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [calc]);
+
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -50,6 +73,16 @@ function App() {
         unitSystem={calc.unitSystem}
         onToggleUnitSystem={calc.toggleUnitSystem}
         onSimulateClick={handleSimulateClick}
+        onUndo={calc.undo}
+        onRedo={calc.redo}
+        canUndo={calc.canUndo}
+        canRedo={calc.canRedo}
+      />
+
+      <RecoveryDialog
+        open={calc.showRecovery}
+        onRecover={calc.recoverState}
+        onDismiss={calc.dismissRecovery}
       />
 
       {/* Floating Sensitivity Panel */}
@@ -81,9 +114,12 @@ function App() {
             <TabsTrigger value="commissions"><span className="text-xs text-muted-foreground mr-1 font-bold">6</span>Commissions</TabsTrigger>
             <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
-            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Subscriptions</TabsTrigger>
+            <TabsTrigger value="dashboard"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Dashboard</TabsTrigger>
+            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Subscriptions</TabsTrigger>
             <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Cash Flow</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="campaigns"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Campaigns</TabsTrigger>
+            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="compare"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Compare</TabsTrigger>
             <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
             <TabsTrigger value="simulate"><span className="text-xs text-primary mr-1 font-bold">●</span>Simulate</TabsTrigger>
           </TabsList>
@@ -97,6 +133,7 @@ function App() {
               updateSKU={calc.updateSKU}
               updateOrderQty={calc.updateOrderQty}
               addIngredient={calc.addIngredient}
+              setIngredients={calc.setIngredients}
               updateIngredient={calc.updateIngredient}
               removeIngredient={calc.removeIngredient}
             />
@@ -172,6 +209,10 @@ function App() {
             <ChartsTab result={calc.result} />
           </TabsContent>
 
+          <TabsContent value="dashboard">
+            <ExecutiveDashboard result={calc.result} />
+          </TabsContent>
+
           <TabsContent value="subscriptions">
             <SubscriptionsTab
               skus={calc.state.skus}
@@ -194,6 +235,14 @@ function App() {
             />
           </TabsContent>
 
+          <TabsContent value="campaigns">
+            <CampaignsTab
+              campaigns={calc.state.campaigns}
+              campaignImpact={calc.result.campaignImpact}
+              onUpdate={(campaigns) => calc.updateState({ campaigns })}
+            />
+          </TabsContent>
+
           <TabsContent value="scenarios">
             <ScenariosTab
               scenarios={calc.scenarios}
@@ -201,6 +250,10 @@ function App() {
               onDelete={calc.deleteScenario}
               onClear={calc.clearScenarios}
             />
+          </TabsContent>
+
+          <TabsContent value="compare">
+            <CompareTab scenarios={calc.scenarios} />
           </TabsContent>
 
           <TabsContent value="simulate">

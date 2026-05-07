@@ -9,6 +9,7 @@ import type { CalculationResult } from "@/types/calculator";
 import { money3, money } from "@/lib/calculator";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
+import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 
 interface CashFlowTabProps {
   result: CalculationResult;
@@ -131,70 +132,107 @@ export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabPro
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{isWeekly ? "Week" : "Month"}</TableHead>
-                  <TableHead className="text-right">
-                    Starting
-                    <InfoTooltip text="Bank balance at the start of this period. Carried forward from the previous period's ending balance." label="Starting Balance" />
-                  </TableHead>
-                  <TableHead className="text-right text-green-600">
-                    Cash In
-                    <InfoTooltip text="All cash received this period: revenue from sales (after payment term delays) plus subscription payments." label="Cash In" />
-                  </TableHead>
-                  <TableHead className="text-right text-red-500">
-                    Cash Out
-                    <InfoTooltip text="All cash paid this period: COGS (after lead time + supplier terms), overhead, debt, commissions, and capital expenditures." label="Cash Out" />
-                  </TableHead>
-                  <TableHead className="text-right">
-                    Net
-                    <InfoTooltip text="Net cash flow = Cash In minus Cash Out. Positive means more money came in than went out." label="Net Cash Flow" />
-                  </TableHead>
-                  <TableHead className="text-right">
-                    Ending
-                    <InfoTooltip text="Bank balance at end of this period = Starting + Net. Rolls forward as next period's starting balance." label="Ending Balance" />
-                  </TableHead>
-                  {!isWeekly && (
-                    <>
-                      <TableHead className="text-right text-xs">Revenue</TableHead>
-                      <TableHead className="text-right text-xs">COGS</TableHead>
-                      <TableHead className="text-right text-xs">Overhead</TableHead>
-                      <TableHead className="text-right text-xs">Debt/CapEx</TableHead>
-                    </>
-                  )}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+            <DesktopTable>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{isWeekly ? "Week" : "Month"}</TableHead>
+                    <TableHead className="text-right">
+                      Starting
+                      <InfoTooltip text="Bank balance at the start of this period. Carried forward from the previous period's ending balance." label="Starting Balance" />
+                    </TableHead>
+                    <TableHead className="text-right text-green-600">
+                      Cash In
+                      <InfoTooltip text="All cash received this period: revenue from sales (after payment term delays) plus subscription payments." label="Cash In" />
+                    </TableHead>
+                    <TableHead className="text-right text-red-500">
+                      Cash Out
+                      <InfoTooltip text="All cash paid this period: COGS (after lead time + supplier terms), overhead, debt, commissions, and capital expenditures." label="Cash Out" />
+                    </TableHead>
+                    <TableHead className="text-right">
+                      Net
+                      <InfoTooltip text="Net cash flow = Cash In minus Cash Out. Positive means more money came in than went out." label="Net Cash Flow" />
+                    </TableHead>
+                    <TableHead className="text-right">
+                      Ending
+                      <InfoTooltip text="Bank balance at end of this period = Starting + Net. Rolls forward as next period's starting balance." label="Ending Balance" />
+                    </TableHead>
+                    {!isWeekly && (
+                      <>
+                        <TableHead className="text-right text-xs">Revenue</TableHead>
+                        <TableHead className="text-right text-xs">COGS</TableHead>
+                        <TableHead className="text-right text-xs">Overhead</TableHead>
+                        <TableHead className="text-right text-xs">Debt/CapEx</TableHead>
+                      </>
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(data as any[]).map((row, i) => {
+                    const isNeg = row.endingBalance < 0;
+                    return (
+                      <TableRow key={i} className={isNeg ? "bg-red-50/50 dark:bg-red-900/10" : ""}>
+                        <TableCell className="font-medium">
+                          {(row as any).monthLabel ?? `W${(row as any).week}`}
+                        </TableCell>
+                        <TableCell className="text-right">{money(row.startingBalance)}</TableCell>
+                        <TableCell className="text-right text-green-600">{money(row.cashIn)}</TableCell>
+                        <TableCell className="text-right text-red-500">{money(row.cashOut)}</TableCell>
+                        <TableCell className={`text-right font-medium ${row.netCashFlow >= 0 ? "text-green-600" : "text-red-500"}`}>
+                          {money(row.netCashFlow)}
+                        </TableCell>
+                        <TableCell className={`text-right font-bold ${isNeg ? "text-red-600" : ""}`}>
+                          {money(row.endingBalance)}
+                        </TableCell>
+                        {!isWeekly && (
+                          <>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).revenueCollected)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).cogsPaid)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).overheadPaid)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).debtServicePaid + (row as any).capexPaid)}</TableCell>
+                          </>
+                        )}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </DesktopTable>
+
+            <MobileOnly>
+              <div className="space-y-2">
                 {(data as any[]).map((row, i) => {
                   const isNeg = row.endingBalance < 0;
+                  const label = (row as any).monthLabel ?? `W${(row as any).week}`;
                   return (
-                    <TableRow key={i} className={isNeg ? "bg-red-50/50 dark:bg-red-900/10" : ""}>
-                      <TableCell className="font-medium">
-                        {(row as any).monthLabel ?? `W${(row as any).week}`}
-                      </TableCell>
-                      <TableCell className="text-right">{money(row.startingBalance)}</TableCell>
-                      <TableCell className="text-right text-green-600">{money(row.cashIn)}</TableCell>
-                      <TableCell className="text-right text-red-500">{money(row.cashOut)}</TableCell>
-                      <TableCell className={`text-right font-medium ${row.netCashFlow >= 0 ? "text-green-600" : "text-red-500"}`}>
-                        {money(row.netCashFlow)}
-                      </TableCell>
-                      <TableCell className={`text-right font-bold ${isNeg ? "text-red-600" : ""}`}>
-                        {money(row.endingBalance)}
-                      </TableCell>
-                      {!isWeekly && (
-                        <>
-                          <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).revenueCollected)}</TableCell>
-                          <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).cogsPaid)}</TableCell>
-                          <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).overheadPaid)}</TableCell>
-                          <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).debtServicePaid + (row as any).capexPaid)}</TableCell>
-                        </>
-                      )}
-                    </TableRow>
+                    <Card key={i} className={`border-l-4 ${isNeg ? "border-l-red-400" : "border-l-primary"}`}>
+                      <CardContent className="p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold text-sm">{label}</span>
+                          <span className={`text-xs font-medium ${isNeg ? "text-red-600" : "text-green-600"}`}>
+                            End: {money(row.endingBalance)}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+                          <div><span className="text-muted-foreground">Start:</span> {money(row.startingBalance)}</div>
+                          <div><span className="text-green-600">In:</span> {money(row.cashIn)}</div>
+                          <div><span className="text-red-500">Out:</span> {money(row.cashOut)}</div>
+                          <div><span className="font-medium">Net:</span> {money(row.netCashFlow)}</div>
+                          {!isWeekly && (
+                            <>
+                              <div><span className="text-muted-foreground">Rev:</span> {money((row as any).revenueCollected)}</div>
+                              <div><span className="text-muted-foreground">COGS:</span> {money((row as any).cogsPaid)}</div>
+                              <div><span className="text-muted-foreground">OH:</span> {money((row as any).overheadPaid)}</div>
+                              <div><span className="text-muted-foreground">Debt/ CapEx:</span> {money((row as any).debtServicePaid + (row as any).capexPaid)}</div>
+                            </>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   );
                 })}
-              </TableBody>
-            </Table>
+              </div>
+            </MobileOnly>
           </div>
         </CardContent>
       </Card>
