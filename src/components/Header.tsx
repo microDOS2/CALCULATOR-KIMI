@@ -8,6 +8,7 @@ import type { CalculationResult } from "@/types/calculator";
 import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
 import { Guide } from "@/components/Guide";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { FeatureList } from "@/components/FeatureList";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -42,6 +43,7 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-end min-w-0">
           <div className="hidden sm:flex items-center gap-1 shrink-0">
+            <FeatureList />
             <Guide />
             <OnboardingWizard />
           </div>
