@@ -1,11 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import type { CalculationResult } from "@/types/calculator";
+import { SanityChecks } from "@/components/SanityChecks";
+import { AssumptionsAuditTrail } from "@/components/AssumptionsAuditTrail";
+import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
 import { formatBenchmarkRange } from "@/lib/benchmarks";
 
 interface ExecutiveDashboardProps {
+  state: CalculatorState;
   result: CalculationResult;
 }
 
@@ -61,7 +64,7 @@ function KPICard({
   );
 }
 
-export function ExecutiveDashboard({ result }: ExecutiveDashboardProps) {
+export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
   const topCost = result.costBreakdown.reduce((a, b) => (a.value > b.value ? a : b), result.costBreakdown[0]);
   const hasCampaigns = result.campaigns && result.campaigns.length > 0;
   const campaignEffect = result.campaignImpact?.netAnnualEffect ?? 0;
@@ -235,6 +238,12 @@ export function ExecutiveDashboard({ result }: ExecutiveDashboardProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* D1: Sanity Checks */}
+      <SanityChecks result={result} />
+
+      {/* D2: Assumptions Audit Trail */}
+      <AssumptionsAuditTrail state={state} result={result} />
     </div>
   );
 }

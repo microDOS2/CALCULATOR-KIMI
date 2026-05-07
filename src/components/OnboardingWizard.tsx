@@ -3,35 +3,50 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Calculator, Package, Store, BarChart3, TrendingUp, HelpCircle, ArrowRight, ArrowLeft, X } from "lucide-react";
+import { Calculator, Package, Store, BarChart3, TrendingUp, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X } from "lucide-react";
 
-const WIZARD_KEY = "channel_calc_wizard_seen_v1";
+const WIZARD_KEY = "channel_calc_wizard_seen_v2";
 
 const steps = [
   {
     icon: Calculator,
     title: "Welcome to Channel Calculator",
-    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Enter your product specs, costs, and pricing — then explore scenarios, simulate changes, and forecast cash flow.",
+    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Enter your product specs, costs, and pricing — then explore scenarios, simulate changes, forecast cash flow, and validate your model against industry benchmarks.",
   },
   {
     icon: Package,
     title: "Step 1: Build Your Product",
-    body: "Start in the Product tab. Add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS — the total cost to produce one pack. Every other number in the tool flows from this foundation.",
+    body: "Start in the Product tab. Add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS — the total cost to produce one pack. Every other number in the tool flows from this foundation. Use CSV Import to bulk-paste ingredients from a spreadsheet.",
   },
   {
     icon: Store,
     title: "Step 2: Set Your Channels",
-    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. The calculator shows gross profit and margin for each channel. Toggle channels on/off to see how each one contributes to your blended bottom line.",
+    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. The calculator shows gross profit and margin for each channel. Toggle channels on/off to see how each one contributes. Add Sales Tax and Import Duty to model regulatory costs. Enable Weight-Based Shipping for carrier-like pricing.",
   },
   {
     icon: BarChart3,
-    title: "Step 3: See the Picture",
-    body: "The Charts tab visualizes your cost breakdown and channel profitability. The pie chart reveals your biggest cost drivers. The bar chart compares revenue vs. profit across all three channels at a glance.",
+    title: "Step 3: Analyze & Visualize",
+    body: "The Charts tab includes a Sensitivity Tornado Chart that shows which inputs most affect your blended margin (±10% swings). A pie chart reveals your biggest cost drivers. A bar chart compares revenue vs. profit across all three channels. Time-series charts in Cash Flow, Subscriptions, and Campaigns tabs show trends over time.",
+  },
+  {
+    icon: Target,
+    title: "Step 4: Optimize with Power Tools",
+    body: "Use Goal Seek (Tab 9.5) to reverse-calculate: enter a target margin or profit, pick which input to adjust (price, discount, cost), and the solver finds the exact value. Use Batch What-If (Tab 9.6) to test 5-10 values at once and compare in a single table. These are the fastest ways to find your optimal pricing and cost structure.",
+  },
+  {
+    icon: Table2,
+    title: "Step 5: Compare & Save Scenarios",
+    body: "Save your model configurations as named scenarios with notes (Tab 13). Use the Compare tab (Tab 14) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. This is the fastest way to evaluate strategic decisions — like raising price vs. cutting costs.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Step 6: Validate & Audit",
+    body: "The Dashboard (Tab 9) is your Mission Control. It includes 10 live KPI cards with industry benchmark comparisons (supplement industry norms), an automated Sanity Checks panel that flags COGS ratios, margins, break-even feasibility, and cash flow risks, plus a complete Assumptions Audit Trail listing every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
   },
   {
     icon: TrendingUp,
-    title: "Step 4: Explore & Forecast",
-    body: "Click Simulate to drag sliders and watch margins update live. Visit the Cash Flow tab to model when cash goes in and out — including payment terms and inventory lead times. This is where strategy meets reality.",
+    title: "Step 7: Forecast & Simulate",
+    body: "Click Simulate to drag sliders and watch margins update live. Visit the Cash Flow tab to model when cash goes in and out — including payment terms and inventory lead times. Model subscriptions with churn and growth projections. This is where strategy meets reality. Remember: you can always undo with Ctrl+Z (50 steps).",
   },
 ];
 

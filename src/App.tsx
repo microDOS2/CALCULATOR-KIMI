@@ -214,7 +214,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="dashboard">
-            <ExecutiveDashboard result={calc.result} />
+            <ExecutiveDashboard state={calc.state} result={calc.result} />
           </TabsContent>
 
           <TabsContent value="goalseek">
