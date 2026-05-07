@@ -122,7 +122,10 @@ export function CompareTab({ scenarios }: CompareTabProps) {
                 </SelectTrigger>
                 <SelectContent>
                   {scenarios.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>{s.label || "—"}</SelectItem>
+                    <SelectItem key={s.id} value={s.id}>
+                      <span className="font-medium">{s.label || "—"}</span>
+                      {s.note && <span className="text-xs text-muted-foreground ml-2">({s.note})</span>}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -138,7 +141,10 @@ export function CompareTab({ scenarios }: CompareTabProps) {
                 </SelectTrigger>
                 <SelectContent>
                   {scenarios.map((s) => (
-                    <SelectItem key={s.id} value={s.id}>{s.label || "—"}</SelectItem>
+                    <SelectItem key={s.id} value={s.id}>
+                      <span className="font-medium">{s.label || "—"}</span>
+                      {s.note && <span className="text-xs text-muted-foreground ml-2">({s.note})</span>}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -152,7 +158,10 @@ export function CompareTab({ scenarios }: CompareTabProps) {
           {/* Scenario A Card */}
           <Card className="border-l-4 border-l-blue-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-blue-600">{scenarioA?.label || "Scenario A"}</CardTitle>
+              <CardTitle className="text-sm text-blue-600">
+                {scenarioA?.label || "Scenario A"}
+                {scenarioA?.note && <span className="block text-xs text-muted-foreground font-normal">{scenarioA.note}</span>}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {deltas.map((row) => (
@@ -167,7 +176,10 @@ export function CompareTab({ scenarios }: CompareTabProps) {
           {/* Scenario B Card */}
           <Card className="border-l-4 border-l-green-500">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-green-600">{scenarioB?.label || "Scenario B"}</CardTitle>
+              <CardTitle className="text-sm text-green-600">
+                {scenarioB?.label || "Scenario B"}
+                {scenarioB?.note && <span className="block text-xs text-muted-foreground font-normal">{scenarioB.note}</span>}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {deltas.map((row) => (

@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -11,7 +12,7 @@ import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { useState } from "react";
 
 interface HeaderProps {
-  onSaveScenario: (label: string) => void;
+  onSaveScenario: (label: string, note?: string) => void;
   onReset: () => void;
   result: CalculationResult;
   unitSystem: 'mg' | 'oz';
@@ -25,6 +26,7 @@ interface HeaderProps {
 
 export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUnitSystem, onSimulateClick, onUndo, onRedo, canUndo, canRedo }: HeaderProps) {
   const [label, setLabel] = useState("");
+  const [note, setNote] = useState("");
   const [copied, setCopied] = useState(false);
 
   const handleShare = () => {
@@ -60,8 +62,17 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
             <Scale className="h-4 w-4 mr-1" /> {unitSystem === 'mg' ? 'mg' : 'oz'}
           </Button>
           <div className="w-px h-6 bg-border mx-1" />
-          <Input placeholder="Scenario label..." className="w-40 h-8 text-sm" value={label} onChange={(e) => setLabel(e.target.value)} />
-          <Button size="sm" variant="default" onClick={() => { onSaveScenario(label); setLabel(""); }}>
+          <div className="flex flex-col gap-1">
+            <Input placeholder="Scenario label..." className="w-48 h-8 text-sm" value={label} onChange={(e) => setLabel(e.target.value)} title="Give your scenario a descriptive name" />
+            <Textarea
+              placeholder="Notes (e.g., 'Aggressive Q4 pricing for investor pitch')"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="w-48 min-h-[36px] text-xs py-1 resize-none"
+              title="Add descriptive notes to remember why you saved this scenario"
+            />
+          </div>
+          <Button size="sm" variant="default" onClick={() => { onSaveScenario(label, note); setLabel(""); setNote(""); }} title="Save current model state with label and notes">
             <Save className="h-4 w-4 mr-1" /> Save
           </Button>
           <DropdownMenu>

@@ -904,11 +904,12 @@ export function useCalculator() {
   const [scenarios, setScenarios] = useState<Scenario[]>(loadScenarios);
 
   const saveScenario = useCallback(
-    (label: string) => {
+    (label: string, note: string = "") => {
       const scenario: Scenario = {
         id: uid(),
         savedAt: new Date().toLocaleString(),
         label: label.trim(),
+        note: note.trim(),
         inputs: JSON.parse(JSON.stringify(state)),
       };
       const next = [scenario, ...scenarios].slice(0, 50);

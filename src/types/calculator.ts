@@ -324,6 +324,7 @@ export interface Scenario {
   id: string;
   savedAt: string;
   label: string;
+  note: string;
   inputs: CalculatorState;
 }
 

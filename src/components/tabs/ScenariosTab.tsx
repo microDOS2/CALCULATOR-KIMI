@@ -55,6 +55,7 @@ export function ScenariosTab({ scenarios, onLoad, onDelete, onClear }: Scenarios
               <TableRow>
                 <TableHead>Saved At</TableHead>
                 <TableHead>Label</TableHead>
+                <TableHead>Notes</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -63,9 +64,10 @@ export function ScenariosTab({ scenarios, onLoad, onDelete, onClear }: Scenarios
                 <TableRow key={scenario.id}>
                   <TableCell className="text-muted-foreground text-sm">{scenario.savedAt}</TableCell>
                   <TableCell className="font-medium">{scenario.label || "—"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{scenario.note || "—"}</TableCell>
                   <TableCell className="text-right">
-                    <Button size="sm" variant="outline" onClick={() => onLoad(scenario)}><Upload className="h-4 w-4 mr-1" /> Load</Button>
-                    <Button size="sm" variant="ghost" className="text-destructive ml-1" onClick={() => onDelete(scenario.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <Button size="sm" variant="outline" onClick={() => onLoad(scenario)} title="Restore this scenario's full model state"><Upload className="h-4 w-4 mr-1" /> Load</Button>
+                    <Button size="sm" variant="ghost" className="text-destructive ml-1" onClick={() => onDelete(scenario.id)} title="Delete this scenario"><Trash2 className="h-4 w-4" /></Button>
                   </TableCell>
                 </TableRow>
               ))}

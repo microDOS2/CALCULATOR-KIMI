@@ -3,6 +3,7 @@ import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
+import { formatBenchmarkRange } from "@/lib/benchmarks";
 
 interface ExecutiveDashboardProps {
   result: CalculationResult;
@@ -15,6 +16,7 @@ function KPICard({
   icon: Icon,
   color,
   trend,
+  benchmark,
 }: {
   title: string;
   value: string;
@@ -22,6 +24,7 @@ function KPICard({
   icon: React.ElementType;
   color: string;
   trend?: "up" | "down" | "neutral";
+  benchmark?: string;
 }) {
   return (
     <Card className="overflow-hidden">
@@ -36,8 +39,13 @@ function KPICard({
             <Icon className="h-5 w-5 text-white" />
           </div>
         </div>
+        {benchmark && (
+          <div className="mt-1 text-xs text-muted-foreground italic">
+            Industry: {benchmark}
+          </div>
+        )}
         {trend && (
-          <div className="mt-2 flex items-center gap-1">
+          <div className="mt-1 flex items-center gap-1">
             {trend === "up" ? (
               <TrendingUp className="h-3 w-3 text-green-500" />
             ) : trend === "down" ? (
@@ -78,6 +86,7 @@ export function ExecutiveDashboard({ result }: ExecutiveDashboardProps) {
           icon={Target}
           color="bg-blue-500"
           trend={result.bgmp > 0.3 ? "up" : result.bgmp > 0.15 ? "neutral" : "down"}
+          benchmark={formatBenchmarkRange("blendedGrossMargin")}
         />
         <KPICard
           title="Break-Even Revenue"
@@ -137,6 +146,7 @@ export function ExecutiveDashboard({ result }: ExecutiveDashboardProps) {
           icon={Truck}
           color="bg-amber-500"
           trend={result.shipPerPack < 5 ? "up" : "down"}
+          benchmark={formatBenchmarkRange("shippingCostPerPack")}
         />
       </div>
 
