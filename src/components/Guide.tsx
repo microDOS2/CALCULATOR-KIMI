@@ -1,245 +1,137 @@
-import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { HelpCircle } from "lucide-react";
-
-const steps = [
-  {
-    num: "1",
-    title: "Product",
-    desc: "Define your Stock Keeping Units (SKUs). Each SKU is a distinct product variant with its own units per pack, retail price, and channel sales mix. Add ingredients (raw materials) with mg per unit, cost per mg, and supplier payment terms. The calculator shows total weight per unit, cost per mg, and cost per gram. Use the Order Composition to set how many packs of each SKU you're ordering.",
-    required: true,
-  },
-  {
-    num: "2",
-    title: "Packaging",
-    desc: "Each SKU has its own packaging layers — primary container, inner packaging, outer box, display packaging, shipping box. Set cost per unit, units per layer, and weight in grams for each layer. Toggle Include on/off to see costs update live. The total packaging cost and weight feed into COGS and shipping calculations.",
-    required: true,
-  },
-  {
-    num: "3",
-    title: "Channels",
-    desc: "Set your wholesale discount (how much retailers pay below retail) and distributor discount (how much distributors pay below wholesale). The cascade is: Retail Price → Wholesale Price → Distributor Price. Toggle which channels to include. Retail can optionally include a per-pack shipping cost.",
-    required: true,
-  },
-  {
-    num: "4",
-    title: "Costs & Break-Even",
-    desc: "Add fixed monthly overhead (salaries, rent, insurance, etc.) and cash flow settings (starting cash, payment terms, lead times, debt service, CapEx). Set monthly volume per SKU — this drives overhead allocation per pack and the break-even calculation. The break-even shows how many packs you need to sell to cover costs.",
-    required: true,
-  },
-  {
-    num: "5",
-    title: "Orders",
-    desc: "Shows the profitability of your Order Composition as a Purchase Order. Breaks down profit by channel for each SKU line item. Calculates total GP, monthly overhead impact, net impact, average cost per unit, and average profit per unit. Based on your Product tab order quantities.",
-    required: false,
-  },
-  {
-    num: "6",
-    title: "Commissions",
-    desc: "Set up a 4-tier sales commission hierarchy: President → VP → RSM → Salesperson. Define override percentages or per-pack amounts. Assign team members. Add performance bonuses with thresholds. View projected commission payouts. This only affects projections, not core profitability.",
-    required: false,
-  },
-  {
-    num: "7",
-    title: "Third Party",
-    desc: "Add external service provider costs across 5 categories (Sales, Operations, Fulfillment, Business Management, Marketing) with 25 line items each. Check 'Include' to fold into monthly overhead. Model outsourced vs. in-house operations and see impact on per-pack profitability.",
-    required: false,
-  },
-  {
-    num: "8",
-    title: "Charts",
-    desc: "Visual analytics — a pie chart breaks down your cost structure (ingredients, packaging layers), and a bar chart compares revenue, gross profit, and operating profit across all three channels. Quickly identify your biggest cost drivers and most profitable channel.",
-    required: false,
-  },
-  {
-    num: "9",
-    title: "Subscriptions",
-    desc: "Model monthly recurring revenue (MRR) with subscription plans. Each plan includes one or more SKUs that subscribers receive monthly. Set growth rate, churn rate, starting subscribers, and CAC. View 12-month projections with subscriber counts, revenue, COGS, and cumulative figures. Compare multiple plans.",
-    required: false,
-  },
-  {
-    num: "10",
-    title: "Cash Flow",
-    desc: "Tracks when money actually enters and leaves your bank account — not just when revenue is earned. Models customer payment terms (retail immediate, wholesale Net-30, distributor Net-60), supplier lead times, inventory delays, debt service, and one-time CapEx. Shows your cash trough, breakeven month, and 12-month net flow. Toggle between monthly and weekly views.",
-    required: false,
-  },
-  {
-    num: "11",
-    title: "Scenarios",
-    desc: "Save a complete snapshot of your entire calculator configuration. Load past scenarios to compare different business models. Export results as CSV, PDF, or Excel. Share via URL — the link encodes your entire model so anyone who opens it sees exactly what you see.",
-    required: false,
-  },
-];
-
-const tips = [
-  "Channel Mix % must total 100% for each SKU — the calculator enforces this automatically.",
-  "Monthly Volume is critical — without it, break-even shows 'Unprofitable' and overhead per pack is artificially high.",
-  "Order Composition is separate from Monthly Volume — order qty drives PO analysis; monthly volume drives overhead allocation.",
-  "Hover over any info badge (i) to see what a section or field means.",
-  "Hover over any formula badge (f) to see the exact calculation with live numbers.",
-  "The formula tooltips show actual numbers — they update live as you change inputs.",
-  "Use 'Share' to copy a URL that contains your entire model — anyone who opens it sees exactly what you see.",
-  "Check 'Include Monthly Overhead' in Break-Even to see how many packs you need to cover fixed costs.",
-  "Third Party costs only affect calculations when 'Include' is checked AND 'Include Third Party' in Costs is also checked.",
-  "Generic defaults (SKU-A, Ingredient 1) mean this works for any physical product — supplements, electronics, apparel, food, etc.",
-  "Each SKU has its own packaging — select an SKU in the Packaging tab to edit its layers independently.",
-  "Toggle the unit switch (mg/oz) in the header to display weights in your preferred unit system.",
-  "Subscription plans can include multiple SKUs — create product bundles like 'Basic' (1 SKU) or 'Premium' (3 SKUs).",
-  "Lower churn rate + higher monthly price = higher LTV and faster CAC payback.",
-  "Cash Flow tracks actual bank balance — a business can be profitable on paper but run out of cash. Watch your lowest balance month.",
-  "The Simulate panel lets you drag sliders to explore 'what-if' scenarios without changing your saved model.",
-  "Payment terms create cash gaps — you may pay suppliers in 30 days but customers pay you in 60 days. That's a 30-day cash gap.",
-  "Use the Simulate tab for deep analysis — it shows all 12 key metrics side-by-side as you adjust levers.",
-  "The info badges (i circles) explain what each section does — hover over them for educational context.",
-];
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import { BookOpen, Lightbulb, MousePointer, Sparkles } from "lucide-react";
 
 export function Guide() {
-  const [open, setOpen] = useState(false);
-
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          variant="outline"
-          className="gap-1 shrink-0"
-          onClick={() => setOpen(true)}
-          type="button"
-        >
-          <HelpCircle className="h-4 w-4" />
-          <span className="hidden sm:inline">Guide</span>
+        <Button size="sm" variant="ghost" className="gap-1">
+          <BookOpen className="h-4 w-4" /> Guide
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[85vh] p-0">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-xl">How to Use the Channel Calculator</DialogTitle>
+      <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-lg flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            User Guide
+          </DialogTitle>
+          <DialogDescription className="text-sm">
+            Complete walkthrough of all 15 tabs and every feature.
+          </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="px-6 pb-6 max-h-[70vh]">
-          <div className="space-y-6">
-            {/* Overview */}
-            <section>
-              <h3 className="font-semibold text-sm mb-2">What This Calculator Does</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                A business modeling tool for any physical product. Calculate per-pack profitability
-                across retail, wholesale, and distributor channels. Model per-SKU packaging costs,
-                ingredient costs, overhead allocation, break-even points, purchase orders, sales
-                commissions, subscription revenue, and cash flow timing. Features sensitivity sliders
-                for strategy exploration, mg/oz unit toggle, multiple SKUs with independent packaging,
-                product bundle subscriptions, and scenario save/load with URL sharing.
-              </p>
-            </section>
 
-            {/* Step Flow */}
-            <section>
-              <h3 className="font-semibold text-sm mb-3">Recommended Input Flow</h3>
-              <div className="space-y-3">
-                {steps.map((step) => (
-                  <div key={step.num} className="flex gap-3 items-start">
-                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold mt-0.5">
-                      {step.num}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{step.title}</span>
-                        {step.required ? (
-                          <Badge variant="destructive" className="text-xs h-4 px-1">Required</Badge>
-                        ) : (
-                          <Badge variant="secondary" className="text-xs h-4 px-1">Optional</Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">{step.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
+        <div className="space-y-6 text-sm">
+          <section>
+            <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
+              <MousePointer className="h-4 w-4 text-primary" />
+              Step-by-Step Walkthrough
+            </h3>
+            <p className="text-xs text-muted-foreground mb-3">
+              Follow these steps in order to build a complete channel model. Each tab builds on the previous one.
+            </p>
+            <ol className="space-y-3 list-decimal list-inside">
+              <li className="pl-1">
+                <span className="font-medium">Product (Tab 1)</span> — Add your SKUs with units-per-pack, units-per-case, and pricing. Add ingredients with mg-per-unit, cost-per-mg, and supplier payment terms. Use <strong>MOQ Pricing Tiers</strong> to model volume discounts: "$0.70/mg at 1kg, $0.55/mg at 5kg. Use the <strong>CSV Import</strong> section to bulk-paste ingredients from a spreadsheet. The calculator auto-computes COGS per pack.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Packaging (Tab 2)</span> — Define packaging layers per SKU (jar, bottle, label, box). Set unit cost and weight (grams) for each layer. Packaging weight is used for <strong>weight-based shipping rates</strong>.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Channels (Tab 3)</span> — Set your retail selling price, wholesale discount %, and distributor discount %. Toggle channels on/off to see how each contributes. Set a flat shipping cost per pack, or enable <strong>Weight-Based Shipping Rates</strong> for carrier-like pricing by package weight. Add <strong>Sales Tax</strong> on retail and <strong>Import Duty</strong> on distributor to model regulatory costs.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Overhead (Tab 4)</span> — Enter your monthly overhead costs (rent, salaries, utilities, marketing). Toggle whether overhead is allocated to each channel. This directly affects operating profit.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">3rd Party (Tab 5)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">PO (Tab 6)</span> — View purchase order projections. The calculator generates POs for raw materials and finished goods based on your production plan and ingredient lead times.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Commissions (Tab 7)</span> — Configure sales commissions. Set commission % per channel and see the total commission impact on your operating profit.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Charts (Tab 8)</span> — Visual breakdown of your business. Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Dashboard (Tab 9)</span> — One-screen "Mission Control" with 10 KPI cards: Blended Margin, Break-Even Revenue, Monthly Volume, COGS/Pack, Channel GPs, Shipping, Top Cost Driver, Tax Impact, and Campaign Effect. All numbers update in real-time. Use this for investor meetings or bank applications.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Subscriptions (Tab 10)</span> — Model recurring revenue with subscription plans. Set monthly price, churn rate, and growth rate. See a 12-month projection of subscribers, MRR, and cumulative profit. Toggle between monthly table view and mobile-friendly card view.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Cash Flow (Tab 11)</span> — Profitability does not equal viability. This tab projects 12 months of cash inflows and outflows, including payment term delays (NET 30/60/90), ingredient PO lead times, and debt service. Toggle between Monthly and Weekly views. Watch for the red warning cards if your balance drops below $5,000.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Campaigns (Tab 12)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive).
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Scenarios (Tab 13)</span> — Save your current model configuration with a label. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 15 tabs.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Compare (Tab 14)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. This is the fastest way to evaluate strategic decisions.
+              </li>
+              <li className="pl-1">
+                <span className="font-medium">Simulate (Tab 15 / floating panel)</span> — Live what-if analysis. Drag 8 sliders (Retail Price, Units/Pack, Wholesale Discount, Distributor Discount, Monthly Volume, Subscription Price, Growth Rate, Churn Rate) and watch 12 delta cards update in real-time. The shadow state does not modify your real model until you click Apply. Click the Simulate button in the header for a floating panel, or use the ● Simulate tab for the full-page dashboard.
+              </li>
+            </ol>
+          </section>
 
-            {/* Tools (unnumbered) */}
-            <section>
-              <h3 className="font-semibold text-sm mb-2">Tools & Modes</h3>
-              <div className="space-y-2">
-                <div className="flex gap-3 items-start">
-                  <div className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold mt-0.5">
-                    ●
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">Simulate</span>
-                      <Badge variant="outline" className="text-xs h-4 px-1">Tool</Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed mt-0.5">
-                      Explore "what-if" scenarios with draggable sliders. Adjust retail price, discounts, volume,
-                      subscription growth, and churn — watch all metrics update in real-time. Available as a
-                      floating side panel (quick exploration) or a dedicated full-screen tab (deep analysis).
-                      Changes don't affect your saved model until you click Apply. Use Reset to snap back anytime.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </section>
+          <section>
+            <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              Key Features
+            </h3>
+            <ul className="space-y-2 list-disc list-inside text-xs text-muted-foreground">
+              <li className="pl-1">
+                <strong className="text-foreground">Undo/Redo</strong> — 50-step history. Use Ctrl+Z to undo, Ctrl+Y to redo. The undo/redo buttons are in the header toolbar next to the Simulate button. Never lose work from accidental changes.
+              </li>
+              <li className="pl-1">
+                <strong className="text-foreground">Auto-Save</strong> — Your session is automatically saved every 30 seconds to localStorage. If you close the browser and return, a recovery dialog appears asking if you want to restore your unsaved work.
+              </li>
+              <li className="pl-1">
+                <strong className="text-foreground">Onboarding Wizard</strong> — First-time users see a 5-step guided tour. Click the <strong>?</strong> button in the header anytime to reopen it.
+              </li>
+              <li className="pl-1">
+                <strong className="text-foreground">Mobile Responsive</strong> — Tables automatically convert to card stacks on mobile devices. The app works on phones and tablets for use in warehouses or supplier meetings.
+              </li>
+              <li className="pl-1">
+                <strong className="text-foreground">CSV Bulk Import</strong> — Paste a CSV of ingredients (name, mgPerUnit, costPerMg, supplierPaymentDays) in the Product tab to import 20 ingredients in 10 seconds instead of entering them one-by-one.
+              </li>
+              <li className="pl-1">
+                <strong className="text-foreground">PDF Export</strong> — Click Export → Download PDF in the header to generate a branded pitch-deck one-pager with Executive Summary, Channel Profitability, Cost Structure, and Break-Even Analysis. Designed for investor meetings and bank loan applications.
+              </li>
+            </ul>
+          </section>
 
-            {/* Features Overview */}
-            <section>
-              <h3 className="font-semibold text-sm mb-2">Key Features</h3>
-              <ul className="space-y-1.5">
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Per-SKU Packaging</strong> — Each product has its own packaging layers with independent costs and weights
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Unit Toggle (mg/oz)</strong> — Switch between milligrams and ounces for ingredient and weight displays
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Subscription Projections</strong> — Model MRR, churn, growth, and 12-month forecasts with product bundles
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Cash Flow Forecasting</strong> — Track actual bank balance with payment terms, lead times, debt, and CapEx. Monthly and weekly views.
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Strategy Simulator</strong> — Drag sliders to explore scenarios without changing your saved model. Panel + tab modes.
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Formula Tooltips</strong> — Hover over (f) badges to see live calculations with actual numbers
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Educational Tooltips</strong> — Hover over (i) badges to learn what each section and field means
-                </li>
-                <li className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                  <span className="text-primary flex-shrink-0">•</span>
-                  <strong>Required/Optional Indicators</strong> — Red badges for required fields, gray for optional
-                </li>
-              </ul>
-            </section>
-
-            {/* Quick Tips */}
-            <section>
-              <h3 className="font-semibold text-sm mb-3">Quick Tips</h3>
-              <ul className="space-y-2">
-                {tips.map((tip, i) => (
-                  <li key={i} className="text-xs text-muted-foreground flex gap-2 items-start leading-relaxed">
-                    <span className="text-primary flex-shrink-0">•</span>
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </div>
-        </ScrollArea>
+          <section>
+            <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 text-primary" />
+              Quick Tips
+            </h3>
+            <ul className="space-y-1.5 list-disc list-inside text-xs text-muted-foreground">
+              <li className="pl-1">Hover over the <strong className="text-foreground">i</strong> icons next to labels for detailed tooltips on every input and metric.</li>
+              <li className="pl-1">Use <strong className="text-foreground">mg</strong> toggle in the header to switch between milligram and ounce units.</li>
+              <li className="pl-1"><strong className="text-foreground">Share</strong> button copies a URL with your full model encoded — anyone with the link sees your exact setup.</li>
+              <li className="pl-1">The <strong className="text-foreground">Save</strong> button in the header saves scenarios to your browser's localStorage (survives page refresh).</li>
+              <li className="pl-1">Red alert cards in Cash Flow warn you when ending balance drops below $5,000.</li>
+              <li className="pl-1">MOQ Pricing Tiers auto-select the right cost-per-mg based on your total order volume.</li>
+              <li className="pl-1">Enable Weight-Based Shipping to replace flat-rate shipping with carrier-like pricing by package weight.</li>
+              <li className="pl-1">Add Sales Tax and Import Duty in the Channels tab to model regulatory costs per channel.</li>
+              <li className="pl-1">The Simulate tab's shadow state lets you experiment safely — your real model is not changed until you click Apply.</li>
+              <li className="pl-1">Use the Compare tab to evaluate strategic decisions by loading two scenarios side-by-side.</li>
+              <li className="pl-1">Campaigns with high volume uplift (50%+) can produce positive net effects despite deep discounts.</li>
+              <li className="pl-1">The Dashboard tab is your fastest way to check overall model health — all 10 KPIs update live.</li>
+              <li className="pl-1">All tables (Subscriptions, Cash Flow) render as card stacks on mobile for phone/tablet use.</li>
+              <li className="pl-1">If you accidentally change something, use Ctrl+Z to undo up to 50 steps back.</li>
+              <li className="pl-1">The PDF export includes a professional branded header — use it for investor decks and bank applications.</li>
+            </ul>
+          </section>
+        </div>
       </DialogContent>
     </Dialog>
   );

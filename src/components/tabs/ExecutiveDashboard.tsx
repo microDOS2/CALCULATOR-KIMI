@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles } from "lucide-react";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
 
@@ -66,6 +67,7 @@ export function ExecutiveDashboard({ result }: ExecutiveDashboardProps) {
 
       <p className="text-sm text-muted-foreground">
         One-screen summary of your most critical business metrics. For investor meetings, bank applications, or partner discussions.
+        <InfoTooltip text="All KPIs update in real-time as you adjust inputs across any tab. Use this view to quickly assess the health of your business model without navigating through individual tabs." label="Dashboard" />
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

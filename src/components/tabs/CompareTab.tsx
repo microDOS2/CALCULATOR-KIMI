@@ -4,6 +4,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRightLeft, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { InfoTooltip } from "@/components/InfoTooltip";
 import type { Scenario, CalculationResult } from "@/types/calculator";
 import { calculate } from "@/lib/calculator";
 import { money3, pct } from "@/lib/calculator";
@@ -95,6 +96,9 @@ export function CompareTab({ scenarios }: CompareTabProps) {
         <ArrowRightLeft className="h-8 w-8 mx-auto mb-2 opacity-50" />
         <p className="text-sm">Save at least 2 scenarios to compare them side-by-side.</p>
         <p className="text-xs mt-1">Configure the calculator, click Save in the header, then return here.</p>
+        <p className="text-xs mt-1 text-muted-foreground">
+          <InfoTooltip text="The Compare tab lets you load two saved scenarios and see 13 key metrics side-by-side with green/red delta indicators. This is the fastest way to evaluate strategic decisions." label="Compare Tab" />
+        </p>
       </div>
     );
   }
