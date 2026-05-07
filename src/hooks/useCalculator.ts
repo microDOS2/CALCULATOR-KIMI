@@ -12,6 +12,7 @@ import type {
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
 import { useUndoRedo } from "./useUndoRedo";
+import LZString from "lz-string";
 
 let uidCounter = 0;
 const uid = () => `u${++uidCounter}`;
@@ -226,18 +227,37 @@ const createDefaultState = (): CalculatorState => {
   };
 };
 
+// v2: LZ-String compressed URLs (shorter)
+const URL_PREFIX_V2 = "c~";
+
 const encodeState = (state: CalculatorState): string => {
   try {
     const json = JSON.stringify(state);
-    return btoa(encodeURIComponent(json));
+    return URL_PREFIX_V2 + LZString.compressToBase64(json);
   } catch {
     return "";
   }
 };
 
 const decodeState = (hash: string): CalculatorState | null => {
+  const raw = hash.replace(/^#/, "");
+  if (!raw) return null;
+
+  // v2: LZ-String compressed
+  if (raw.startsWith(URL_PREFIX_V2)) {
+    try {
+      const compressed = raw.slice(URL_PREFIX_V2.length);
+      const json = LZString.decompressFromBase64(compressed);
+      if (!json) return null;
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+
+  // v1: Legacy base64+encodeURIComponent (backward compatible)
   try {
-    const json = decodeURIComponent(atob(hash.replace(/^#/, "")));
+    const json = decodeURIComponent(atob(raw));
     return JSON.parse(json);
   } catch {
     return null;
