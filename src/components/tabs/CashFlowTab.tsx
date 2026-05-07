@@ -9,6 +9,7 @@ import type { CalculationResult } from "@/types/calculator";
 import { money3, money } from "@/lib/calculator";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
+import { CashFlowChart } from "@/components/CashFlowChart";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 
 interface CashFlowTabProps {
@@ -30,13 +31,6 @@ export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabPro
   }
 
   const data = isWeekly && cf.weekly ? cf.weekly : cf.months;
-
-  const sparklineData = cf.months.map((m) => ({
-    label: m.monthLabel,
-    balance: m.endingBalance,
-    inflow: m.cashIn,
-    outflow: m.cashOut,
-  }));
 
   return (
     <div className="space-y-6">
@@ -80,36 +74,8 @@ export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabPro
         </FormulaTooltip>
       </div>
 
-      {/* Sparkline Bar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Cash Balance Over Time
-            <InfoTooltip text="Shows your bank balance at the end of each month. The lowest point is your cash trough — the moment you need the most capital. Positive means you have cash; negative means you're in the red." label="Cash Balance" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-end gap-1 h-32 px-2">
-            {sparklineData.map((d, i) => {
-              const min = Math.min(...sparklineData.map((x) => x.balance), 0);
-              const max = Math.max(...sparklineData.map((x) => x.balance), 1);
-              const range = max - min;
-              const heightPct = range > 0 ? ((d.balance - min) / range) * 100 : 50;
-              const isNegative = d.balance < 0;
-              return (
-                <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                  <div
-                    className={`w-full rounded-t ${isNegative ? "bg-red-400" : "bg-primary"}`}
-                    style={{ height: `${Math.max(4, heightPct)}%` }}
-                    title={`${d.label}: ${money3(d.balance)}`}
-                  />
-                  <span className="text-[9px] text-muted-foreground">{d.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Cash Flow Chart */}
+      <CashFlowChart cashFlow={cf} />
 
       {/* Toggle */}
       <div className="flex items-center justify-end gap-2">

@@ -239,6 +239,10 @@ function App() {
             <CampaignsTab
               campaigns={calc.state.campaigns}
               campaignImpact={calc.result.campaignImpact}
+              baseRetailPrice={calc.result.retail.price}
+              baseWholesalePrice={calc.result.wholesale.price}
+              baseDistributorPrice={calc.result.distributor.price}
+              baseVolume={calc.result.totalMonthlyVolume}
               onUpdate={(campaigns) => calc.updateState({ campaigns })}
             />
           </TabsContent>

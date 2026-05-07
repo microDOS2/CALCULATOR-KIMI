@@ -6,14 +6,19 @@ import { Plus, Trash2, Tag } from "lucide-react";
 import type { Campaign } from "@/types/calculator";
 import { money3 } from "@/lib/calculator";
 import { InfoTooltip } from "@/components/InfoTooltip";
+import { CampaignChart } from "@/components/CampaignChart";
 
 interface CampaignsTabProps {
   campaigns: Campaign[];
   campaignImpact: { totalRevenueAtRisk: number; totalMarginCompression: number; netAnnualEffect: number; affectedChannels: string[] };
+  baseRetailPrice: number;
+  baseWholesalePrice: number;
+  baseDistributorPrice: number;
+  baseVolume: number;
   onUpdate: (campaigns: Campaign[]) => void;
 }
 
-export function CampaignsTab({ campaigns, campaignImpact, onUpdate }: CampaignsTabProps) {
+export function CampaignsTab({ campaigns, campaignImpact, baseRetailPrice, baseWholesalePrice, baseDistributorPrice, baseVolume, onUpdate }: CampaignsTabProps) {
   const addCampaign = () => {
     const newCampaign: Campaign = {
       id: `camp-${Date.now()}`,
@@ -145,6 +150,17 @@ export function CampaignsTab({ campaigns, campaignImpact, onUpdate }: CampaignsT
           </Button>
         </CardContent>
       </Card>
+
+      {campaigns.length > 0 && (
+        <CampaignChart
+          campaigns={campaigns}
+          campaignImpact={campaignImpact}
+          baseRetailPrice={baseRetailPrice}
+          baseWholesalePrice={baseWholesalePrice}
+          baseDistributorPrice={baseDistributorPrice}
+          baseVolume={baseVolume}
+        />
+      )}
 
       {campaigns.length > 0 && (
         <Card>

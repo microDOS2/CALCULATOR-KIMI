@@ -16,6 +16,7 @@ import { InfoTooltip } from "@/components/InfoTooltip";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 import type { SKU, SubscriptionPlan, SubscriptionSummary } from "@/types/calculator";
 import { money3, money } from "@/lib/calculator";
+import { SubscriptionChart } from "@/components/SubscriptionChart";
 
 interface SubscriptionsTabProps {
   skus: SKU[];
@@ -169,6 +170,8 @@ export function SubscriptionsTab({
                     </span>
                   </FormulaTooltip>
                 </div>
+                <SubscriptionChart plan={plan} />
+
                 <div className="overflow-x-auto rounded-lg border">
                   <DesktopTable>
                     <Table>
