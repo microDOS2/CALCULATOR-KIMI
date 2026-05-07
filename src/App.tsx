@@ -15,6 +15,8 @@ import { ScenariosTab } from "@/components/tabs/ScenariosTab";
 import { CompareTab } from "@/components/tabs/CompareTab";
 import { CampaignsTab } from "@/components/tabs/CampaignsTab";
 import { ExecutiveDashboard } from "@/components/tabs/ExecutiveDashboard";
+import { GoalSeekTab } from "@/components/tabs/GoalSeekTab";
+import { BatchWhatIfTab } from "@/components/tabs/BatchWhatIfTab";
 import { ChartsTab } from "@/components/tabs/ChartsTab";
 import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
 import { SimulateTab } from "@/components/tabs/SimulateTab";
@@ -115,6 +117,8 @@ function App() {
             <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
             <TabsTrigger value="dashboard"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Dashboard</TabsTrigger>
+            <TabsTrigger value="goalseek"><span className="text-xs text-muted-foreground mr-1 font-bold">9.5</span>Goal Seek</TabsTrigger>
+            <TabsTrigger value="batch"><span className="text-xs text-muted-foreground mr-1 font-bold">9.6</span>Batch</TabsTrigger>
             <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Subscriptions</TabsTrigger>
             <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Cash Flow</TabsTrigger>
             <TabsTrigger value="campaigns"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Campaigns</TabsTrigger>
@@ -211,6 +215,14 @@ function App() {
 
           <TabsContent value="dashboard">
             <ExecutiveDashboard result={calc.result} />
+          </TabsContent>
+
+          <TabsContent value="goalseek">
+            <GoalSeekTab state={calc.state} />
+          </TabsContent>
+
+          <TabsContent value="batch">
+            <BatchWhatIfTab state={calc.state} />
           </TabsContent>
 
           <TabsContent value="subscriptions">
