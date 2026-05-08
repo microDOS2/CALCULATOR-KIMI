@@ -5,12 +5,13 @@ import {
 } from "@/components/ui/dialog";
 import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X, Wrench, ShoppingCart, ToggleLeft } from "lucide-react";
 
-const WIZARD_KEY = "channel_calc_wizard_seen_v3";
+const WIZARD_KEY = "channel_calc_wizard_seen_v4";
 
 const tabColorLegend = [
   { label: "Foundation", cls: "bg-blue-200 text-blue-800", tabs: "1-3" },
-  { label: "B2C Sales", cls: "bg-indigo-200 text-indigo-800", tabs: "4-5" },
-  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10" },
+  { label: "B2C Sales", cls: "bg-indigo-200 text-indigo-800", tabs: "4" },
+  { label: "B2B Sales", cls: "bg-teal-200 text-teal-800", tabs: "5" },
+  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10, 20-21" },
   { label: "Dashboard & Power", cls: "bg-violet-200 text-violet-800", tabs: "11-13" },
   { label: "Forecast", cls: "bg-amber-200 text-amber-800", tabs: "14-16" },
   { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "17-19" },
@@ -51,12 +52,12 @@ const steps = [
   {
     icon: Target,
     title: "Step 6: Optimize with Power Tools",
-    body: "Goal Seek (Tab 12) — reverse-solve: pick a target, pick an adjustable input, solver finds the exact value. Batch What-If (Tab 13) — test 5-10 values at once with green/red profit indicators. These are the fastest ways to find optimal pricing.",
+    body: "Goal Seek (Tab 13) — reverse-solve: pick a target, pick an adjustable input, solver finds the exact value. Batch What-If (Tab 14) — test 5-10 values at once with green/red profit indicators. These are the fastest ways to find optimal pricing.",
   },
   {
     icon: Table2,
     title: "Step 7: Compare & Save Scenarios",
-    body: "Save model configurations as named scenarios with notes (Tab 17). Export scenarios as .channelcalc files to share or backup. Import .channelcalc files to restore a complete model state. Use the Compare tab to load two scenarios side-by-side with 13 key metrics and green/red delta indicators.",
+    body: "Save model configurations as named scenarios with notes (Tab 18). Export scenarios as .channelcalc files to share or backup. Import .channelcalc files to restore a complete model state. Use the Compare tab (Tab 19) to load two scenarios side-by-side with 13 key metrics and green/red delta indicators.",
   },
   {
     icon: ShieldCheck,
@@ -66,7 +67,7 @@ const steps = [
   {
     icon: Wrench,
     title: "Step 9: Cash Flow & Advanced Tools",
-    body: "The Cash Flow tab (amber) projects 12 months of inflows/outflows with payment term delays, lead times, and debt service. Capital Expenditures and Debt Service cards for modeling investments and loans. Subscription plans (start inactive — you must enable them) with churn/growth. Remember: Ctrl+Z undoes up to 50 steps.",
+    body: "The Cash Flow tab (Tab 15, amber) projects 12 months of inflows/outflows with payment term delays, lead times, and debt service. Capital Expenditures and Debt Service cards for modeling investments and loans. Subscription plans (Tab 14, start inactive) with churn/growth. Optional: Marketing (Tab 20, pink) and Shipping Employees (Tab 21, cyan) for advanced cost modeling. Remember: Ctrl+Z undoes up to 50 steps.",
   },
 ];
 
