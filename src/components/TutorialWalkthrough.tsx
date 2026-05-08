@@ -120,9 +120,15 @@ const steps: TutorialStep[] = [
           Toggle which channels carry overhead — this affects operating profit per channel.
         </p>
         <p className="text-sm text-muted-foreground">
-          Optional tabs for advanced cost modeling: <strong>Marketing</strong> (salary or hourly employees + channel-tied expenditures),
-          <strong>Shipping Employees</strong> (salary or hourly + per-pack production bonus + materials), <strong>Third Party</strong> services, and <strong>Campaigns</strong>.
+          Optional tabs for advanced cost modeling: <strong>Marketing</strong> (salary or hourly employees + channel-tied expenditures — both support CSV import/export),
+          <strong>Shipping Employees</strong> (salary or hourly + per-pack production bonus + materials — CSV import/export), <strong>Third Party</strong> services, and <strong>Campaigns</strong>.
         </p>
+        <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-sm">
+          <p className="text-blue-800 font-medium">Bulk Import Tip</p>
+          <p className="text-xs text-blue-700 mt-1">
+            Look for the blue "CSV Bulk Import" cards on the Marketing and Shipping tabs. You can paste CSV text or upload a .csv file. Click "Download Template" to see the exact column format for each tab.
+          </p>
+        </div>
       </div>
     ),
     highlight: "overhead",

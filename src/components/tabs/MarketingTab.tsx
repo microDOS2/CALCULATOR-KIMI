@@ -16,6 +16,10 @@ import { Plus, Trash2, Megaphone, Users, Receipt } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { MarketingEmployee, MarketingExpense, CalculatorState } from "@/types/calculator";
 import { money } from "@/lib/calculator";
+import { CsvImportCard } from "@/components/CsvImportCard";
+import { CsvExportButton } from "@/components/CsvExportButton";
+
+function uid(): string { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 interface MarketingTabProps {
   state: CalculatorState;
@@ -161,10 +165,63 @@ export function MarketingTab({
                 </Button>
               </div>
 
+              {/* CSV Import / Export */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <CsvExportButton
+                  data={marketingEmployees.map((e) => ({
+                    name: e.name,
+                    title: e.title,
+                    isHourly: e.isHourly,
+                    salary: e.salary,
+                    hourlyRate: e.hourlyRate,
+                    hoursPerWeek: e.hoursPerWeek,
+                  }))}
+                  columns={[
+                    { key: "name", header: "name" },
+                    { key: "title", header: "title" },
+                    { key: "isHourly", header: "isHourly" },
+                    { key: "salary", header: "salary" },
+                    { key: "hourlyRate", header: "hourlyRate" },
+                    { key: "hoursPerWeek", header: "hoursPerWeek" },
+                  ]}
+                  filename="marketing-employees.csv"
+                  label="Export Employees"
+                  tooltip="Download all marketing employees as a CSV file. Use this as a backup or to transfer data to another scenario."
+                />
+              </div>
+
+              <CsvImportCard
+                title="Import Marketing Employees"
+                tooltip="Upload a CSV file or paste CSV text to bulk-import marketing employees. Each row becomes one employee. Use the Download Template button to see the exact format."
+                entityName="employee"
+                columns={[
+                  { key: "name", header: "name", type: "string", required: true, example: "Jane Smith" },
+                  { key: "title", header: "title", type: "string", required: false, example: "Marketing Manager" },
+                  { key: "isHourly", header: "isHourly", type: "boolean", required: false, example: "false" },
+                  { key: "salary", header: "salary", type: "number", required: false, example: "5000" },
+                  { key: "hourlyRate", header: "hourlyRate", type: "number", required: false, example: "25" },
+                  { key: "hoursPerWeek", header: "hoursPerWeek", type: "number", required: false, example: "40" },
+                ]}
+                onImport={(rows) => {
+                  const newEmployees: MarketingEmployee[] = rows.map((r) => ({
+                    id: uid(),
+                    name: r.name || "Imported Employee",
+                    title: r.title || "",
+                    isHourly: r.isHourly?.toLowerCase() === "true" || r.isHourly === "1",
+                    salary: parseFloat(r.salary) || 0,
+                    hourlyRate: parseFloat(r.hourlyRate) || 0,
+                    hoursPerWeek: parseFloat(r.hoursPerWeek) || 40,
+                  }));
+                  updateState({
+                    marketingEmployees: [...state.marketingEmployees, ...newEmployees],
+                  });
+                }}
+              />
+
               {marketingEmployees.length === 0 && (
                 <Card className="border-dashed">
                   <CardContent className="py-6 text-center text-muted-foreground text-sm">
-                    No marketing employees. Click "Add Employee" to add team members.
+                    No marketing employees. Click "Add Employee" or use the Import tool above to add team members.
                   </CardContent>
                 </Card>
               )}
@@ -258,10 +315,66 @@ export function MarketingTab({
                 </Button>
               </div>
 
+              {/* CSV Import / Export */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <CsvExportButton
+                  data={marketingExpenses.map((e) => ({
+                    category: e.category,
+                    name: e.name,
+                    amount: e.amount,
+                    channelR: e.channels.retail,
+                    channelW: e.channels.wholesale,
+                    channelD: e.channels.distributor,
+                  }))}
+                  columns={[
+                    { key: "category", header: "category" },
+                    { key: "name", header: "name" },
+                    { key: "amount", header: "amount" },
+                    { key: "channelR", header: "channelR" },
+                    { key: "channelW", header: "channelW" },
+                    { key: "channelD", header: "channelD" },
+                  ]}
+                  filename="marketing-expenses.csv"
+                  label="Export Expenses"
+                  tooltip="Download all marketing expenses as a CSV file."
+                />
+              </div>
+
+              <CsvImportCard
+                title="Import Marketing Expenses"
+                tooltip="Upload a CSV file or paste CSV text to bulk-import marketing expenses. Each row becomes one expense line item. Categories: Digital Ads, Trade Shows, Content, PR, Influencer, Custom."
+                entityName="expense"
+                columns={[
+                  { key: "category", header: "category", type: "string", required: true, example: "Digital Ads" },
+                  { key: "name", header: "name", type: "string", required: true, example: "Google Ads Q1" },
+                  { key: "amount", header: "amount", type: "number", required: true, example: "2500" },
+                  { key: "channelR", header: "channelR", type: "boolean", required: false, example: "true" },
+                  { key: "channelW", header: "channelW", type: "boolean", required: false, example: "false" },
+                  { key: "channelD", header: "channelD", type: "boolean", required: false, example: "false" },
+                ]}
+                onImport={(rows) => {
+                  const validCategories = ["Digital Ads", "Trade Shows", "Content", "PR", "Influencer", "Custom"] as const;
+                  const newExpenses: MarketingExpense[] = rows.map((r) => ({
+                    id: uid(),
+                    category: validCategories.includes(r.category as any) ? (r.category as typeof validCategories[number]) : "Custom",
+                    name: r.name || "Imported Expense",
+                    amount: parseFloat(r.amount) || 0,
+                    channels: {
+                      retail: r.channelR?.toLowerCase() === "true" || r.channelR === "1",
+                      wholesale: r.channelW?.toLowerCase() === "true" || r.channelW === "1",
+                      distributor: r.channelD?.toLowerCase() === "true" || r.channelD === "1",
+                    },
+                  }));
+                  updateState({
+                    marketingExpenses: [...state.marketingExpenses, ...newExpenses],
+                  });
+                }}
+              />
+
               {marketingExpenses.length === 0 && (
                 <Card className="border-dashed">
                   <CardContent className="py-6 text-center text-muted-foreground text-sm">
-                    No marketing expenses. Click "Add Expense" to add expenditure categories.
+                    No marketing expenses. Click "Add Expense" or use the Import tool above to add expenditure categories.
                   </CardContent>
                 </Card>
               )}

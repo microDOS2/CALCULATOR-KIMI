@@ -45,6 +45,25 @@ const features: FeatureSection[] = [
   },
   {
     number: 2,
+    title: "Bulk Import & Export (All Tabs)",
+    groupColor: "system",
+    groupName: "Core Design",
+    items: [
+      { text: "CSV Import with File Picker — Upload .csv or .txt files via Choose File button on every supported tab" },
+      { text: "CSV Import by Paste — Paste CSV text directly into a textarea for quick data entry" },
+      { text: "Template Download — Every import tab provides a Download Template button with example rows showing exact column format" },
+      { text: "Validation & Preview — Preview button validates all rows, shows error count and details, confirms valid rows before import" },
+      { text: "CSV Export — Download current data as .csv from Marketing Employees, Marketing Expenses, Shipping Employees, Shipping Materials" },
+      { text: "Scenario Files (.channelcalc) — Export any saved scenario as a .channelcalc file (JSON format). Import .channelcalc files to restore full model state" },
+      { text: "Product Ingredients CSV Import (Tab 1) — Bulk-import ingredients: name, mgPerUnit, costPerMg, supplierPaymentDays. Paste from spreadsheet" },
+      { text: "Marketing Employees CSV Import — Import: name, title, isHourly, salary, hourlyRate, hoursPerWeek" },
+      { text: "Marketing Expenses CSV Import — Import: category, name, amount, channelR, channelW, channelD" },
+      { text: "Shipping Employees CSV Import — Import: name, title, isHourly, salary, hourlyRate, hoursPerWeek, perItemBonus, perItemBonusEnabled" },
+      { text: "Shipping Materials CSV Import — Import: name, costPerPack" },
+    ],
+  },
+  {
+    number: 3,
     title: "Core Product Modeling (Tab 1: Product)",
     groupColor: "core",
     groupName: "Core Setup",
@@ -58,7 +77,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 3,
+    number: 4,
     title: "Per-SKU Packaging (Tab 2: Packaging)",
     groupColor: "core",
     groupName: "Core Setup",
@@ -69,7 +88,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 4,
+    number: 5,
     title: "Channels (Tab 4) — Blank Slate Selection",
     groupColor: "core",
     groupName: "Core Setup",
@@ -83,7 +102,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 5,
+    number: 6,
     title: "Retail + Affiliates (Tabs 4-5)",
     groupColor: "b2c",
     groupName: "B2C Sales",
@@ -101,7 +120,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 6,
+    number: 7,
     title: "Overhead Management (Tab 3: Costs)",
     groupColor: "core",
     groupName: "Core Setup",
@@ -112,7 +131,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 5,
+    number: 8,
     title: "Marketing Employees (Tab: Marketing)",
     groupColor: "ops",
     groupName: "Operations",
@@ -127,7 +146,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 6,
+    number: 9,
     title: "Shipping Employees (Tab: Shipping)",
     groupColor: "ops",
     groupName: "Operations",
@@ -142,7 +161,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 7,
+    number: 10,
     title: "Purchase Orders (Tab 6: Orders)",
     groupColor: "ops",
     groupName: "Operations",
@@ -152,7 +171,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 6,
+    number: 11,
     title: "Commission Hierarchy (Tab 7: Commissions)",
     groupColor: "ops",
     groupName: "Operations",
@@ -165,7 +184,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 7,
+    number: 12,
     title: "Overrides (Tab 8: Overrides)",
     groupColor: "ops",
     groupName: "Operations",
@@ -182,7 +201,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 8,
+    number: 13,
     title: "Third-Party Services (Tab 9: Third Party)",
     groupColor: "ops",
     groupName: "Operations",
@@ -193,7 +212,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 9,
+    number: 14,
     title: "Visual Analytics (Tab 10: Charts)",
     groupColor: "ops",
     groupName: "Operations",
@@ -204,7 +223,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 10,
+    number: 15,
     title: "Executive Dashboard (Tab 11) — Mission Control",
     groupColor: "power",
     groupName: "Dashboard & Power",
@@ -217,7 +236,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 11,
+    number: 16,
     title: "Goal Seek / Target Finder (Tab 12)",
     groupColor: "power",
     groupName: "Dashboard & Power",
@@ -229,7 +248,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 12,
+    number: 17,
     title: "Batch What-If Testing (Tab 13)",
     groupColor: "power",
     groupName: "Dashboard & Power",
@@ -240,7 +259,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 14,
+    number: 18,
     title: "Subscription Modeling (Tab 14)",
     groupColor: "forecast",
     groupName: "Forecasting",
@@ -254,7 +273,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 15,
+    number: 19,
     title: "Cash Flow Forecasting (Tab 15)",
     groupColor: "forecast",
     groupName: "Forecasting",
@@ -272,7 +291,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 16,
+    number: 20,
     title: "Campaign/Promotion Modeling (Tab 16)",
     groupColor: "forecast",
     groupName: "Forecasting",
@@ -283,7 +302,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 17,
+    number: 21,
     title: "Scenario Management (Tab 17)",
     groupColor: "manage",
     groupName: "Management",
@@ -295,7 +314,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 18,
+    number: 22,
     title: "Side-by-Side Comparison (Tab 18)",
     groupColor: "manage",
     groupName: "Management",
@@ -307,7 +326,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 19,
+    number: 23,
     title: "Temporal Audit Log (Tab 19)",
     groupColor: "manage",
     groupName: "Management",
@@ -326,7 +345,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 20,
+    number: 24,
     title: "Live Simulation (Tab Simulate / Floating Panel)",
     groupColor: "simulate",
     groupName: "Simulate",
@@ -339,7 +358,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 21,
+    number: 25,
     title: "System Features",
     groupColor: "system",
     groupName: "System",
@@ -433,7 +452,7 @@ export function FeatureList() {
           })}
 
           <div className="pt-4 border-t text-center text-xs text-muted-foreground">
-            Channel Calculator v11 — Blank Slate Philosophy, 17 tabs, 45+ major features, fully client-side.
+            Channel Calculator v12 — Blank Slate Philosophy, 17 tabs, 25 feature categories, 50+ major features, fully client-side.
           </div>
         </div>
       </DialogContent>

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { BookOpen, Lightbulb, MousePointer, Sparkles, ShieldCheck, ClipboardList, ToggleLeft, Package } from "lucide-react";
+import { BookOpen, Lightbulb, MousePointer, Sparkles, ShieldCheck, ClipboardList, ToggleLeft, Package, FileSpreadsheet } from "lucide-react";
 import { DependencyFlowChart } from "./DependencyFlowChart";
 
 export function Guide() {
@@ -73,6 +73,24 @@ export function Guide() {
 
         {/* Dependency Flow Chart */}
         <DependencyFlowChart />
+
+        {/* Bulk Import & Export Reference */}
+        <div className="p-3 rounded-lg border bg-gradient-to-r from-sky-50 to-sky-100/30 dark:from-sky-950/20 dark:to-sky-900/10">
+          <p className="text-xs font-semibold text-sky-800 mb-2 flex items-center gap-1.5">
+            <FileSpreadsheet className="h-3.5 w-3.5" /> Bulk Import &amp; Export Reference
+          </p>
+          <p className="text-xs text-sky-700 leading-relaxed mb-2">
+            Multiple tabs support CSV import (paste text or upload file) and CSV export. Use the <strong>Download Template</strong> button on any import card to see the exact column format. All imports include validation and preview before importing.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs text-sky-700">
+            <span><strong>Product (Tab 1)</strong> — Import: ingredients CSV (name, mgPerUnit, costPerMg, supplierPaymentDays)</span>
+            <span><strong>Marketing Employees</strong> — Import/Export: name, title, isHourly, salary, hourlyRate, hoursPerWeek</span>
+            <span><strong>Marketing Expenses</strong> — Import/Export: category, name, amount, channelR, channelW, channelD</span>
+            <span><strong>Shipping Employees</strong> — Import/Export: name, title, isHourly, salary, hourlyRate, hoursPerWeek, perItemBonus, perItemBonusEnabled</span>
+            <span><strong>Shipping Materials</strong> — Import/Export: name, costPerPack</span>
+            <span><strong>Scenarios (Tab 17)</strong> — Import/Export: .channelcalc files (full model state)</span>
+          </div>
+        </div>
 
         <div className="space-y-6 text-sm">
           <section>

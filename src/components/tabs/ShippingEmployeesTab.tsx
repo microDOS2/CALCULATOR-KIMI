@@ -9,6 +9,10 @@ import { Plus, Trash2, Truck, PackageCheck, ExternalLink, Box, Package, Containe
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { ShippingEmployee, ShippingMaterial, CalculatorState } from "@/types/calculator";
 import { money } from "@/lib/calculator";
+import { CsvImportCard } from "@/components/CsvImportCard";
+import { CsvExportButton } from "@/components/CsvExportButton";
+
+function uid(): string { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 interface ShippingEmployeesTabProps {
   state: CalculatorState;
@@ -251,10 +255,38 @@ export function ShippingEmployeesTab({
               </Button>
             </div>
 
+            {/* CSV Import / Export for Materials */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <CsvExportButton
+                data={shippingMaterials.map((m) => ({ name: m.name, costPerPack: m.costPerPack }))}
+                columns={[{ key: "name", header: "name" }, { key: "costPerPack", header: "costPerPack" }]}
+                filename="shipping-materials.csv"
+                label="Export Materials"
+                tooltip="Download all shipping materials as a CSV file."
+              />
+            </div>
+            <CsvImportCard
+              title="Import Shipping Materials"
+              tooltip="Upload a CSV file or paste CSV text to bulk-import shipping materials. Each row becomes one material entry."
+              entityName="material"
+              columns={[
+                { key: "name", header: "name", type: "string", required: true, example: "Corrugated Box 12x10x8" },
+                { key: "costPerPack", header: "costPerPack", type: "number", required: true, example: "0.85" },
+              ]}
+              onImport={(rows) => {
+                const newMaterials: ShippingMaterial[] = rows.map((r) => ({
+                  id: uid(),
+                  name: r.name || "Imported Material",
+                  costPerPack: parseFloat(r.costPerPack) || 0,
+                }));
+                updateState({ shippingMaterials: [...state.shippingMaterials, ...newMaterials] });
+              }}
+            />
+
             {shippingMaterials.length === 0 && (
               <Card className="border-dashed">
                 <CardContent className="py-6 text-center text-muted-foreground text-sm">
-                  No shipping materials. Click "Add Material" to add boxes, tape, labels, etc.
+                  No shipping materials. Click "Add Material" or use the Import tool above to add boxes, tape, labels, etc.
                 </CardContent>
               </Card>
             )}
@@ -306,10 +338,69 @@ export function ShippingEmployeesTab({
             </Button>
           </div>
 
+          {/* CSV Import / Export for Employees */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <CsvExportButton
+              data={shippingEmployees.map((e) => ({
+                name: e.name,
+                title: e.title,
+                isHourly: e.isHourly,
+                salary: e.salary,
+                hourlyRate: e.hourlyRate,
+                hoursPerWeek: e.hoursPerWeek,
+                perItemBonus: e.perItemBonus,
+                perItemBonusEnabled: e.perItemBonusEnabled,
+              }))}
+              columns={[
+                { key: "name", header: "name" },
+                { key: "title", header: "title" },
+                { key: "isHourly", header: "isHourly" },
+                { key: "salary", header: "salary" },
+                { key: "hourlyRate", header: "hourlyRate" },
+                { key: "hoursPerWeek", header: "hoursPerWeek" },
+                { key: "perItemBonus", header: "perItemBonus" },
+                { key: "perItemBonusEnabled", header: "perItemBonusEnabled" },
+              ]}
+              filename="shipping-employees.csv"
+              label="Export Employees"
+              tooltip="Download all shipping employees as a CSV file."
+            />
+          </div>
+
+          <CsvImportCard
+            title="Import Shipping Employees"
+            tooltip="Upload a CSV file or paste CSV text to bulk-import shipping employees. Each row becomes one employee with optional per-pack production bonus."
+            entityName="employee"
+            columns={[
+              { key: "name", header: "name", type: "string", required: true, example: "Mike Johnson" },
+              { key: "title", header: "title", type: "string", required: false, example: "Warehouse Lead" },
+              { key: "isHourly", header: "isHourly", type: "boolean", required: false, example: "false" },
+              { key: "salary", header: "salary", type: "number", required: false, example: "4200" },
+              { key: "hourlyRate", header: "hourlyRate", type: "number", required: false, example: "20" },
+              { key: "hoursPerWeek", header: "hoursPerWeek", type: "number", required: false, example: "40" },
+              { key: "perItemBonus", header: "perItemBonus", type: "number", required: false, example: "0.25" },
+              { key: "perItemBonusEnabled", header: "perItemBonusEnabled", type: "boolean", required: false, example: "true" },
+            ]}
+            onImport={(rows) => {
+              const newEmployees: ShippingEmployee[] = rows.map((r) => ({
+                id: uid(),
+                name: r.name || "Imported Employee",
+                title: r.title || "",
+                isHourly: r.isHourly?.toLowerCase() === "true" || r.isHourly === "1",
+                salary: parseFloat(r.salary) || 0,
+                hourlyRate: parseFloat(r.hourlyRate) || 0,
+                hoursPerWeek: parseFloat(r.hoursPerWeek) || 40,
+                perItemBonus: parseFloat(r.perItemBonus) || 0,
+                perItemBonusEnabled: r.perItemBonusEnabled?.toLowerCase() === "true" || r.perItemBonusEnabled === "1",
+              }));
+              updateState({ shippingEmployees: [...state.shippingEmployees, ...newEmployees] });
+            }}
+          />
+
           {shippingEmployees.length === 0 && (
             <Card className="border-dashed">
               <CardContent className="py-6 text-center text-muted-foreground text-sm">
-                No shipping employees. Click "Add Employee" to add team members.
+                No shipping employees. Click "Add Employee" or use the Import tool above to add team members.
               </CardContent>
             </Card>
           )}
