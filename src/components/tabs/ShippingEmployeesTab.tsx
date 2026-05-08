@@ -93,12 +93,20 @@ export function ShippingEmployeesTab({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center items-end">
                 <div>
-                  <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground line-through"}`}>
-                    {state.includeShip ? money(state.shippingPerPack) : "$0"}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">Per pack (carrier fee)</p>
+                  <p className="text-[10px] text-muted-foreground font-medium mb-1">CARRIER COST / PACK</p>
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={state.shippingPerPack}
+                      onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })}
+                      className="pl-5 h-9 font-bold text-amber-700"
+                      placeholder="0.00"
+                    />
+                  </div>
                 </div>
                 <div>
                   <p className={`text-lg font-bold ${state.includeShip ? "text-green-700" : "text-red-600"}`}>
@@ -111,6 +119,10 @@ export function ShippingEmployeesTab({
                     {state.includeShip ? (state.useShippingRateTable ? "Rate Table" : "Flat Rate") : "—"}
                   </p>
                   <p className="text-[10px] text-muted-foreground">Pricing model</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-amber-700">{money((state.includeShip ? state.shippingPerPack : 0))}/p</p>
+                  <p className="text-[10px] text-muted-foreground">Effective cost</p>
                 </div>
               </div>
             </CardContent>
