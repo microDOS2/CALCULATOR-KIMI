@@ -2,7 +2,8 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { BookOpen, Lightbulb, MousePointer, Sparkles, ShieldCheck, ClipboardList } from "lucide-react";
+import { BookOpen, Lightbulb, MousePointer, Sparkles, ShieldCheck, ClipboardList, ToggleLeft, Package } from "lucide-react";
+import { DependencyFlowChart } from "./DependencyFlowChart";
 
 export function Guide() {
   return (
@@ -43,6 +44,35 @@ export function Guide() {
             ))}
           </div>
         </div>
+
+        {/* Blank Slate Philosophy */}
+        <div className="p-3 rounded-lg border bg-gradient-to-r from-amber-50 to-amber-100/30 dark:from-amber-950/20 dark:to-amber-900/10">
+          <p className="text-xs font-semibold text-amber-800 mb-2 flex items-center gap-1.5">
+            <ToggleLeft className="h-3.5 w-3.5" /> Blank Slate Philosophy
+          </p>
+          <p className="text-xs text-amber-700 leading-relaxed">
+            <strong>Nothing is pre-selected.</strong> All channels (Retail, Wholesale, Distributor) start unchecked.
+            All subscription plans start inactive. All commission channels start unchecked.
+            You must consciously choose every assumption. This prevents hidden defaults from silently
+            skewing your analysis. Enable what you need, leave the rest off.
+          </p>
+        </div>
+
+        {/* Cost Per Pack Explained */}
+        <div className="p-3 rounded-lg border bg-gradient-to-r from-blue-50 to-blue-100/30 dark:from-blue-950/20 dark:to-blue-900/10">
+          <p className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1.5">
+            <Package className="h-3.5 w-3.5" /> Cost Per Pack — Not Per Shipment
+          </p>
+          <p className="text-xs text-blue-700 leading-relaxed">
+            Shipping costs are shown as <strong>cost per PACK shipped</strong> — not per individual item, not per shipment/delivery.
+            A &quot;pack&quot; is what your customer buys (e.g., a box of 10 units).
+            Example: a $350 pallet containing 144 packs = <strong>$2.43/pack</strong>. The carrier invoices per pallet,
+            but for margin analysis we divide by packs. Only Retail has a default ($2.50). Wholesale and Distributor <strong>must be defined by you</strong>.
+          </p>
+        </div>
+
+        {/* Dependency Flow Chart */}
+        <DependencyFlowChart />
 
         <div className="space-y-6 text-sm">
           <section>

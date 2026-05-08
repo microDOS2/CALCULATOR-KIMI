@@ -9,6 +9,7 @@ import { exportResultCSV, exportPDF, exportExcel } from "@/lib/export";
 import { Guide } from "@/components/Guide";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { FeatureList } from "@/components/FeatureList";
+import { TutorialButton } from "@/components/TutorialWalkthrough";
 import { useState } from "react";
 
 interface HeaderProps {
@@ -43,6 +44,7 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
         </div>
         <div className="flex items-center gap-1.5 sm:gap-2 flex-1 justify-end min-w-0">
           <div className="hidden sm:flex items-center gap-1 shrink-0">
+            <TutorialButton />
             <FeatureList />
             <Guide />
             <OnboardingWizard />
@@ -95,7 +97,9 @@ export function Header({ onSaveScenario, onReset, result, unitSystem, onToggleUn
           <Button size="sm" onClick={handleShare} className="shrink-0 h-8 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 shadow-sm" title="Copy shareable link">
             <Share2 className="h-4 w-4 text-indigo-600" />
           </Button>
-          <Button size="sm" onClick={onReset} className="shrink-0 h-8 w-8 p-0 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-sm" title="Reset all"><RotateCcw className="h-4 w-4 text-red-500" /></Button>
+          <Button size="sm" onClick={onReset} className="shrink-0 h-8 w-8 p-0 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-sm" title="Reset all">
+            <RotateCcw className="h-4 w-4 text-red-600" />
+          </Button>
         </div>
       </div>
     </header>

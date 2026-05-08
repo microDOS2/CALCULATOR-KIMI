@@ -353,11 +353,13 @@ export function calculate(state: CalculatorState): CalculationResult {
     0
   );
   // Overhead per pack — only allocated across channels where overhead is enabled
+  const ohChannelsActive = (ohR ? 1 : 0) + (ohW ? 1 : 0) + (ohD ? 1 : 0);
   const includedMonthlyVolume = Math.max(
     1,
     (ohR ? totalPacksR : 0) + (ohW ? totalPacksW : 0) + (ohD ? totalPacksD : 0)
   );
-  const ohPerPack = ohTotal / includedMonthlyVolume;
+  // Overhead per pack — when no channels carry overhead, per-pack overhead is $0
+  const ohPerPack = ohChannelsActive > 0 ? ohTotal / includedMonthlyVolume : 0;
   const ohPerPackR = ohR ? ohPerPack : 0;
   const ohPerPackW = ohW ? ohPerPack : 0;
   const ohPerPackD = ohD ? ohPerPack : 0;

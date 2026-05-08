@@ -12,7 +12,7 @@ import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { CashFlowChart } from "@/components/CashFlowChart";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 import { Input } from "@/components/ui/input";
-import { Landmark, HardHat, Plus, Trash2, Wallet, Clock, Truck, UserCog } from "lucide-react";
+import { Landmark, HardHat, Plus, Trash2, Wallet, Clock, Truck, UserCog, AlertCircle } from "lucide-react";
 
 interface CashFlowTabProps {
   state: CalculatorState;
@@ -36,8 +36,28 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
 
   const data = isWeekly && cf.weekly ? cf.weekly : cf.months;
 
+  const noChannels = !state.includeR && !state.includeW && !state.includeD;
+
   return (
     <div className="space-y-6">
+      {/* Empty state: no channels */}
+      {noChannels && (
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100/50">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h3 className="font-semibold text-amber-800 text-sm">No Revenue — No Cash In</h3>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  All sales channels are off. Cash flow projections require at least one enabled channel.
+                  Go to the Channels tab and check Retail, Wholesale, or Distributor to begin.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Alert Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <FormulaTooltip label="Starting Cash" formula={`Initial bank balance = ${money3(cf.startingCash)}`}>

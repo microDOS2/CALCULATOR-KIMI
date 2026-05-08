@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X, Wrench } from "lucide-react";
+import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X, Wrench, ShoppingCart, ToggleLeft } from "lucide-react";
 
 const WIZARD_KEY = "channel_calc_wizard_seen_v3";
 
@@ -21,42 +21,52 @@ const steps = [
   {
     icon: Calculator,
     title: "Welcome to Channel Calculator",
-    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Enter your product specs, costs, and pricing — then explore scenarios, simulate changes, forecast cash flow, and validate your model against industry benchmarks. Every advanced feature lives in a color-coded tool card so you can't miss it.",
+    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Every input starts blank — you consciously choose every assumption. No hidden defaults, no pre-selected channels, no assumed costs.",
+  },
+  {
+    icon: ToggleLeft,
+    title: "Step 1: Choose Your Channels (Blank Slate)",
+    body: "All three channels start OFF by design. You must check at least one to begin: Retail (B2C — direct to consumers), Wholesale (B2B — sell to retailers), or Distributor (B2B — sell through middlemen). Go to the Channels tab and check the channels you plan to use. You can toggle any channel on/off at any time.",
   },
   {
     icon: Package,
-    title: "Step 1: Build Your Product",
-    body: "Start in the Product tab (blue tab group). Add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS. Look for the blue CSV Bulk Import card to paste a spreadsheet of ingredients in seconds. Use the amber Volume Pricing Tiers card to set MOQ discounts like \"$0.70/mg at 1kg\".",
+    title: "Step 2: Build Your Product",
+    body: "In the Product tab (blue group), add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS per pack. Use the CSV Bulk Import card to paste a spreadsheet of ingredients. Use the Volume Pricing Tiers card to set MOQ discounts.",
+  },
+  {
+    icon: ShoppingCart,
+    title: "Step 3: Set Channel Prices & Shipping",
+    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. The Per-Channel Shipping card lets you set carrier costs per channel. IMPORTANT: Cost per PACK, not per shipment. Example: a $350 pallet with 144 packs = $2.43/pack. Only Retail has a default — Wholesale and Distributor must be defined by you.",
   },
   {
     icon: Store,
-    title: "Step 2: Set Your Channels",
-    body: "In the Product tab (blue) (blue group), set retail price, wholesale discount, and distributor discount. Toggle channels on/off to see contribution. Look for the sky-blue Weight-Based Shipping card to model carrier-like pricing by package weight. Use the emerald Tax & Duty card to add Sales Tax on retail and Import Duty on distributor. These are not hidden — they're right below your channel cards.",
+    title: "Step 4: Add Operating Costs",
+    body: "In the Costs tab, enter monthly overhead (rent, salaries, utilities, marketing) and set monthly volumes per SKU. Toggle overhead allocation per channel. Optional: add Marketing, Shipping Employees, Third Party services, or Campaigns for promotions.",
   },
   {
     icon: BarChart3,
-    title: "Step 3: Analyze & Visualize",
-    body: "The Charts tab (emerald group) includes a Sensitivity Tornado Chart that shows which inputs most affect your blended margin (±10% swings). A pie chart reveals your biggest cost drivers. A bar chart compares revenue vs. profit across all three channels. Time-series charts in Cash Flow, Subscriptions, and Campaigns tabs show trends over time.",
+    title: "Step 5: Analyze & Visualize",
+    body: "The Charts tab shows a Sensitivity Tornado Chart (which inputs most affect margin), a cost breakdown pie chart, and channel profit comparison bars. The Dashboard (violet) shows KPIs, sanity checks against benchmarks, and a complete assumptions audit trail.",
   },
   {
     icon: Target,
-    title: "Step 4: Optimize with Power Tools",
-    body: "The violet tabs are your power tools. Goal Seek (Tab 14) reverse-calculates: enter a target margin or profit, pick an input to adjust, and the solver finds the exact value. Batch What-If (Tab 14) tests 5-10 values at once in a comparison table with green/red profit indicators. These are the fastest ways to find your optimal pricing and cost structure.",
+    title: "Step 6: Optimize with Power Tools",
+    body: "Goal Seek (Tab 12) — reverse-solve: pick a target, pick an adjustable input, solver finds the exact value. Batch What-If (Tab 13) — test 5-10 values at once with green/red profit indicators. These are the fastest ways to find optimal pricing.",
   },
   {
     icon: Table2,
-    title: "Step 5: Compare & Save Scenarios",
-    body: "Save your model configurations as named scenarios with notes (Tab 17, slate group). Use the Compare tab (Tab 17, slate group) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. Notes help you remember why you saved each scenario. This is the fastest way to evaluate strategic decisions.",
+    title: "Step 7: Compare & Save Scenarios",
+    body: "Save model configurations as named scenarios with notes (Tab 17). Use the Compare tab to load two scenarios side-by-side with 13 key metrics and green/red delta indicators. Notes help you remember why you saved each scenario.",
   },
   {
     icon: ShieldCheck,
-    title: "Step 6: Validate & Audit",
-    body: "The Dashboard (Tab 11, violet group) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 9 industry benchmarks and flags problems. Below that, live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
+    title: "Step 8: Validate & Audit",
+    body: "The Dashboard starts with the Sanity Checks panel (9 industry benchmarks). Below: 10 live KPI cards with trend indicators. At the bottom: the Assumptions Audit Trail lists every assumption in your model with current values and business impact. Use this for investor meetings and due diligence.",
   },
   {
     icon: Wrench,
-    title: "Step 7: Cash Flow & Advanced Tools",
-    body: "The Cash Flow tab (Tab 14, amber group) includes orange tool cards for Capital Expenditures (equipment, vehicles) and Debt Service (monthly loan payments). These affect your 12-month cash projection. Model subscriptions with churn and growth projections. The Simulate button (rose) opens a floating panel for live what-if analysis. Remember: Ctrl+Z undoes up to 50 steps.",
+    title: "Step 9: Cash Flow & Advanced Tools",
+    body: "The Cash Flow tab (amber) projects 12 months of inflows/outflows with payment term delays, lead times, and debt service. Capital Expenditures and Debt Service cards for modeling investments and loans. Subscription plans (start inactive — you must enable them) with churn/growth. Remember: Ctrl+Z undoes up to 50 steps.",
   },
 ];
 

@@ -152,9 +152,9 @@ const createDefaultState = (): CalculatorState => {
     ohW: true,
     ohD: true,
     includeThirdParty: false,
-    includeR: true,
-    includeW: true,
-    includeD: true,
+    includeR: false,   // User must consciously enable each channel
+    includeW: false,   // No pre-selected channels — blank slate philosophy
+    includeD: false,
     beIncludeOverhead: true,
     retailSalesTaxRate: 0,
     distributorImportDutyRate: 0,
@@ -251,7 +251,7 @@ const createDefaultState = (): CalculatorState => {
         startingSubscribers: 100,
         monthlyGrowthRate: 5,
         monthlyChurnRate: 3,
-        included: true,
+        included: false,  // User must consciously enable subscription plans
         cac: 25,
       },
     ],

@@ -69,17 +69,41 @@ function buildAuditRows(state: CalculatorState, result: CalculationResult): Audi
     });
   });
 
-  // CHANNEL ASSUMPTIONS
+  // CHANNEL CONFIG — which channels are enabled/disabled
+  rows.push({
+    category: "Channels",
+    assumption: "Retail Channel",
+    value: state.includeR ? "ENABLED" : "DISABLED",
+    impact: state.includeR
+      ? `Revenue source active — ${money3(result.avgPriceR)}/pack`
+      : "No retail revenue — user must consciously enable this channel",
+  });
+  rows.push({
+    category: "Channels",
+    assumption: "Wholesale Channel",
+    value: state.includeW ? "ENABLED" : "DISABLED",
+    impact: state.includeW
+      ? `Revenue source active — ${money3(result.avgPriceW)}/pack`
+      : "No wholesale revenue — user must consciously enable this channel",
+  });
+  rows.push({
+    category: "Channels",
+    assumption: "Distributor Channel",
+    value: state.includeD ? "ENABLED" : "DISABLED",
+    impact: state.includeD
+      ? `Revenue source active — ${money3(result.avgPriceD)}/pack`
+      : "No distributor revenue — user must consciously enable this channel",
+  });
   rows.push({
     category: "Channels",
     assumption: "Wholesale Discount",
-    value: `${(state.wDisc * 100).toFixed(1)}%`,
+    value: `${state.wDisc}%`,
     impact: `Wholesale price = ${money3(result.avgPriceW)}`,
   });
   rows.push({
     category: "Channels",
     assumption: "Distributor Discount",
-    value: `${(state.dDisc * 100).toFixed(1)}%`,
+    value: `${state.dDisc}%`,
     impact: `Distributor price = ${money3(result.avgPriceD)}`,
   });
 
@@ -167,21 +191,24 @@ function buildAuditRows(state: CalculatorState, result: CalculationResult): Audi
     });
   }
 
-  // SUBSCRIPTIONS
+  // SUBSCRIPTIONS — show all plans with enabled/disabled status
   state.subscriptionPlans.forEach((plan) => {
-    if (!plan.included) return;
     rows.push({
       category: "Subscriptions",
-      assumption: `${plan.name} — Price`,
-      value: money3(plan.monthlyPrice) + "/mo",
-      impact: `${plan.startingSubscribers} starting subs, ${(plan.monthlyGrowthRate * 100).toFixed(1)}% growth`,
+      assumption: `${plan.name} — Status`,
+      value: plan.included ? "ENABLED" : "DISABLED",
+      impact: plan.included
+        ? `${plan.startingSubscribers} starting subs, ${plan.monthlyGrowthRate}% growth, ${money3(plan.monthlyPrice)}/mo`
+        : "Plan exists but is not included in projections — user must consciously enable",
     });
-    rows.push({
-      category: "Subscriptions",
-      assumption: `${plan.name} — Churn`,
-      value: `${(plan.monthlyChurnRate * 100).toFixed(1)}%/mo`,
-      impact: `CAC: ${money3(plan.cac)}`,
-    });
+    if (plan.included) {
+      rows.push({
+        category: "Subscriptions",
+        assumption: `${plan.name} — Churn`,
+        value: `${plan.monthlyChurnRate}%/mo`,
+        impact: `CAC: ${money3(plan.cac)}`,
+      });
+    }
   });
 
   // CAMPAIGNS

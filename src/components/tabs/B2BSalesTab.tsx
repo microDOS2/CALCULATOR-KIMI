@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import { ToggleLeft } from "lucide-react";
+import { ToggleLeft, AlertCircle } from "lucide-react";
 import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
 
@@ -14,6 +14,8 @@ interface B2BSalesTabProps {
 }
 
 export function B2BSalesTab({ state, result, updateState }: B2BSalesTabProps) {
+  const noB2B = !state.includeW && !state.includeD;
+
   return (
     <div className="space-y-6">
       {/* B2B Context Banner */}
@@ -24,6 +26,24 @@ export function B2BSalesTab({ state, result, updateState }: B2BSalesTabProps) {
           You receive payment when the sale completes — no post-sale commissions.
         </p>
       </div>
+
+      {/* Empty state: no B2B channels */}
+      {noB2B && (
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100/50">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h3 className="font-semibold text-amber-800 text-sm">No B2B Channels Enabled</h3>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  Both Wholesale and Distributor are currently off. Check at least one B2B channel below to configure B2B sales settings.
+                  You must consciously choose which channels to include — nothing is pre-selected.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>

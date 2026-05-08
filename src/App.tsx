@@ -27,6 +27,7 @@ import { OverridesTab } from "@/components/tabs/OverridesTab";
 import { AuditLogTab } from "@/components/tabs/AuditLogTab";
 import { MarketingTab } from "@/components/tabs/MarketingTab";
 import { ShippingEmployeesTab } from "@/components/tabs/ShippingEmployeesTab";
+import { TutorialWalkthrough } from "@/components/TutorialWalkthrough";
 
 function App() {
   const calc = useCalculator();
@@ -431,9 +432,12 @@ function App() {
         </Tabs>
       </main>
 
+      {/* First-time tutorial overlay */}
+      <TutorialWalkthrough />
+
       <footer className="border-t py-6 mt-8">
         <div className="container mx-auto px-4 sm:px-6 text-center text-xs text-muted-foreground">
-          Channel Calculator v10 · Simulate · Cash Flow · Per-SKU Packaging · mg/oz Toggle · Formula-driven
+          Channel Calculator v11 · Blank Slate · Per-Pack Shipping · Tutorial · Flow Chart · Formula-driven
         </div>
       </footer>
     </div>

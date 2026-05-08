@@ -7,7 +7,7 @@ import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
-import { Truck, Receipt, Globe, Package, AlertTriangle, Container } from "lucide-react";
+import { Truck, Receipt, Globe, Package, AlertTriangle, Container, Info } from "lucide-react";
 
 interface ChannelsTabProps {
   state: CalculatorState;
@@ -124,8 +124,28 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
     </Card>
   );
 
+  const noChannelsSelected = !state.includeR && !state.includeW && !state.includeD;
+
   return (
     <div className="space-y-6">
+      {/* Blank Slate Banner */}
+      {noChannelsSelected && (
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10">
+          <CardContent className="p-5">
+            <div className="flex items-start gap-3">
+              <Info className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h3 className="font-semibold text-amber-800 text-sm">Blank Slate — Choose Your Channels</h3>
+                <p className="text-xs text-amber-700 leading-relaxed">
+                  All sales channels start <strong>unchecked by design.</strong> You must consciously decide which channels to include in your model.
+                  Check at least one channel below to begin. Each channel can be toggled independently at any time.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <div className="space-y-1">
@@ -188,8 +208,8 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                   Per-Channel Shipping Costs
                   <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Required</span>
                   <InfoTooltip
-                    text="Each channel ships differently. Retail = individual consumer parcels (has a default). Wholesale = pallets or large boxes to retailers. Distributor = freight/LTL to distribution centers. Set each channel's cost independently — they are NOT inherited from Retail."
-                    label="Per-Channel Shipping"
+                    text="Cost per PACK shipped — NOT per individual item, NOT per shipment/delivery. A 'pack' is one unit your customer buys. Example: a pallet costs $400 to ship and holds 200 packs = $2.00/pack. The carrier invoices you per pallet, but for margin analysis we allocate down to each pack."
+                    label="Cost Per Pack Explained"
                   />
                 </CardTitle>
               </CardHeader>
@@ -200,6 +220,10 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                     <div className="flex items-center gap-1.5">
                       <Package className="h-3.5 w-3.5 text-indigo-500" />
                       <Label className="text-xs font-medium text-indigo-700">Retail (Consumer Parcel)</Label>
+                      <InfoTooltip
+                        text="Cost per PACK shipped to a consumer. Example: UPS charges $12.50 to deliver a box of 5 packs to a customer's door = $2.50/pack. NOT $12.50 (that's per shipment). The pack is what the customer buys — divide your total shipping invoice by the number of packs in the shipment."
+                        label="Retail Shipping Cost"
+                      />
                     </div>
                     <p className="text-[10px] text-muted-foreground">Individual packages to end consumers</p>
                     <Input
@@ -217,6 +241,10 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                     <div className="flex items-center gap-1.5">
                       <Container className="h-3.5 w-3.5 text-teal-500" />
                       <Label className="text-xs font-medium text-teal-700">Wholesale (Pallet/Freight)</Label>
+                      <InfoTooltip
+                        text="Cost per PACK shipped to wholesale buyers. Example: a pallet costs $350 to ship to a retailer and holds 144 packs = $2.43/pack ($350 / 144). NOT $350 — that's per pallet. You MUST calculate this yourself because pallet sizes, freight rates, and pack counts vary by product and carrier. No default is provided."
+                        label="Wholesale Shipping Cost"
+                      />
                     </div>
                     <p className="text-[10px] text-muted-foreground">Pallets or large boxes to retailers</p>
                     <Input
@@ -225,13 +253,12 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                       onChange={(e) => updateState({ shippingPerPackW: Number(e.target.value) })}
                       placeholder="Enter cost..."
                     />
-                    {state.shippingPerPackW === 0 && (
+                    {state.shippingPerPackW === 0 ? (
                       <div className="flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3 text-amber-500" />
                         <span className="text-[10px] text-amber-700 font-medium">Must be defined by user</span>
                       </div>
-                    )}
-                    {state.shippingPerPackW > 0 && (
+                    ) : (
                       <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Set: {money3(state.shippingPerPackW)}/pack</span>
                     )}
                   </div>
@@ -241,6 +268,10 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                     <div className="flex items-center gap-1.5">
                       <Container className="h-3.5 w-3.5 text-teal-700" />
                       <Label className="text-xs font-medium text-teal-800">Distributor (Freight/LTL)</Label>
+                      <InfoTooltip
+                        text="Cost per PACK shipped to distribution centers. Example: an LTL freight shipment costs $850 to a regional DC and holds 500 packs = $1.70/pack ($850 / 500). NOT $850 — that's per freight shipment. Distributor logistics often involve full truckloads, containers, or intermodal rail. You MUST calculate this yourself based on your actual freight contracts. No default is provided."
+                        label="Distributor Shipping Cost"
+                      />
                     </div>
                     <p className="text-[10px] text-muted-foreground">Freight to distribution centers</p>
                     <Input
@@ -249,13 +280,12 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                       onChange={(e) => updateState({ shippingPerPackD: Number(e.target.value) })}
                       placeholder="Enter cost..."
                     />
-                    {state.shippingPerPackD === 0 && (
+                    {state.shippingPerPackD === 0 ? (
                       <div className="flex items-center gap-1">
                         <AlertTriangle className="h-3 w-3 text-amber-500" />
                         <span className="text-[10px] text-amber-700 font-medium">Must be defined by user</span>
                       </div>
-                    )}
-                    {state.shippingPerPackD > 0 && (
+                    ) : (
                       <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Set: {money3(state.shippingPerPackD)}/pack</span>
                     )}
                   </div>

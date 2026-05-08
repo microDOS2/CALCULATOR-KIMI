@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles, Users } from "lucide-react";
+import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles, Users, AlertCircle } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { SanityChecks } from "@/components/SanityChecks";
 import { AssumptionsAuditTrail } from "@/components/AssumptionsAuditTrail";
@@ -221,6 +221,8 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
   const topCost = result.costBreakdown.reduce((a, b) => (a.value > b.value ? a : b), result.costBreakdown[0]);
   const hasCampaigns = result.campaigns && result.campaigns.length > 0;
   const campaignEffect = result.campaignImpact?.netAnnualEffect ?? 0;
+  const noChannels = !state.includeR && !state.includeW && !state.includeD;
+  const noRevenue = result.brev === 0;
 
   return (
     <div className="space-y-6">
@@ -233,6 +235,46 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
         One-screen summary of your most critical business metrics. For investor meetings, bank applications, or partner discussions.
         <InfoTooltip text="All KPIs update in real-time as you adjust inputs across any tab. Use this view to quickly assess the health of your business model without navigating through individual tabs." label="Dashboard" />
       </p>
+
+      {/* Empty state: no channels enabled */}
+      {noChannels && (
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-amber-200">
+                <AlertCircle className="h-6 w-6 text-amber-700" />
+              </div>
+              <div className="space-y-2 flex-1">
+                <h3 className="font-semibold text-amber-800">No Sales Channels Enabled</h3>
+                <p className="text-sm text-amber-700 leading-relaxed">
+                  All channels (Retail, Wholesale, Distributor) are currently off. The calculator starts from a blank slate —
+                  <strong> you must consciously choose which channels to include.</strong>
+                </p>
+                <p className="text-xs text-amber-600 pt-1 font-medium">
+                  Go to the Channels tab (blue group) to enable your sales channels.
+                </p>
+                <p className="text-xs text-amber-600">
+                  Tip: Enable at least one channel for the Dashboard to show meaningful calculations.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Channels enabled but no revenue yet */}
+      {!noChannels && noRevenue && (
+        <Card className="border-blue-200 bg-gradient-to-r from-blue-50 to-blue-100/50 dark:from-blue-950/20 dark:to-blue-900/10">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-blue-500 shrink-0" />
+              <p className="text-sm text-blue-700">
+                <strong>Channels are on but volume is 0.</strong> Set monthly volumes in the Product tab to see revenue calculations.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Sanity Checks — at top as a validation gate */}
       <SanityChecks result={result} />
