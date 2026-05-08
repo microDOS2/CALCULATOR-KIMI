@@ -13,9 +13,14 @@ interface ChannelsTabProps {
   state: CalculatorState;
   result: CalculationResult;
   updateState: (patch: Partial<CalculatorState>) => void;
+  mode?: 'all' | 'b2c' | 'b2b';
 }
 
-export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
+export function ChannelsTab({ state, result, updateState, mode = 'all' }: ChannelsTabProps) {
+  const showRetail = mode === 'b2c' || mode === 'all';
+  const showWholesale = mode === 'b2b' || mode === 'all';
+  const showDistributor = mode === 'b2b' || mode === 'all';
+  const showTools = mode === 'b2c' || mode === 'all';
   const ChannelCard = ({
     title,
     calc,
@@ -136,21 +141,28 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-4 flex-wrap mb-6">
+            {showRetail && (
             <Label className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox checked={state.includeR} onCheckedChange={(v) => updateState({ includeR: !!v })} />
               Include Retail
             </Label>
+            )}
+            {showWholesale && (
             <Label className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox checked={state.includeW} onCheckedChange={(v) => updateState({ includeW: !!v })} />
               Include Wholesale
             </Label>
+            )}
+            {showDistributor && (
             <Label className="flex items-center gap-2 text-sm cursor-pointer">
               <Checkbox checked={state.includeD} onCheckedChange={(v) => updateState({ includeD: !!v })} />
               Include Distributor
             </Label>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className={`grid gap-4 ${mode === 'b2b' ? 'grid-cols-1 md:grid-cols-2' : mode === 'b2c' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'}`}>
+            {showRetail && (
             <ChannelCard
               title="Retail"
               calc={result.retail}
@@ -176,9 +188,9 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
                   )}
                 </div>
               }
-            />
+            />)}
 
-            <ChannelCard
+            {showWholesale && (<ChannelCard
               title="Wholesale"
               calc={result.wholesale}
               priceLabel="Retail − Discount"
@@ -203,9 +215,9 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
                   </FormulaTooltip>
                 </div>
               }
-            />
+            />)}
 
-            <ChannelCard
+            {showDistributor && (<ChannelCard
               title="Distributor"
               calc={result.distributor}
               priceLabel="Wholesale − Discount"
@@ -243,9 +255,10 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
                   </div>
                 </div>
               }
-            />
+            />)}
           </div>
 
+          {showTools && (<>
           {/* Advanced Tool Cards */}
           <div className="flex items-center gap-2 py-1 mt-2">
             <div className="h-0.5 flex-1 bg-gradient-to-r from-sky-300 via-emerald-300 to-transparent" />
@@ -385,6 +398,7 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
               </CardContent>
             </Card>
           </div>
+          </>)}
         </CardContent>
       </Card>
     </div>

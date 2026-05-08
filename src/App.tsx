@@ -22,6 +22,7 @@ import { SubscriptionsTab } from "@/components/tabs/SubscriptionsTab";
 import { SimulateTab } from "@/components/tabs/SimulateTab";
 import { CashFlowTab } from "@/components/tabs/CashFlowTab";
 import { AffiliatesTab } from "@/components/tabs/AffiliatesTab";
+import { B2BSalesTab } from "@/components/tabs/B2BSalesTab";
 
 function App() {
   const calc = useCalculator();
@@ -123,8 +124,11 @@ function App() {
             <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
 
             {/* Group 2: B2C Sales — Indigo */}
-            <TabsTrigger value="retail" className="bg-indigo-100/70 text-indigo-800 hover:bg-indigo-200 data-[state=active]:!bg-indigo-300 data-[state=active]:!text-indigo-950 dark:bg-indigo-900/30 dark:text-indigo-200 dark:hover:bg-indigo-800/50 dark:data-[state=active]:!bg-indigo-700 dark:data-[state=active]:!text-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-              <span className="text-xs mr-1 font-bold opacity-70">4</span>Retail + Affiliates
+            <TabsTrigger value="b2c" className="bg-indigo-100/70 text-indigo-800 hover:bg-indigo-200 data-[state=active]:!bg-indigo-300 data-[state=active]:!text-indigo-950 dark:bg-indigo-900/30 dark:text-indigo-200 dark:hover:bg-indigo-800/50 dark:data-[state=active]:!bg-indigo-700 dark:data-[state=active]:!text-indigo-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">4</span>B2C Sales
+            </TabsTrigger>
+            <TabsTrigger value="b2b" className="bg-teal-100/70 text-teal-800 hover:bg-teal-200 data-[state=active]:!bg-teal-300 data-[state=active]:!text-teal-950 dark:bg-teal-900/30 dark:text-teal-200 dark:hover:bg-teal-800/50 dark:data-[state=active]:!bg-teal-700 dark:data-[state=active]:!text-teal-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">5</span>B2B Sales
             </TabsTrigger>
 
             <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
@@ -202,11 +206,12 @@ function App() {
             />
           </TabsContent>
 
-          <TabsContent value="retail">
+          <TabsContent value="b2c">
             <ChannelsTab
               state={calc.state}
               result={calc.result}
               updateState={calc.updateState}
+              mode="b2c"
             />
             <div className="mt-6">
               <AffiliatesTab
@@ -215,6 +220,14 @@ function App() {
                 updateState={calc.updateState}
               />
             </div>
+          </TabsContent>
+
+          <TabsContent value="b2b">
+            <B2BSalesTab
+              state={calc.state}
+              result={calc.result}
+              updateState={calc.updateState}
+            />
           </TabsContent>
 
           <TabsContent value="costs">
