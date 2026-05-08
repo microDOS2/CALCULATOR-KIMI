@@ -7,7 +7,7 @@ import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3, pct } from "@/lib/calculator";
-import { Truck, Receipt, Globe } from "lucide-react";
+import { Truck, Receipt, Globe, Package, AlertTriangle, Container } from "lucide-react";
 
 interface ChannelsTabProps {
   state: CalculatorState;
@@ -81,7 +81,7 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
 
         <FormulaTooltip
           label="Operating Profit / Pack"
-          formula={`GP − Overhead − Shipping = ${money3(calc.gp)} − ${money3(title === "Retail" ? result.ohPerPackR : title === "Wholesale" ? result.ohPerPackW : result.ohPerPackD)} − ${title === "Retail" ? money3(result.shipPerPack) : "$0"} = ${money3(calc.op)}`}
+          formula={`GP − Overhead − Shipping = ${money3(calc.gp)} − ${money3(title === "Retail" ? result.ohPerPackR : title === "Wholesale" ? result.ohPerPackW : result.ohPerPackD)} − ${title === "Retail" ? money3(result.shipPerPack) : title === "Wholesale" ? money3(result.shippingPerPackW) : money3(result.shippingPerPackD)} = ${money3(calc.op)}`}
         >
           <div className="flex justify-between items-center cursor-help">
             <span className="text-sm text-muted-foreground">Operating Profit / Pack</span>
@@ -172,37 +172,111 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                 <div className="pt-2 space-y-2 border-t">
                   <div className="flex items-center gap-2">
                     <Checkbox checked={state.includeShip} onCheckedChange={(v) => updateState({ includeShip: !!v })} />
-                    <span className="text-sm">Include shipping</span>
-                    <InfoTooltip text="When enabled, shipping cost is added to COGS for all channels. Each channel can have a different shipping cost." label="Include Shipping" />
+                    <span className="text-sm">Include shipping in COGS</span>
+                    <InfoTooltip text="Master toggle: when enabled, shipping cost is subtracted from gross profit for all channels. Each channel has its own shipping cost — set in the Per-Channel Shipping card below." label="Include Shipping" />
                   </div>
-                  {state.includeShip && !state.useShippingRateTable && (
-                    <div className="space-y-2">
-                      <Label className="text-xs text-muted-foreground">Flat Shipping $/Pack per Channel</Label>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <span className="text-[10px] text-indigo-600 font-medium">Retail</span>
-                          <Input type="number" step="0.01" className="h-7"
-                            value={state.shippingPerPack}
-                            onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })} />
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-teal-600 font-medium">Wholesale</span>
-                          <Input type="number" step="0.01" className="h-7"
-                            value={state.shippingPerPackW}
-                            onChange={(e) => updateState({ shippingPerPackW: Number(e.target.value) })} />
-                        </div>
-                        <div>
-                          <span className="text-[10px] text-teal-700 font-medium">Distributor</span>
-                          <Input type="number" step="0.01" className="h-7"
-                            value={state.shippingPerPackD}
-                            onChange={(e) => updateState({ shippingPerPackD: Number(e.target.value) })} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               }
-            />)}
+            />)}<span data-shipping-extracted />
+
+          {/* Per-Channel Shipping Costs — STANDALONE */}
+          {state.includeShip && !state.useShippingRateTable && (
+            <Card className="border-l-4 border-l-amber-400 shadow-md bg-gradient-to-br from-amber-50 via-white to-white dark:from-amber-950/20 dark:via-transparent dark:to-transparent">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-amber-500" />
+                  Per-Channel Shipping Costs
+                  <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Required</span>
+                  <InfoTooltip
+                    text="Each channel ships differently. Retail = individual consumer parcels (has a default). Wholesale = pallets or large boxes to retailers. Distributor = freight/LTL to distribution centers. Set each channel's cost independently — they are NOT inherited from Retail."
+                    label="Per-Channel Shipping"
+                  />
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-0">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Retail — has default */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Package className="h-3.5 w-3.5 text-indigo-500" />
+                      <Label className="text-xs font-medium text-indigo-700">Retail (Consumer Parcel)</Label>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Individual packages to end consumers</p>
+                    <Input
+                      type="number" step="0.01" className="h-8"
+                      value={state.shippingPerPack}
+                      onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })}
+                    />
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Default: $2.50</span>
+                    </div>
+                  </div>
+
+                  {/* Wholesale — must be defined */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Container className="h-3.5 w-3.5 text-teal-500" />
+                      <Label className="text-xs font-medium text-teal-700">Wholesale (Pallet/Freight)</Label>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Pallets or large boxes to retailers</p>
+                    <Input
+                      type="number" step="0.01" className="h-8"
+                      value={state.shippingPerPackW}
+                      onChange={(e) => updateState({ shippingPerPackW: Number(e.target.value) })}
+                      placeholder="Enter cost..."
+                    />
+                    {state.shippingPerPackW === 0 && (
+                      <div className="flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3 text-amber-500" />
+                        <span className="text-[10px] text-amber-700 font-medium">Must be defined by user</span>
+                      </div>
+                    )}
+                    {state.shippingPerPackW > 0 && (
+                      <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Set: {money3(state.shippingPerPackW)}/pack</span>
+                    )}
+                  </div>
+
+                  {/* Distributor — must be defined */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Container className="h-3.5 w-3.5 text-teal-700" />
+                      <Label className="text-xs font-medium text-teal-800">Distributor (Freight/LTL)</Label>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">Freight to distribution centers</p>
+                    <Input
+                      type="number" step="0.01" className="h-8"
+                      value={state.shippingPerPackD}
+                      onChange={(e) => updateState({ shippingPerPackD: Number(e.target.value) })}
+                      placeholder="Enter cost..."
+                    />
+                    {state.shippingPerPackD === 0 && (
+                      <div className="flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3 text-amber-500" />
+                        <span className="text-[10px] text-amber-700 font-medium">Must be defined by user</span>
+                      </div>
+                    )}
+                    {state.shippingPerPackD > 0 && (
+                      <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Set: {money3(state.shippingPerPackD)}/pack</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Summary bar */}
+                <div className="flex items-center gap-4 flex-wrap text-xs text-muted-foreground bg-primary/5 rounded p-2 mt-2">
+                  <span className="font-medium">Effective shipping:</span>
+                  <span>Retail: {money3(result.shipPerPack)}</span>
+                  <span>Wholesale: {money3(result.shippingPerPackW)}</span>
+                  <span>Distributor: {money3(result.shippingPerPackD)}</span>
+                  {state.includeShip && (state.shippingPerPackW === 0 || state.shippingPerPackD === 0) && (
+                    <span className="text-amber-600 font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      W/D shipping costs are $0 — set values above for accurate margins
+                    </span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
             {showWholesale && (<ChannelCard
               title="Wholesale"

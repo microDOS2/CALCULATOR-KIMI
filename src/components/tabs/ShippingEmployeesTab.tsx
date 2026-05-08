@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Plus, Trash2, Truck, PackageCheck, ExternalLink, Box } from "lucide-react";
+import { Plus, Trash2, Truck, PackageCheck, ExternalLink, Box, Package, Container, AlertTriangle } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { ShippingEmployee, ShippingMaterial, CalculatorState } from "@/types/calculator";
 import { money } from "@/lib/calculator";
@@ -83,19 +83,23 @@ export function ShippingEmployeesTab({
 
       {enabled && (
         <>
-          {/* Carrier Cost Reference */}
+          {/* Per-Channel Carrier Costs */}
           <Card className="border-l-4 border-l-amber-500 shadow-md bg-gradient-to-br from-white to-amber-50/40">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <ExternalLink className="h-4 w-4 text-amber-600" />
-                Carrier Shipping Cost (All Channels)
-                <InfoTooltip text="This is the per-pack cost you pay the carrier to deliver each package. It applies to ALL channels — Retail, Wholesale, and Distributor. Every pack shipped incurs this cost regardless of destination." label="Carrier Cost Reference" />
+                Per-Channel Carrier Shipping Costs
+                <InfoTooltip text="Each channel uses a different shipping method. Retail = individual consumer parcels. Wholesale = pallets or large boxes to retailers. Distributor = freight/LTL to distribution centers. Only Retail has a default — Wholesale and Distributor MUST be set by you based on your actual freight costs." label="Per-Channel Shipping" />
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center items-end">
-                <div>
-                  <p className="text-[10px] text-muted-foreground font-medium mb-1">CARRIER COST / PACK</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Retail */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Package className="h-3.5 w-3.5 text-indigo-500" />
+                    <p className="text-[10px] text-muted-foreground font-medium">RETAIL — CONSUMER PARCEL</p>
+                  </div>
                   <div className="relative">
                     <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
                     <Input
@@ -103,43 +107,93 @@ export function ShippingEmployeesTab({
                       step="0.01"
                       value={state.shippingPerPack}
                       onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })}
-                      className="pl-5 h-9 font-bold text-amber-700"
+                      className="pl-5 h-9 font-bold text-indigo-700"
                       placeholder="0.00"
                     />
                   </div>
+                  <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">Default: $2.50</span>
                 </div>
-                <div className="flex items-center justify-center pb-2">
-                  <Label className="flex items-center gap-2 text-sm cursor-pointer">
-                    <Checkbox
-                      checked={state.includeShip}
-                      onCheckedChange={(v) => updateState({ includeShip: !!v })}
-                      className="data-[state=checked]:bg-green-600"
+
+                {/* Wholesale */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Container className="h-3.5 w-3.5 text-teal-500" />
+                    <p className="text-[10px] text-muted-foreground font-medium">WHOLESALE — PALLET/FREIGHT</p>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={state.shippingPerPackW}
+                      onChange={(e) => updateState({ shippingPerPackW: Number(e.target.value) })}
+                      className="pl-5 h-9 font-bold text-teal-700"
+                      placeholder="Enter cost..."
                     />
-                    <span className={state.includeShip ? "text-green-700 font-medium" : "text-red-600 font-medium"}>
-                      {state.includeShip ? "In COGS" : "Not in COGS"}
+                  </div>
+                  {state.shippingPerPackW === 0 ? (
+                    <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> Must be defined by user
                     </span>
-                  </Label>
+                  ) : (
+                    <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">User defined</span>
+                  )}
                 </div>
-                <div>
-                  <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground"}`}>
-                    {state.includeShip ? (state.useShippingRateTable ? "Rate Table" : "Flat Rate") : "—"}
+
+                {/* Distributor */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5">
+                    <Container className="h-3.5 w-3.5 text-teal-700" />
+                    <p className="text-[10px] text-muted-foreground font-medium">DISTRIBUTOR — FREIGHT/LTL</p>
+                  </div>
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={state.shippingPerPackD}
+                      onChange={(e) => updateState({ shippingPerPackD: Number(e.target.value) })}
+                      className="pl-5 h-9 font-bold text-teal-800"
+                      placeholder="Enter cost..."
+                    />
+                  </div>
+                  {state.shippingPerPackD === 0 ? (
+                    <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> Must be defined by user
+                    </span>
+                  ) : (
+                    <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-medium">User defined</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Master toggle + model */}
+              <div className="flex items-center gap-4 mt-4 pt-3 border-t flex-wrap">
+                <Label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <Checkbox
+                    checked={state.includeShip}
+                    onCheckedChange={(v) => updateState({ includeShip: !!v })}
+                    className="data-[state=checked]:bg-green-600"
+                  />
+                  <span className={state.includeShip ? "text-green-700 font-medium" : "text-red-600 font-medium"}>
+                    {state.includeShip ? "Shipping in COGS" : "Shipping not in COGS"}
+                  </span>
+                </Label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground">MODEL:</span>
+                  <p className={`text-sm font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground"}`}>
+                    {state.includeShip ? (state.useShippingRateTable ? "Weight-Based Rate Table" : "Flat Rate Per Channel") : "—"}
                   </p>
-                  <p className="text-[10px] text-muted-foreground">Pricing model</p>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-amber-700">{money((state.includeShip ? state.shippingPerPack : 0))}/p</p>
-                  <p className="text-[10px] text-muted-foreground">Effective cost</p>
-                </div>
-                <div className="flex items-center justify-center pb-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => updateState({ useShippingRateTable: !state.useShippingRateTable })}
-                    className="text-xs"
-                  >
-                    {state.useShippingRateTable ? "Use Flat Rate" : "Use Rate Table"}
-                  </Button>
-                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => updateState({ useShippingRateTable: !state.useShippingRateTable })}
+                  className="text-xs"
+                  disabled={!state.includeShip}
+                >
+                  {state.useShippingRateTable ? "Use Flat Rate" : "Use Rate Table"}
+                </Button>
               </div>
             </CardContent>
           </Card>

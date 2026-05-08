@@ -136,9 +136,9 @@ const createDefaultState = (): CalculatorState => {
     wDisc: 50,
     dDisc: 25,
     includeShip: true,
-    shippingPerPack: 2.5,
-    shippingPerPackW: 2.5,
-    shippingPerPackD: 2.5,
+    shippingPerPack: 2.5,     // Retail: consumer parcel shipping has a reasonable default
+    shippingPerPackW: 0,      // Wholesale: MUST be user-defined (pallets/freight, not parcels)
+    shippingPerPackD: 0,      // Distributor: MUST be user-defined (pallets/freight, not parcels)
     shippingRateBrackets: [
       { maxWeightGrams: 100, cost: 3.50 },
       { maxWeightGrams: 250, cost: 4.50 },
