@@ -113,8 +113,8 @@ function App() {
       />
 
       <main className="container mx-auto py-6 px-4 sm:px-6">
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="w-full justify-center flex-wrap h-auto gap-1.5 bg-transparent">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6 overflow-visible">
+          <TabsList className="w-full flex-wrap h-auto gap-1 bg-transparent overflow-visible">
             {/* Group 1: Foundation — Blue */}
             <TabsTrigger value="product" className="bg-blue-100/70 text-blue-800 hover:bg-blue-200 data-[state=active]:!bg-blue-300 data-[state=active]:!text-blue-950 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/50 dark:data-[state=active]:!bg-blue-700 dark:data-[state=active]:!text-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
               <span className="text-xs mr-1 font-bold opacity-70">1</span>Product
