@@ -86,6 +86,7 @@ export interface Salesperson {
   name: string;
   type: 'pctGrossRev' | 'perPack';
   val: number;
+  baseSalary: number; // fixed monthly base pay, always paid regardless of sales
   chR: boolean;
   chW: boolean;
   chD: boolean;
@@ -108,6 +109,7 @@ export interface RSM {
   name: string;
   type: 'pctGrossRev' | 'perPack';
   val: number;
+  baseSalary: number; // fixed monthly base pay, always paid regardless of sales
   chR: boolean;
   chW: boolean;
   chD: boolean;
@@ -119,6 +121,7 @@ export interface VP {
   name: string;
   type: 'pctGrossRev' | 'perPack';
   val: number;
+  baseSalary: number; // fixed monthly base pay, always paid regardless of sales
   chR: boolean;
   chW: boolean;
   chD: boolean;
@@ -129,6 +132,7 @@ export interface President {
   name: string;
   type: 'pctGrossRev' | 'perPack';
   val: number;
+  baseSalary: number; // fixed monthly base pay, always paid regardless of sales
   chR: boolean;
   chW: boolean;
   chD: boolean;
@@ -385,6 +389,7 @@ export interface CommissionResults {
   totalRevenue: number;
   totalOpProfit: number;
   totalComm: number;
+  totalBaseSalary: number;
   totalBonus: number;
   commPctGross: number;
   commPctOp: number;

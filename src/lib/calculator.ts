@@ -1096,7 +1096,7 @@ function calculateCommissions(
       ...sp,
       basePay: base,
       bonusPay: bonus,
-      totalPay: base + bonus,
+      totalPay: base + bonus + sp.baseSalary,
       _units: units,
       _grossRev: grossRev,
       _grossProfit: grossProfit,
@@ -1118,7 +1118,7 @@ function calculateCommissions(
     if (rsm.type === "pctGrossRev") override = grossRev * (rsm.val / 100);
     else if (rsm.type === "perPack") override = units * rsm.val;
 
-    return { ...rsm, overridePay: override, totalPay: override };
+    return { ...rsm, overridePay: override, totalPay: override + rsm.baseSalary };
   });
 
   const vpsWithPay = vps.map((vp) => {
@@ -1135,7 +1135,7 @@ function calculateCommissions(
     if (vp.type === "pctGrossRev") override = grossRev * (vp.val / 100);
     else if (vp.type === "perPack") override = units * vp.val;
 
-    return { ...vp, overridePay: override, totalPay: override };
+    return { ...vp, overridePay: override, totalPay: override + vp.baseSalary };
   });
 
   const includedVPs = vpsWithPay.filter((vp) => vp.includePres).map((vp) => vp.id);
@@ -1160,7 +1160,7 @@ function calculateCommissions(
   if (president.type === "pctGrossRev") presOverride = presGrossRev * (president.val / 100);
   else if (president.type === "perPack") presOverride = presUnits * president.val;
 
-  const presidentWithPay = { ...president, overridePay: presOverride, totalPay: presOverride };
+  const presidentWithPay = { ...president, overridePay: presOverride, totalPay: presOverride + president.baseSalary };
 
   const totalRevenue = perf.R.rev + perf.W.rev + perf.D.rev;
   const totalOpProfit =
@@ -1176,6 +1176,12 @@ function calculateCommissions(
 
   const totalBonus = spsWithPay.reduce((sum, sp) => sum + sp.bonusPay, 0);
 
+  const totalBaseSalary =
+    president.baseSalary +
+    vps.reduce((sum, vp) => sum + vp.baseSalary, 0) +
+    rsms.reduce((sum, rsm) => sum + rsm.baseSalary, 0) +
+    sps.reduce((sum, sp) => sum + sp.baseSalary, 0);
+
   return {
     president: presidentWithPay,
     vps: vpsWithPay,
@@ -1184,6 +1190,7 @@ function calculateCommissions(
     totalRevenue,
     totalOpProfit,
     totalComm,
+    totalBaseSalary,
     totalBonus,
     commPctGross: totalRevenue > 0 ? totalComm / totalRevenue : 0,
     commPctOp: totalOpProfit > 0 ? totalComm / totalOpProfit : 0,

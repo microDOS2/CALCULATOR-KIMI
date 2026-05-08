@@ -60,8 +60,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">Top of commission hierarchy. Earns override on assigned channels.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <Input value={president.name} onChange={(e) => onUpdatePresident({ name: e.target.value })} className="h-8" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <Input value={president.name} onChange={(e) => onUpdatePresident({ name: e.target.value })} className="h-8" placeholder="Role Name" />
             <Select value={president.type} onValueChange={(v) => onUpdatePresident({ type: v as "pctGrossRev" | "perPack" })}>
               <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -69,7 +69,11 @@ export function CommissionsTab(props: CommissionsTabProps) {
                 <SelectItem value="perPack">$ per Pack Sold</SelectItem>
               </SelectContent>
             </Select>
-            <Input type="number" step="0.01" value={president.val} onChange={(e) => onUpdatePresident({ val: Number(e.target.value) })} className="h-8" />
+            <Input type="number" step="0.01" value={president.val} onChange={(e) => onUpdatePresident({ val: Number(e.target.value) })} className="h-8" placeholder="Rate" />
+            <div className="relative">
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+              <Input type="number" step="100" value={president.baseSalary} onChange={(e) => onUpdatePresident({ baseSalary: Number(e.target.value) })} className="h-8 pl-5" placeholder="Base Salary/mo" />
+            </div>
           </div>
           <ChannelChecks chW={president.chW} chD={president.chD} onChange={(p) => onUpdatePresident(p)} />
         </CardContent>
@@ -91,8 +95,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
           <Card key={vp.id}>
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 flex-1">
-                  <Input value={vp.name} onChange={(e) => onUpdateVP(vp.id, { name: e.target.value })} className="h-8" />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1">
+                  <Input value={vp.name} onChange={(e) => onUpdateVP(vp.id, { name: e.target.value })} className="h-8" placeholder="Role Name" />
                   <Select value={vp.type} onValueChange={(v) => onUpdateVP(vp.id, { type: v as "pctGrossRev" | "perPack" })}>
                     <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -100,7 +104,11 @@ export function CommissionsTab(props: CommissionsTabProps) {
                       <SelectItem value="perPack">$ per Pack Sold</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input type="number" step="0.01" value={vp.val} onChange={(e) => onUpdateVP(vp.id, { val: Number(e.target.value) })} className="h-8" />
+                  <Input type="number" step="0.01" value={vp.val} onChange={(e) => onUpdateVP(vp.id, { val: Number(e.target.value) })} className="h-8" placeholder="Rate" />
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input type="number" step="100" value={vp.baseSalary} onChange={(e) => onUpdateVP(vp.id, { baseSalary: Number(e.target.value) })} className="h-8 pl-5" placeholder="Base Salary/mo" />
+                  </div>
                 </div>
                 <Button size="sm" variant="ghost" className="text-destructive ml-2" onClick={() => onRemoveVP(vp.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
@@ -130,8 +138,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
           <Card key={rsm.id}>
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1">
-                  <Input value={rsm.name} onChange={(e) => onUpdateRSM(rsm.id, { name: e.target.value })} className="h-8" />
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 flex-1">
+                  <Input value={rsm.name} onChange={(e) => onUpdateRSM(rsm.id, { name: e.target.value })} className="h-8" placeholder="Role Name" />
                   <Select value={rsm.type} onValueChange={(v) => onUpdateRSM(rsm.id, { type: v as "pctGrossRev" | "perPack" })}>
                     <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -139,7 +147,11 @@ export function CommissionsTab(props: CommissionsTabProps) {
                       <SelectItem value="perPack">$ per Pack Sold</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input type="number" step="0.01" value={rsm.val} onChange={(e) => onUpdateRSM(rsm.id, { val: Number(e.target.value) })} className="h-8" />
+                  <Input type="number" step="0.01" value={rsm.val} onChange={(e) => onUpdateRSM(rsm.id, { val: Number(e.target.value) })} className="h-8" placeholder="Rate" />
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input type="number" step="100" value={rsm.baseSalary} onChange={(e) => onUpdateRSM(rsm.id, { baseSalary: Number(e.target.value) })} className="h-8 pl-5" placeholder="Base Salary/mo" />
+                  </div>
                   <Select value={rsm.assignedVP || "__none__"} onValueChange={(v) => onUpdateRSM(rsm.id, { assignedVP: v === "__none__" ? "" : v })}>
                     <SelectTrigger className="h-8"><SelectValue placeholder="Assign to VP" /></SelectTrigger>
                     <SelectContent>
@@ -172,8 +184,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
           <Card key={sp.id}>
             <CardContent className="p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-1">
-                  <Input value={sp.name} onChange={(e) => onUpdateSP(sp.id, { name: e.target.value })} className="h-8" />
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 flex-1">
+                  <Input value={sp.name} onChange={(e) => onUpdateSP(sp.id, { name: e.target.value })} className="h-8" placeholder="Role Name" />
                   <Select value={sp.type} onValueChange={(v) => onUpdateSP(sp.id, { type: v as "pctGrossRev" | "perPack" })}>
                     <SelectTrigger className="h-8"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -181,7 +193,11 @@ export function CommissionsTab(props: CommissionsTabProps) {
                       <SelectItem value="perPack">$ per Pack Sold</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input type="number" step="0.01" value={sp.val} onChange={(e) => onUpdateSP(sp.id, { val: Number(e.target.value) })} className="h-8" />
+                  <Input type="number" step="0.01" value={sp.val} onChange={(e) => onUpdateSP(sp.id, { val: Number(e.target.value) })} className="h-8" placeholder="Rate" />
+                  <div className="relative">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                    <Input type="number" step="100" value={sp.baseSalary} onChange={(e) => onUpdateSP(sp.id, { baseSalary: Number(e.target.value) })} className="h-8 pl-5" placeholder="Base Salary/mo" />
+                  </div>
                   <Select value={sp.assignedRSM || "__none__"} onValueChange={(v) => onUpdateSP(sp.id, { assignedRSM: v === "__none__" ? "" : v })}>
                     <SelectTrigger className="h-8"><SelectValue placeholder="Assign to RSM" /></SelectTrigger>
                     <SelectContent>
@@ -251,7 +267,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
               <TableHeader>
                 <TableRow>
                   <TableHead>Role / Name</TableHead>
-                  <TableHead className="text-right">Base Pay</TableHead>
+                  <TableHead className="text-right">Base Salary</TableHead>
+                  <TableHead className="text-right">Comm. / Base</TableHead>
                   <TableHead className="text-right">Bonuses</TableHead>
                   <TableHead className="text-right">Override</TableHead>
                   <TableHead className="text-right">Total Pay</TableHead>
@@ -260,6 +277,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
               <TableBody>
                 <TableRow className="font-semibold bg-muted/40">
                   <TableCell>{comm.president.name}</TableCell>
+                  <TableCell className="text-right">{money(commissions.president.baseSalary)}</TableCell>
                   <TableCell className="text-right">—</TableCell>
                   <TableCell className="text-right">—</TableCell>
                   <TableCell className="text-right">{money(comm.president.overridePay)}</TableCell>
@@ -269,6 +287,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                   <>
                     <TableRow key={vp.id} className="font-medium">
                       <TableCell className="pl-6">{vp.name}</TableCell>
+                      <TableCell className="text-right">{money(commissions.vps.find((v) => v.id === vp.id)?.baseSalary ?? 0)}</TableCell>
                       <TableCell className="text-right">—</TableCell>
                       <TableCell className="text-right">—</TableCell>
                       <TableCell className="text-right">{money(vp.overridePay)}</TableCell>
@@ -278,6 +297,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                       <>
                         <TableRow key={rsm.id}>
                           <TableCell className="pl-10">{rsm.name}</TableCell>
+                          <TableCell className="text-right">{money(commissions.rsms.find((r) => r.id === rsm.id)?.baseSalary ?? 0)}</TableCell>
                           <TableCell className="text-right">—</TableCell>
                           <TableCell className="text-right">—</TableCell>
                           <TableCell className="text-right">{money(rsm.overridePay)}</TableCell>
@@ -286,6 +306,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                         {comm.sps.filter((sp) => sp.assignedRSM === rsm.id).map((sp) => (
                           <TableRow key={sp.id} className="italic">
                             <TableCell className="pl-14">{sp.name}</TableCell>
+                            <TableCell className="text-right">{money(commissions.sps.find((s) => s.id === sp.id)?.baseSalary ?? 0)}</TableCell>
                             <TableCell className="text-right">{money(sp.basePay)}</TableCell>
                             <TableCell className="text-right">{money(sp.bonusPay)}</TableCell>
                             <TableCell className="text-right">—</TableCell>
@@ -298,7 +319,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
                 ))}
                 <TableRow className="font-bold border-t-2">
                   <TableCell>Grand Total</TableCell>
-                  <TableCell className="text-right">—</TableCell>
+                  <TableCell className="text-right">{money(comm.totalBaseSalary)}</TableCell>
+                  <TableCell className="text-right">{money(comm.sps.reduce((s, sp) => s + sp.basePay, 0))}</TableCell>
                   <TableCell className="text-right">{money(comm.totalBonus)}</TableCell>
                   <TableCell className="text-right">—</TableCell>
                   <TableCell className="text-right">

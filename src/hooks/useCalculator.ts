@@ -186,6 +186,7 @@ const createDefaultState = (): CalculatorState => {
         name: "President of Sales",
         type: "pctGrossRev",
         val: 1,
+        baseSalary: 0,
         chR: false,
         chW: false,
         chD: false,
@@ -196,6 +197,7 @@ const createDefaultState = (): CalculatorState => {
           name: "VP of Sales",
           type: "pctGrossRev",
           val: 2,
+          baseSalary: 0,
           chR: false,
           chW: false,
           chD: false,
@@ -208,6 +210,7 @@ const createDefaultState = (): CalculatorState => {
           name: "RSM 1",
           type: "pctGrossRev",
           val: 3,
+          baseSalary: 0,
           chR: false,
           chW: false,
           chD: false,
@@ -220,6 +223,7 @@ const createDefaultState = (): CalculatorState => {
           name: "Salesperson 1",
           type: "pctGrossRev",
           val: 5,
+          baseSalary: 0,
           chR: false,
           chW: false,
           chD: false,
@@ -332,15 +336,13 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
       ...ing,
       moqTiers: ing.moqTiers ?? [],
     })),
-    // v2: Commissions are B2B only — force all channel flags false on old data
-    commissions: (raw.schemaVersion ?? 0) < 2
-      ? {
-          president: { ...(raw.commissions?.president ?? defaults.commissions.president), chR: false, chW: false, chD: false },
-          vps: (raw.commissions?.vps ?? defaults.commissions.vps).map((vp) => ({ ...vp, chR: false, chW: false, chD: false })),
-          rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, chR: false, chW: false, chD: false })),
-          sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, chR: false, chW: false, chD: false })),
-        }
-      : (raw.commissions ?? defaults.commissions),
+    // v2: Commissions are B2B only — force all channel flags false + add baseSalary on old data
+    commissions: {
+      president: { ...(raw.commissions?.president ?? defaults.commissions.president), baseSalary: raw.commissions?.president?.baseSalary ?? 0, chR: false },
+      vps: (raw.commissions?.vps ?? defaults.commissions.vps).map((vp) => ({ ...vp, baseSalary: vp.baseSalary ?? 0, chR: false })),
+      rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, baseSalary: rsm.baseSalary ?? 0, chR: false })),
+      sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, baseSalary: sp.baseSalary ?? 0, chR: false })),
+    },
   };
 
   return migrated;
@@ -783,6 +785,7 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 2,
+              baseSalary: 0,
               chR: false,
               chW: false,
               chD: false,
@@ -844,6 +847,7 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 3,
+              baseSalary: 0,
               chR: false,
               chW: false,
               chD: false,
@@ -905,6 +909,7 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 5,
+              baseSalary: 0,
               chR: false,
               chW: false,
               chD: false,
