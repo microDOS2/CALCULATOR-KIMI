@@ -375,10 +375,10 @@ export function calculate(state: CalculatorState): CalculationResult {
       : shippingPerPack)
     : 0;
 
-  // Operating profit per pack
+  // Operating profit per pack — shipping applies to ALL channels
   const opR = gpR - ohPerPackR - shipPerPack;
-  const opW = gpW - ohPerPackW;
-  const opD = gpD - ohPerPackD;
+  const opW = gpW - ohPerPackW - shipPerPack;
+  const opD = gpD - ohPerPackD - shipPerPack;
 
   // Operating margin
   const omR = avgPriceR > 0 ? opR / avgPriceR : 0;
@@ -456,8 +456,8 @@ export function calculate(state: CalculatorState): CalculationResult {
   // Break-even
   const fixedCosts = beIncludeOverhead ? ohTotal : 0;
   const contribR = gpR - shipPerPack;
-  const contribW = gpW;
-  const contribD = gpD;
+  const contribW = gpW - shipPerPack;
+  const contribD = gpD - shipPerPack;
   const contribB = brev > 0 ? bopp + ohPerPack : 0;
 
   const beUnitsR = contribR > 0 ? fixedCosts / contribR : Infinity;
@@ -512,8 +512,8 @@ export function calculate(state: CalculatorState): CalculationResult {
     const priceD = priceW * (1 - dDisc / 100);
 
     const retailProfit = retailQty * (priceR - cogsPerPack - shipPerPack);
-    const wholesaleProfit = wholesaleQty * (priceW - cogsPerPack);
-    const distributorProfit = distributorQty * (priceD - cogsPerPack);
+    const wholesaleProfit = wholesaleQty * (priceW - cogsPerPack - shipPerPack);
+    const distributorProfit = distributorQty * (priceD - cogsPerPack - shipPerPack);
     const totalProfit = retailProfit + wholesaleProfit + distributorProfit;
 
     // Overhead allocation for this line item (proportional to packs per channel)

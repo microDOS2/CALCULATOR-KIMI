@@ -88,8 +88,8 @@ export function ShippingEmployeesTab({
             <CardHeader className="pb-2">
               <CardTitle className="text-sm flex items-center gap-2">
                 <ExternalLink className="h-4 w-4 text-amber-600" />
-                Carrier Shipping Cost (from Costs tab)
-                <InfoTooltip text="This is the per-pack cost you pay the carrier (USPS, UPS, FedEx) to deliver each package. It is configured on the Costs tab and is included in COGS. Shown here for reference only — edit it on the Costs tab." label="Carrier Cost Reference" />
+                Carrier Shipping Cost (All Channels)
+                <InfoTooltip text="This is the per-pack cost you pay the carrier to deliver each package. It applies to ALL channels — Retail, Wholesale, and Distributor. Every pack shipped incurs this cost regardless of destination." label="Carrier Cost Reference" />
               </CardTitle>
             </CardHeader>
             <CardContent>
