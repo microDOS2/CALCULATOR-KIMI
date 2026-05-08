@@ -248,11 +248,12 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
 
           {/* Weight-Based Shipping Rates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <Card className="border-dashed border-2">
+            <Card className="border-dashed border-2 bg-sky-50/50 dark:bg-sky-950/20 border-l-4 border-l-sky-400">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Truck className="h-5 w-5 text-primary" />
+                  <Truck className="h-5 w-5 text-sky-500" />
                   Weight-Based Shipping Rates
+                  <span className="bg-sky-100 text-sky-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
                   <InfoTooltip
                     text="Carrier-like pricing based on your total package weight (ingredients + all packaging layers). When enabled, the flat shipping rate is ignored and the rate table determines shipping cost per pack."
                     label="Weight-Based Shipping"
@@ -325,11 +326,12 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
             </Card>
 
             {/* Tax & Duty Configuration */}
-            <Card className="border-dashed border-2">
+            <Card className="border-dashed border-2 bg-emerald-50/50 dark:bg-emerald-950/20 border-l-4 border-l-emerald-400">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <Receipt className="h-5 w-5 text-primary" />
+                  <Receipt className="h-5 w-5 text-emerald-500" />
                   Tax &amp; Duty
+                  <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
                   <InfoTooltip
                     text="Configure regulatory costs per channel. Sales tax applies to retail customer purchases. Import duty applies to distributor imports. Both are shown as separate line items so buyers see true total costs."
                     label="Tax & Duty"

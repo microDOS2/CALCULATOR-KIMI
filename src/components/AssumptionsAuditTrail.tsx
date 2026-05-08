@@ -204,11 +204,12 @@ export function AssumptionsAuditTrail({ state, result }: AssumptionsAuditTrailPr
   const categories = [...new Set(rows.map((r) => r.category))];
 
   return (
-    <Card>
+    <Card className="border-l-4 border-l-slate-400 bg-slate-50/50 dark:bg-slate-950/20">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-primary" />
+          <ClipboardList className="h-5 w-5 text-slate-500" />
           Assumptions Audit Trail
+          <span className="bg-slate-100 text-slate-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Audit</span>
           <InfoTooltip
             text="A complete, auditable list of every assumption in your model — organized by category (Product, Ingredients, Packaging, Channels, Shipping, Overhead, Tax, Volume, Cash Flow, Subscriptions, Campaigns). Each row shows the assumption name, its current value, and the business impact it has on your model. Use this for due diligence, investor meetings, or when handing off a model to another team member."
             label="Audit Trail"

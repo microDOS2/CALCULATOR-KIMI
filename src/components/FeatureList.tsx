@@ -108,7 +108,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 10,
-    title: "Goal Seek / Target Finder (Tab 9.5)",
+    title: "Goal Seek / Target Finder (Tab 10)",
     items: [
       { text: "Reverse Solver — Pick a target metric, pick an adjustable input, solver finds the exact value" },
       { text: "5 Target Metrics — Total Gross Profit, Blended Gross Margin %, Break-Even Revenue, COGS/Pack, Monthly Volume" },
@@ -118,7 +118,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 11,
-    title: "Batch What-If Testing (Tab 9.6)",
+    title: "Batch What-If Testing (Tab 11)",
     items: [
       { text: "Multi-Value Comparison Table — Enter comma-separated values, get instant comparison" },
       { text: "5 Input Variables — Retail Price, Wholesale Discount, Distributor Discount, Ingredient Cost (multiplier), Shipping Cost" },
@@ -127,7 +127,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 12,
-    title: "Subscription Modeling (Tab 10)",
+    title: "Subscription Modeling (Tab 12)",
     items: [
       { text: "Unlimited Subscription Plans — Monthly price, starting subscribers, growth rate, churn rate, CAC" },
       { text: "Plan Items — Assign SKUs with packs-per-month to each plan" },
@@ -138,7 +138,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 13,
-    title: "Cash Flow Forecasting (Tab 11)",
+    title: "Cash Flow Forecasting (Tab 13)",
     items: [
       { text: "12-Month Monthly Projection — Starting balance, cash in, cash out, net flow, ending balance with full line-item detail" },
       { text: "Weekly View Toggle — Switch to 52-week granularity" },
@@ -153,7 +153,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 14,
-    title: "Campaign/Promotion Modeling (Tab 12)",
+    title: "Campaign/Promotion Modeling (Tab 14)",
     items: [
       { text: "Unlimited Campaigns — Name, discount %, duration in weeks, affected channels, expected volume uplift %" },
       { text: "Impact Analysis — Revenue At Risk, Margin Compression, Net Annual Effect with green/red indicators" },
@@ -162,7 +162,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 15,
-    title: "Scenario Management (Tab 13)",
+    title: "Scenario Management (Tab 15)",
     items: [
       { text: "Save Scenarios with Labels & Notes — Descriptive notes explain the rationale behind each saved state" },
       { text: "Load / Delete / Clear All — Full CRUD for saved scenarios" },
@@ -172,7 +172,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 16,
-    title: "Side-by-Side Comparison (Tab 14)",
+    title: "Side-by-Side Comparison (Tab 16)",
     items: [
       { text: "Two-Scenario Comparison — Load any two saved scenarios" },
       { text: "13 Key Metrics Compared — Price, margin, break-even, volume, profit, shipping, COGS" },
@@ -182,7 +182,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 17,
-    title: "Live Simulation (Tab 15 / Floating Panel)",
+    title: "Live Simulation (Tab Simulate / Floating Panel)",
     items: [
       { text: "Shadow State — Experiment without modifying your real model" },
       { text: "8 Adjustable Sliders — Retail Price, Units/Pack, Wholesale Discount, Distributor Discount, Monthly Volume, Subscription Price, Growth Rate, Churn Rate" },
@@ -198,14 +198,15 @@ const features: FeatureSection[] = [
       { text: "50-Step Undo/Redo — Ctrl+Z / Ctrl+Y with visual buttons in header" },
       { text: "Auto-Save — Every 30 seconds to localStorage" },
       { text: "Session Recovery — Recovery dialog on re-open if unsaved work detected" },
-      { text: "URL State Encoding — Full model encoded in URL hash (shareable links)" },
+      { text: "URL State Encoding — Full model encoded in URL hash (shareable links), LZ-String compressed for 81% shorter URLs" },
       { text: "PDF Export — Branded one-pager with Executive Summary, Channel Profitability, Cost Structure, Break-Even Analysis" },
       { text: "CSV Export — All key metrics in spreadsheet format" },
       { text: "Excel Export — Full data export" },
       { text: "Onboarding Wizard — 8-step guided tour for first-time users (re-openable via \"?\" button)" },
-      { text: "Comprehensive User Guide — Complete walkthrough of all 17 tabs with tips and feature descriptions" },
+      { text: "Comprehensive User Guide — Complete walkthrough of all 16 tabs with tips and feature descriptions" },
       { text: "Feature List Button — This dialog: complete inventory of all features organized by tab" },
       { text: "Info Tooltips Everywhere — \"i\" icons on every input and metric with detailed explanations" },
+      { text: "Color-Coded Tool Cards — Every advanced feature in a visually distinct card: Blue (Import), Amber (Pricing), Sky (Shipping), Emerald (Tax), Orange (Cash Flow), Violet (Power Tools), Rose (Validation), Slate (Audit)" },
       { text: "Mobile Responsive — Tables become card stacks on phones/tablets" },
       { text: "Schema Migration — Automatic state migration when app updates" },
       { text: "Sticky Header — Toolbar stays visible while scrolling" },
@@ -253,7 +254,7 @@ export function FeatureList() {
           ))}
 
           <div className="pt-4 border-t text-center text-xs text-muted-foreground">
-            Channel Calculator v10 — 17 tabs, 40+ major features, fully client-side.
+            Channel Calculator v10 — 16 tabs, 40+ major features, fully client-side.
           </div>
         </div>
       </DialogContent>

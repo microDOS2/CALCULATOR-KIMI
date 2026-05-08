@@ -258,11 +258,12 @@ export function SanityChecks({ result }: SanityChecksProps) {
   };
 
   return (
-    <Card>
+    <Card className="border-l-4 border-l-rose-400 bg-rose-50/50 dark:bg-rose-950/20">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <ShieldCheck className="h-5 w-5 text-primary" />
+          <ShieldCheck className="h-5 w-5 text-rose-500" />
           Sanity Checks
+          <span className="bg-rose-100 text-rose-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Validation</span>
           <InfoTooltip
             text="Automated validation of your model against industry benchmarks and business logic. Errors (red) require attention. Warnings (amber) suggest review. Green checks confirm healthy metrics. These checks analyze COGS ratios, margins, break-even feasibility, subscription churn, cash flow, campaign effects, channel profitability, and overhead ratios."
             label="Sanity Checks"

@@ -198,11 +198,12 @@ export function GoalSeekTab({ state }: GoalSeekTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="border-l-4 border-l-primary">
+      <Card className="border-l-4 border-l-violet-400 bg-violet-50/50 dark:bg-violet-950/20">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <Crosshair className="h-5 w-5 text-primary" />
+            <Crosshair className="h-5 w-5 text-violet-500" />
             Goal Seek / Target Finder
+            <span className="bg-violet-100 text-violet-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Power Tool</span>
             <InfoTooltip
               text="Work backward from a target. Select what you want to achieve (e.g., '$50 gross profit per pack'), pick which input to adjust (e.g., 'Retail Price'), and the solver finds the exact value that hits your target. Uses 30-iteration binary search for precision."
               label="Goal Seek"

@@ -213,14 +213,15 @@ export function ProductTab({
               </div>
 
               {/* MOQ Tier Editor */}
-              <Card className="border-dashed border-2">
+              <Card className="border-dashed border-2 bg-amber-50/50 dark:bg-amber-950/20 border-l-4 border-l-amber-400">
                 <CardHeader className="py-2 px-3">
                   <CardTitle className="text-xs flex items-center gap-1.5">
-                    <Scale className="h-3.5 w-3.5 text-primary" />
+                    <Scale className="h-3.5 w-3.5 text-amber-500" />
                     Volume Pricing Tiers
                     <span className="text-muted-foreground font-normal">
                       {ing.moqTiers && ing.moqTiers.length > 0 && `(${ing.moqTiers.length} tiers)`}
                     </span>
+                    <span className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
                     <InfoTooltip
                       text="Set lower cost-per-mg when ordering larger quantities. The calculator auto-selects the right tier based on total order volume. Example: $0.70/mg at 1kg, $0.55/mg at 5kg."
                       label="MOQ Pricing Tiers"

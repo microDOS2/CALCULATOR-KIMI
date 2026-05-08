@@ -3,25 +3,25 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Calculator, Package, Store, BarChart3, TrendingUp, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X } from "lucide-react";
+import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, HelpCircle, ArrowRight, ArrowLeft, X, Wrench } from "lucide-react";
 
-const WIZARD_KEY = "channel_calc_wizard_seen_v2";
+const WIZARD_KEY = "channel_calc_wizard_seen_v3";
 
 const steps = [
   {
     icon: Calculator,
     title: "Welcome to Channel Calculator",
-    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Enter your product specs, costs, and pricing — then explore scenarios, simulate changes, forecast cash flow, and validate your model against industry benchmarks.",
+    body: "This tool models your product's profitability across Retail, Wholesale, and Distributor channels. Enter your product specs, costs, and pricing — then explore scenarios, simulate changes, forecast cash flow, and validate your model against industry benchmarks. Every advanced feature lives in a color-coded tool card so you can't miss it.",
   },
   {
     icon: Package,
     title: "Step 1: Build Your Product",
-    body: "Start in the Product tab. Add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS — the total cost to produce one pack. Every other number in the tool flows from this foundation. Use CSV Import to bulk-paste ingredients from a spreadsheet.",
+    body: "Start in the Product tab. Add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS. Look for the blue CSV Bulk Import card to paste a spreadsheet of ingredients in seconds. Use the amber Volume Pricing Tiers card to set MOQ discounts like \"$0.70/mg at 1kg\".",
   },
   {
     icon: Store,
     title: "Step 2: Set Your Channels",
-    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. The calculator shows gross profit and margin for each channel. Toggle channels on/off to see how each one contributes. Add Sales Tax and Import Duty to model regulatory costs. Enable Weight-Based Shipping for carrier-like pricing.",
+    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. Toggle channels on/off to see contribution. Look for the sky-blue Weight-Based Shipping card to model carrier-like pricing by package weight. Use the emerald Tax & Duty card to add Sales Tax on retail and Import Duty on distributor. These are not hidden — they're right below your channel cards.",
   },
   {
     icon: BarChart3,
@@ -31,22 +31,22 @@ const steps = [
   {
     icon: Target,
     title: "Step 4: Optimize with Power Tools",
-    body: "Use Goal Seek (Tab 9.5) to reverse-calculate: enter a target margin or profit, pick which input to adjust (price, discount, cost), and the solver finds the exact value. Use Batch What-If (Tab 9.6) to test 5-10 values at once and compare in a single table. These are the fastest ways to find your optimal pricing and cost structure.",
+    body: "The violet cards are your power tools. Goal Seek (Tab 10) reverse-calculates: enter a target margin or profit, pick an input to adjust, and the solver finds the exact value. Batch What-If (Tab 11) tests 5-10 values at once in a comparison table with green/red profit indicators. These are the fastest ways to find your optimal pricing and cost structure.",
   },
   {
     icon: Table2,
     title: "Step 5: Compare & Save Scenarios",
-    body: "Save your model configurations as named scenarios with notes (Tab 13). Use the Compare tab (Tab 14) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. This is the fastest way to evaluate strategic decisions — like raising price vs. cutting costs.",
+    body: "Save your model configurations as named scenarios with notes (Tab 15). Use the Compare tab (Tab 16) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. Notes help you remember why you saved each scenario. This is the fastest way to evaluate strategic decisions.",
   },
   {
     icon: ShieldCheck,
     title: "Step 6: Validate & Audit",
-    body: "The Dashboard (Tab 9) is your Mission Control. It includes 10 live KPI cards with industry benchmark comparisons (supplement industry norms), an automated Sanity Checks panel that flags COGS ratios, margins, break-even feasibility, and cash flow risks, plus a complete Assumptions Audit Trail listing every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
+    body: "The Dashboard (Tab 9) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 8 industry benchmarks and flags problems. Below that, 10 live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
   },
   {
-    icon: TrendingUp,
-    title: "Step 7: Forecast & Simulate",
-    body: "Click Simulate to drag sliders and watch margins update live. Visit the Cash Flow tab to model when cash goes in and out — including payment terms and inventory lead times. Model subscriptions with churn and growth projections. This is where strategy meets reality. Remember: you can always undo with Ctrl+Z (50 steps).",
+    icon: Wrench,
+    title: "Step 7: Cash Flow & Advanced Tools",
+    body: "The Cash Flow tab (Tab 13) includes orange tool cards for Capital Expenditures (equipment, vehicles) and Debt Service (monthly loan payments). These affect your 12-month cash projection. Model subscriptions with churn and growth projections. The Simulate button opens a floating panel for live what-if analysis. Remember: Ctrl+Z undoes up to 50 steps.",
   },
 ];
 

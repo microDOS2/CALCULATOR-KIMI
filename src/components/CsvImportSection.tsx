@@ -80,11 +80,12 @@ export function CsvImportSection({ existingIngredients, unitSystem, setIngredien
   };
 
   return (
-    <Card className="border-dashed border-2">
+    <Card className="border-dashed border-2 bg-blue-50/50 dark:bg-blue-950/20 border-l-4 border-l-blue-400">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <FileSpreadsheet className="h-5 w-5 text-primary" />
+          <FileSpreadsheet className="h-5 w-5 text-blue-500" />
           CSV Bulk Import
+          <span className="bg-blue-100 text-blue-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
           <InfoTooltip
             text="Paste a CSV spreadsheet to bulk-import ingredients in seconds. Supports: name, mgPerUnit, costPerMg, supplierPaymentDays columns. Import 20+ ingredients at once instead of entering them one by one."
             label="CSV Import"

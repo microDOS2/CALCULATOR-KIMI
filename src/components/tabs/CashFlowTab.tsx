@@ -80,11 +80,12 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
 
       {/* Capital Expenditures */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-dashed border-2">
+        <Card className="border-dashed border-2 bg-orange-50/50 dark:bg-orange-950/20 border-l-4 border-l-orange-400">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <HardHat className="h-5 w-5 text-primary" />
+              <HardHat className="h-5 w-5 text-orange-500" />
               Capital Expenditures
+              <span className="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
               <InfoTooltip
                 text="One-time investments (equipment, vehicles, facility improvements) by month. These appear as cash outflows in the respective month. Use this to model major purchases that affect your cash position."
                 label="Capital Expenditures"
@@ -171,11 +172,12 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
         </Card>
 
         {/* Debt Service */}
-        <Card className="border-dashed border-2">
+        <Card className="border-dashed border-2 bg-orange-50/50 dark:bg-orange-950/20 border-l-4 border-l-orange-400">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
-              <Landmark className="h-5 w-5 text-primary" />
+              <Landmark className="h-5 w-5 text-orange-500" />
               Debt Service
+              <span className="bg-orange-100 text-orange-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
               <InfoTooltip
                 text="Fixed monthly loan or debt payments that reduce your cash balance. Enter the total monthly payment across all loans. This is treated as a recurring cash outflow every month."
                 label="Debt Service"
