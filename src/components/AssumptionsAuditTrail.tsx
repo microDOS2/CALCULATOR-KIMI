@@ -194,6 +194,21 @@ function buildAuditRows(state: CalculatorState, result: CalculationResult): Audi
     });
   });
 
+  // OVERRIDES
+  state.overrides.forEach((ov) => {
+    if (!ov.enabled) return;
+    const channelList = Object.entries(ov.channels)
+      .filter(([, v]) => v)
+      .map(([k]) => k)
+      .join(", ");
+    rows.push({
+      category: "Overrides",
+      assumption: ov.name,
+      value: `${ov.percentage}% of ${ov.basis === "gross" ? "gross" : "net"} revenue`,
+      impact: `Channels: ${channelList} | Monthly cost: ${money3((result.overrides?.entries.find((e) => e.name === ov.name)?.amount) ?? 0)}`,
+    });
+  });
+
   // AFFILIATES
   if (state.affiliate.enabled) {
     const af = state.affiliate;

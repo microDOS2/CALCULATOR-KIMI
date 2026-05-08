@@ -19,7 +19,7 @@ export function Guide() {
             User Guide
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Complete walkthrough of all 16 tabs and every feature.
+            Complete walkthrough of all 17 tabs and every feature.
           </DialogDescription>
         </DialogHeader>
 
@@ -30,10 +30,10 @@ export function Guide() {
             {[
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
               { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-9" },
-              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "10-12" },
-              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "13-15" },
-              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "16-17" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
+              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
+              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-18" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
@@ -79,10 +79,13 @@ export function Guide() {
                 <span className="font-medium text-emerald-700">Commissions (Tab 7)</span> — Configure sales commissions. Set commission % per channel and see the total commission impact on your operating profit.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
-                <span className="font-medium text-emerald-700">Charts (Tab 9)</span> — Visual breakdown of your business. <strong>Sensitivity Tornado Chart</strong> shows which inputs most affect your blended margin (diverging bars for ±10% changes). Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels. Time-series charts appear in their respective tabs.
+                <span className="font-medium text-emerald-700">Overrides (Tab 8)</span> — <strong>Named individual payments.</strong> A third payment system separate from Affiliates and Commissions. Create override entries with a name, percentage, gross/net basis, and channel selection (Retail, Wholesale, Distributor, Affiliate). Use for consultants, advisors, partners, or anyone who receives a revenue share. Each override shows its monthly impact. Enable/disable individually.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Charts (Tab 10)</span> — Visual breakdown of your business. <strong>Sensitivity Tornado Chart</strong> shows which inputs most affect your blended margin (diverging bars for ±10% changes). Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels. Time-series charts appear in their respective tabs.
               </li>
               <li className="pl-1 border-l-2 border-l-violet-300">
-                <span className="font-medium text-violet-700">Dashboard (Tab 10)</span> — One-screen "Mission Control". Starts with the <strong>Sanity Checks</strong> panel (rose red) that validates your model against 8 industry benchmarks. Below that, 10 live KPI cards with industry benchmark ranges and trend indicators. At the bottom, the <strong>Assumptions Audit Trail</strong> (slate gray) lists every assumption in your model. Use this for investor meetings or bank applications.
+                <span className="font-medium text-violet-700">Dashboard (Tab 11)</span> — One-screen "Mission Control". Starts with the <strong>Sanity Checks</strong> panel (rose red) that validates your model against 9 industry benchmarks. Below that, 10 live KPI cards with industry benchmark ranges and trend indicators. At the bottom, the <strong>Assumptions Audit Trail</strong> (slate gray) lists every assumption in your model. Use this for investor meetings or bank applications.
               </li>
               <li className="pl-1 border-l-2 border-l-violet-300">
                 <span className="font-medium text-violet-700">Goal Seek (Tab 11)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Work backward from a target. Select what you want to achieve (e.g., "$50 gross profit per pack"), pick which input to adjust (e.g., "Retail Price"), and the solver finds the exact value that hits your target using 30-iteration binary search. Supports 5 target metrics and 7 adjustable inputs including ingredient/packaging cost multipliers.
@@ -100,7 +103,7 @@ export function Guide() {
                 <span className="font-medium text-amber-700">Campaigns (Tab 15)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive). Includes before/during/after revenue comparison chart.
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
-                <span className="font-medium text-slate-700">Scenarios (Tab 16)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 16 tabs. Notes help you remember the rationale behind each saved scenario.
+                <span className="font-medium text-slate-700">Scenarios (Tab 16)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 17 tabs. Notes help you remember the rationale behind each saved scenario.
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
                 <span className="font-medium text-slate-700">Compare (Tab 17)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
@@ -125,6 +128,7 @@ export function Guide() {
               <li className="pl-1"><strong className="text-foreground">Cash Flow</strong> — Alerts when projected balance goes negative or below $5,000.</li>
               <li className="pl-1"><strong className="text-foreground">Campaign Net Effect</strong> — Warns if promotions reduce overall annual profit.</li>
               <li className="pl-1"><strong className="text-foreground">Overhead Ratio</strong> — Flags when overhead exceeds 25% of revenue.</li>
+              <li className="pl-1"><strong className="text-foreground">Override Cost</strong> — Warns if override payments exceed 10% of total revenue.</li>
             </ul>
           </section>
 

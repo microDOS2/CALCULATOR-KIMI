@@ -210,6 +210,28 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
           </Card>
         )}
 
+        {/* Override Cost KPI */}
+        {(result.overrides?.totalOverrideCost ?? 0) > 0 && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Override Cost</p>
+                  <p className="text-lg font-bold text-amber-600">
+                    {money3(result.overrides?.totalOverrideCost ?? 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {state.overrides.filter((o) => o.enabled).length} active override{state.overrides.filter((o) => o.enabled).length !== 1 ? "s" : ""}
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-emerald-500">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Affiliate Commission KPI */}
         {result.affiliate.enabled && (
           <Card>

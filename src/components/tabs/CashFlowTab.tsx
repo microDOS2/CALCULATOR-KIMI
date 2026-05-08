@@ -12,7 +12,7 @@ import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { CashFlowChart } from "@/components/CashFlowChart";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 import { Input } from "@/components/ui/input";
-import { Landmark, HardHat, Plus, Trash2, Wallet, Clock, Truck } from "lucide-react";
+import { Landmark, HardHat, Plus, Trash2, Wallet, Clock, Truck, UserCog } from "lucide-react";
 
 interface CashFlowTabProps {
   state: CalculatorState;
@@ -178,6 +178,38 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
           </div>
         </CardContent>
       </Card>
+
+      {/* Override Cost Summary */}
+      {(result.overrides?.totalOverrideCost ?? 0) > 0 && (
+        <Card className="border-dashed border-2 bg-gradient-to-br from-emerald-100 via-emerald-50 to-white dark:from-emerald-900/30 dark:via-emerald-950/20 dark:to-transparent shadow-md border-l-4 border-l-emerald-400">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <UserCog className="h-5 w-5 text-emerald-500" />
+              Override Payouts
+              <span className="bg-emerald-100 text-emerald-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
+              <InfoTooltip
+                text="Monthly override payments to named individuals. These are fixed percentage payouts based on selected channel revenue, separate from commissions and affiliate fees. Shown as a recurring cash outflow each month."
+                label="Override Payouts"
+              />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 space-y-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              {result.overrides?.entries.map((entry, i) => (
+                <div key={i} className="bg-white/70 dark:bg-black/20 rounded-md p-2">
+                  <p className="text-xs text-muted-foreground">{entry.name}</p>
+                  <p className="text-sm font-bold text-amber-700">{money3(entry.amount)}</p>
+                  <p className="text-[10px] text-muted-foreground">{entry.percentage}% of {entry.channels.join(", ")}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between pt-1 border-t">
+              <span className="text-xs text-muted-foreground">Total monthly override payout</span>
+              <span className="text-sm font-bold text-amber-700">{money3(result.overrides?.totalOverrideCost ?? 0)}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Capital Expenditures */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

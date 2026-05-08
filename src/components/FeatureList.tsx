@@ -109,7 +109,24 @@ const features: FeatureSection[] = [
   },
   {
     number: 7,
-    title: "Third-Party Services (Tab 8: Third Party)",
+    title: "Overrides (Tab 8: Overrides)",
+    groupColor: "ops",
+    groupName: "Operations",
+    items: [
+      { text: "Named Individual Payments — A third payment system separate from Affiliates and Commissions" },
+      { text: "Unlimited Override Entries — Each with name, percentage, gross/net basis, and channel selection" },
+      { text: "Per-Override Channel Toggles — Apply to Retail, Wholesale, Distributor, and/or Affiliate independently" },
+      { text: "Gross vs Net Basis — Calculate on total revenue or revenue after COGS deductions" },
+      { text: "Enable/Disable Toggle — Activate or deactivate individual overrides without deleting" },
+      { text: "Monthly Impact Preview — Shows dollar amount and which channels contribute" },
+      { text: "Summary Cards — Total entries, active count, monthly cost, annual cost" },
+      { text: "Cash Flow Integration — Override payouts appear as recurring monthly cash outflows" },
+      { text: "Sanity Check — Warns if total override costs exceed 10% of revenue" },
+    ],
+  },
+  {
+    number: 8,
+    title: "Third-Party Services (Tab 9: Third Party)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -119,8 +136,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 8,
-    title: "Visual Analytics (Tab 9: Charts)",
+    number: 9,
+    title: "Visual Analytics (Tab 10: Charts)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -130,21 +147,21 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 9,
-    title: "Executive Dashboard (Tab 17) — Mission Control",
+    number: 10,
+    title: "Executive Dashboard (Tab 11) — Mission Control",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
       { text: "10 Live KPI Cards — Blended Margin, Break-Even Revenue, Monthly Volume, COGS/Pack, Retail GP, Wholesale GP, Distributor GP, Shipping/Pack, Top Cost Driver, Tax/Campaign Impact" },
       { text: "Industry Benchmark Overlays — Supplement industry ranges displayed on select KPIs (e.g., \"Industry: 45%-75%\")" },
       { text: "Trend Indicators — Up/down/neutral arrows with color coding" },
-      { text: "Sanity Checks Panel — 8 automated validations: COGS ratio, blended margin, break-even feasibility, channel profitability, subscription churn, cash flow balance, campaign net effect, overhead ratio. Sorted by severity (error/warning/ok) with detailed corrective guidance" },
+      { text: "Sanity Checks Panel — 9 automated validations: COGS ratio, blended margin, break-even feasibility, channel profitability, subscription churn, cash flow balance, campaign net effect, overhead ratio, override cost ratio. Sorted by severity (error/warning/ok) with detailed corrective guidance" },
       { text: "Assumptions Audit Trail — Complete categorized listing of every assumption in the model (Product, Ingredients, Packaging, Channels, Shipping, Overhead, Tax, Volume, Cash Flow, Subscriptions, Campaigns) with current value and business impact" },
     ],
   },
   {
-    number: 10,
-    title: "Goal Seek / Target Finder (Tab 17)",
+    number: 11,
+    title: "Goal Seek / Target Finder (Tab 12)",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
@@ -155,8 +172,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 11,
-    title: "Batch What-If Testing (Tab 17)",
+    number: 12,
+    title: "Batch What-If Testing (Tab 13)",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
@@ -166,8 +183,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 12,
-    title: "Subscription Modeling (Tab 17)",
+    number: 13,
+    title: "Subscription Modeling (Tab 14)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -179,8 +196,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 13,
-    title: "Cash Flow Forecasting (Tab 17)",
+    number: 14,
+    title: "Cash Flow Forecasting (Tab 15)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -196,8 +213,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 14,
-    title: "Campaign/Promotion Modeling (Tab 17)",
+    number: 15,
+    title: "Campaign/Promotion Modeling (Tab 16)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -207,7 +224,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 15,
+    number: 16,
     title: "Scenario Management (Tab 17)",
     groupColor: "manage",
     groupName: "Management",
@@ -219,8 +236,8 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 16,
-    title: "Side-by-Side Comparison (Tab 17)",
+    number: 17,
+    title: "Side-by-Side Comparison (Tab 18)",
     groupColor: "manage",
     groupName: "Management",
     items: [
@@ -231,7 +248,7 @@ const features: FeatureSection[] = [
     ],
   },
   {
-    number: 17,
+    number: 18,
     title: "Live Simulation (Tab Simulate / Floating Panel)",
     groupColor: "simulate",
     groupName: "Simulate",
@@ -257,11 +274,11 @@ const features: FeatureSection[] = [
       { text: "CSV Export — All key metrics in spreadsheet format" },
       { text: "Excel Export — Full data export" },
       { text: "Onboarding Wizard — 8-step guided tour for first-time users (re-openable via \"?\" button)" },
-      { text: "Comprehensive User Guide — Complete walkthrough of all 16 tabs with tips and feature descriptions" },
+      { text: "Comprehensive User Guide — Complete walkthrough of all 17 tabs with tips and feature descriptions" },
       { text: "Feature List Button — This dialog: complete inventory of all features organized by tab" },
       { text: "Info Tooltips Everywhere — \"i\" icons on every input and metric with detailed explanations" },
       { text: "Color-Coded Tool Cards — Every advanced feature in a visually distinct card: Blue (Import), Amber (Pricing), Sky (Shipping), Emerald (Tax), Orange (Cash Flow), Violet (Power Tools), Rose (Validation), Slate (Audit)" },
-      { text: "Tab Color Groups — Blue (Setup), Emerald (Operations), Violet (Power), Amber (Forecast), Slate (Manage), Rose (Simulate)" },
+      { text: "Tab Color Groups — Blue (Foundation), Indigo (B2C Sales), Teal (B2B Sales), Emerald (Operations), Violet (Dashboard & Power), Amber (Forecast), Slate (Manage), Rose (Simulate)" },
       { text: "Mobile Responsive — Tables become card stacks on phones/tablets" },
       { text: "Schema Migration — Automatic state migration when app updates" },
       { text: "Sticky Header — Toolbar stays visible while scrolling" },
@@ -284,7 +301,7 @@ export function FeatureList() {
             Complete Feature List
           </DialogTitle>
           <DialogDescription className="text-sm">
-            18 feature categories across 16 tabs. Each tab group has a color so you can navigate at a glance.
+            19 feature categories across 17 tabs. Each tab group has a color so you can navigate at a glance.
           </DialogDescription>
         </DialogHeader>
 
@@ -294,11 +311,11 @@ export function FeatureList() {
           <div className="flex flex-wrap gap-2">
             {[
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
-              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-9" },
-              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "10-12" },
-              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "13-15" },
-              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "16-17" },
+              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
+              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
+              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-18" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
@@ -336,7 +353,7 @@ export function FeatureList() {
           })}
 
           <div className="pt-4 border-t text-center text-xs text-muted-foreground">
-            Channel Calculator v10 — 16 tabs, 40+ major features, fully client-side.
+            Channel Calculator v10 — 17 tabs, 42+ major features, fully client-side.
           </div>
         </div>
       </DialogContent>

@@ -8,11 +8,12 @@ import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, Hel
 const WIZARD_KEY = "channel_calc_wizard_seen_v3";
 
 const tabColorLegend = [
-  { label: "Core Setup", cls: "bg-blue-200 text-blue-800", tabs: "1-4" },
-  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "5-8" },
-  { label: "Power", cls: "bg-violet-200 text-violet-800", tabs: "9-11" },
-  { label: "Forecast", cls: "bg-amber-200 text-amber-800", tabs: "12-14" },
-  { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "15-16" },
+  { label: "Foundation", cls: "bg-blue-200 text-blue-800", tabs: "1-3" },
+  { label: "B2C Sales", cls: "bg-indigo-200 text-indigo-800", tabs: "4-5" },
+  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10" },
+  { label: "Dashboard & Power", cls: "bg-violet-200 text-violet-800", tabs: "11-13" },
+  { label: "Forecast", cls: "bg-amber-200 text-amber-800", tabs: "14-16" },
+  { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "17-18" },
   { label: "Simulate", cls: "bg-rose-200 text-rose-800", tabs: "●" },
 ];
 
@@ -50,7 +51,7 @@ const steps = [
   {
     icon: ShieldCheck,
     title: "Step 6: Validate & Audit",
-    body: "The Dashboard (Tab 14, violet group) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 8 industry benchmarks and flags problems. Below that, 10 live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
+    body: "The Dashboard (Tab 11, violet group) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 9 industry benchmarks and flags problems. Below that, live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
   },
   {
     icon: Wrench,

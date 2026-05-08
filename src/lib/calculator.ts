@@ -582,6 +582,12 @@ export function calculate(state: CalculatorState): CalculationResult {
   // Subscription projections
   const subscriptionSummary = calculateSubscriptions(state, cogsPerPack);
 
+  // Overrides (must be computed before cash flow)
+  const overrides = calculateOverrides(state, totalRevenueR, totalRevenueW, totalRevenueD, afGrossRevenue);
+
+  // Cash flow (depends on overrides)
+  const cashFlow = calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal, overrides.totalOverrideCost);
+
   return {
     unitSystem: state.unitSystem,
     skus: state.skus,
@@ -651,6 +657,7 @@ export function calculate(state: CalculatorState): CalculationResult {
       netProfit: afNetProfit,
       commissionAsPercentOfRevenue: afGrossRevenue > 0 ? (afInitialCommission / afGrossRevenue) * 100 : 0,
     },
+    overrides,
     retailPriceWithTax,
     retailTaxAmount,
     distributorImportDuty,
@@ -703,13 +710,13 @@ export function calculate(state: CalculatorState): CalculationResult {
     channelProfits,
     subscriptionPlans: state.subscriptionPlans,
     subscriptionSummary,
-    cashFlow: calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal),
     campaignImpact: calculateCampaignImpact(state.campaigns, {
       retail: { price: avgPriceR, gp: gpR, gm: gmR, op: opR, om: omR, costPerUnit, profitPerUnit: profitPerUnitR },
       wholesale: { price: avgPriceW, gp: gpW, gm: gmW, op: opW, om: omW, costPerUnit, profitPerUnit: profitPerUnitW },
       distributor: { price: avgPriceD, gp: gpD, gm: gmD, op: opD, om: omD, costPerUnit, profitPerUnit: profitPerUnitD },
       totalMonthlyVolume,
     }, state),
+    cashFlow,
   };
 }
 
@@ -820,7 +827,8 @@ function calculateCashFlow(
   blendedRevenuePerPack: number,
   totalMonthlyVolume: number,
   cogsPerPack: number,
-  ohTotal: number
+  ohTotal: number,
+  overrideCost: number,
 ): CalculationResult["cashFlow"] {
   const {
     customerPaymentTerms,
@@ -885,12 +893,13 @@ function calculateCashFlow(
 
     const overheadPaid = ohTotal;
     const commissionsPaid = 0; // simplified - could integrate commission results
+    const overridesPaid = overrideCost; // monthly override payouts
     const debtPaid = debtServiceMonthly;
     const capexPaid = capitalExpenditures
       .filter((c) => c.month === m)
       .reduce((s, c) => s + c.amount, 0);
 
-    const cashOut = cogsPaid + overheadPaid + commissionsPaid + debtPaid + capexPaid;
+    const cashOut = cogsPaid + overheadPaid + commissionsPaid + overridesPaid + debtPaid + capexPaid;
 
     const netCashFlow = cashIn - cashOut;
     balance = startingBalance + netCashFlow;
@@ -962,6 +971,47 @@ function calculateCashFlow(
     totalNetFlow: totalIn - totalOut,
     endingBalance: balance,
   };
+}
+
+function calculateOverrides(
+  state: CalculatorState,
+  totalRevenueR: number,
+  totalRevenueW: number,
+  totalRevenueD: number,
+  afGrossRevenue: number,
+): CalculationResult['overrides'] {
+  const entries: CalculationResult['overrides']['entries'] = [];
+  let totalOverrideCost = 0;
+
+  for (const override of state.overrides) {
+    if (!override.enabled) continue;
+
+    let revenue = 0;
+    if (override.channels.retail && state.includeR) revenue += totalRevenueR;
+    if (override.channels.wholesale && state.includeW) revenue += totalRevenueW;
+    if (override.channels.distributor && state.includeD) revenue += totalRevenueD;
+    if (override.channels.affiliate && state.affiliate.enabled) revenue += afGrossRevenue;
+
+    const basisRevenue = override.basis === 'net' ? revenue : revenue; // gross and net same for now
+    const amount = basisRevenue * (override.percentage / 100);
+
+    totalOverrideCost += amount;
+
+    const channelNames: string[] = [];
+    if (override.channels.retail) channelNames.push('Retail');
+    if (override.channels.wholesale) channelNames.push('Wholesale');
+    if (override.channels.distributor) channelNames.push('Distributor');
+    if (override.channels.affiliate) channelNames.push('Affiliate');
+
+    entries.push({
+      name: override.name,
+      amount,
+      percentage: override.percentage,
+      channels: channelNames,
+    });
+  }
+
+  return { totalOverrideCost, entries };
 }
 
 function calculateCommissions(

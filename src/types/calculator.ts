@@ -57,6 +57,30 @@ export interface MonthlyVolume {
   qty: number;
 }
 
+export interface OverrideEntry {
+  id: string;
+  name: string;
+  percentage: number;
+  channels: {
+    retail: boolean;
+    wholesale: boolean;
+    distributor: boolean;
+    affiliate: boolean;
+  };
+  basis: 'gross' | 'net';
+  enabled: boolean;
+}
+
+export interface OverrideCalc {
+  totalOverrideCost: number;
+  entries: Array<{
+    name: string;
+    amount: number;
+    percentage: number;
+    channels: string[];
+  }>;
+}
+
 export interface Salesperson {
   id: string;
   name: string;
@@ -224,6 +248,7 @@ export interface CalculationResult {
   wholesale: ChannelCalc;
   distributor: ChannelCalc;
   affiliate: AffiliateCalc;
+  overrides: OverrideCalc;
 
   // Tax & regulatory
   retailPriceWithTax: number;
@@ -458,6 +483,7 @@ export interface CalculatorState {
   retailSalesTaxRate: number; // % sales tax on retail (e.g., 8.5)
   distributorImportDutyRate: number; // % import duty on distributor (e.g., 5)
   affiliate: AffiliateState;
+  overrides: OverrideEntry[];
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
   subscriptionPlans: SubscriptionPlan[];

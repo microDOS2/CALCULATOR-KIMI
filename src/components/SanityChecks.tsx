@@ -216,7 +216,30 @@ function runChecks(result: CalculationResult): SanityCheck[] {
     }
   }
 
-  // 8. Channel profitability
+  // 8. Override cost check
+  if ((result.overrides?.totalOverrideCost ?? 0) > 0) {
+    const totalRev = (result.includeR ? result.retail.price : 0) + (result.includeW ? result.wholesale.price : 0) + (result.includeD ? result.distributor.price : 0);
+    const ovRatio = totalRev > 0 ? (result.overrides?.totalOverrideCost ?? 0) / totalRev : 0;
+    if (ovRatio > 0.1) {
+      checks.push({
+        id: "override-high",
+        severity: "warning",
+        title: "Override Costs Are Elevated",
+        message: `Overrides are ${pct(ovRatio)} of revenue — above 10% threshold.`,
+        detail: `Your override payments total ${money3(result.overrides?.totalOverrideCost ?? 0)} monthly, which is ${(ovRatio * 100).toFixed(1)}% of channel revenue. While overrides can be strategic, high percentages may erode profitability. Review if each override is still warranted.`,
+      });
+    } else {
+      checks.push({
+        id: "override-ok",
+        severity: "ok",
+        title: "Override Costs Reasonable",
+        message: `Overrides are ${pct(ovRatio)} of revenue — within healthy range.`,
+        detail: `Your ${money3(result.overrides?.totalOverrideCost ?? 0)} in monthly override payments represents ${(ovRatio * 100).toFixed(1)}% of revenue, which is sustainable.`,
+      });
+    }
+  }
+
+  // 9. Channel profitability
   const channels = [
     { name: "Retail", ch: result.retail, included: result.includeR },
     { name: "Wholesale", ch: result.wholesale, included: result.includeW },

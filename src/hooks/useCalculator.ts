@@ -8,6 +8,7 @@ import type {
   CommissionState,
   ThirdPartyCompany,
   Scenario,
+  OverrideEntry,
 } from "@/types/calculator";
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
@@ -178,6 +179,7 @@ const createDefaultState = (): CalculatorState => {
       payoutDayOfMonth: 15,
       payoutDelayMonths: 1,
     },
+    overrides: [],
     commissions: {
       president: {
         name: "President of Sales",
@@ -322,6 +324,8 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
     retailSalesTaxRate: raw.retailSalesTaxRate ?? defaults.retailSalesTaxRate,
     distributorImportDutyRate: raw.distributorImportDutyRate ?? defaults.distributorImportDutyRate,
     campaigns: raw.campaigns ?? defaults.campaigns,
+    overrides: raw.overrides ?? defaults.overrides,
+    affiliate: raw.affiliate ?? defaults.affiliate,
     ingredients: (raw.ingredients ?? defaults.ingredients).map((ing) => ({
       ...ing,
       moqTiers: ing.moqTiers ?? [],
@@ -956,6 +960,40 @@ export function useCalculator() {
     []
   );
 
+  // Overrides
+  const addOverride = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      overrides: [
+        ...prev.overrides,
+        {
+          id: uid(),
+          name: `Override ${prev.overrides.length + 1}`,
+          percentage: 1,
+          channels: { retail: true, wholesale: false, distributor: false, affiliate: false },
+          basis: 'gross' as const,
+          enabled: true,
+        },
+      ],
+    }));
+  }, []);
+
+  const removeOverride = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      overrides: prev.overrides.filter((o) => o.id !== id),
+    }));
+  }, []);
+
+  const updateOverride = useCallback((id: string, patch: Partial<OverrideEntry>) => {
+    setState((prev) => ({
+      ...prev,
+      overrides: prev.overrides.map((o) =>
+        o.id === id ? { ...o, ...patch } : o
+      ),
+    }));
+  }, []);
+
   // Scenarios
   const [scenarios, setScenarios] = useState<Scenario[]>(loadScenarios);
 
@@ -1055,6 +1093,10 @@ export function useCalculator() {
     thirdPartyCompanies: state.thirdPartyCompanies,
     updateThirdParty,
     updateThirdPartyItem,
+    overrides: state.overrides,
+    addOverride,
+    removeOverride,
+    updateOverride,
     scenarios,
     saveScenario,
     loadScenario,
