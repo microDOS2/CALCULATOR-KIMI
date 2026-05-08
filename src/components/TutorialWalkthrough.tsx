@@ -64,7 +64,7 @@ const steps: TutorialStep[] = [
     body: (
       <div className="space-y-3">
         <p>
-          Go to the <strong>Channels tab</strong> (blue). <strong>Check at least one channel</strong> to begin:
+          Go to the <strong>Costs tab (Tab 3, blue)</strong>. <strong>Check at least one channel</strong> to begin:
         </p>
         <ul className="space-y-2 text-sm">
           <li className="flex items-start gap-2">
@@ -94,7 +94,7 @@ const steps: TutorialStep[] = [
     body: (
       <div className="space-y-3">
         <p>
-          In the <strong>Channels tab</strong>, the "Per-Channel Shipping Costs" card lets you set carrier costs for each channel.
+          In the <strong>Costs tab (Tab 3)</strong>, the "Per-Channel Shipping Costs" card lets you set carrier costs for each channel.
         </p>
         <div className="p-3 rounded-lg bg-primary/5 text-sm space-y-2">
           <p className="font-medium">Cost per PACK — not per shipment</p>

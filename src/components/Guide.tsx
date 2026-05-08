@@ -258,7 +258,7 @@ export function Guide() {
               <li className="pl-1">Red alert cards in Cash Flow warn you when ending balance drops below $5,000.</li>
               <li className="pl-1">MOQ Pricing Tiers (amber card) auto-select the right cost-per-mg based on your total order volume.</li>
               <li className="pl-1">Enable Weight-Based Shipping (sky card) to replace flat-rate shipping with carrier-like pricing by package weight.</li>
-              <li className="pl-1">Add Sales Tax and Import Duty (emerald card) in the Channels tab to model regulatory costs per channel.</li>
+              <li className="pl-1">Add Sales Tax and Import Duty (emerald card) in the B2C Sales and B2B Sales tabs to model regulatory costs per channel.</li>
               <li className="pl-1">The Simulate tab's shadow state lets you experiment safely — your real model is not changed until you click Apply.</li>
               <li className="pl-1">Use the Compare tab to evaluate strategic decisions by loading two scenarios side-by-side.</li>
               <li className="pl-1">Campaigns with high volume uplift (50%+) can produce positive net effects despite deep discounts.</li>
