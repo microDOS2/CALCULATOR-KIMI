@@ -96,7 +96,7 @@ export function PackagingTab({
               <span>Layer Name</span>
               <span>Cost / Unit</span>
               <span>Units / Layer</span>
-              <span>Weight (g)</span>
+              <span>Weight ({unitSystem === 'mg' ? 'g' : 'oz'})</span>
               <span>Include</span>
               <span></span>
             </div>
@@ -114,7 +114,7 @@ export function PackagingTab({
                 <Input type="number" min={1} value={layer.unitsPerLayer}
                   onChange={(e) => updateLayer(selectedSku.id, layer.id, { unitsPerLayer: Math.max(1, Number(e.target.value)) })} className="h-8 w-24" />
                 <Input type="number" step="0.1" min={0} value={layer.weightPerUnit}
-                  onChange={(e) => updateLayer(selectedSku.id, layer.id, { weightPerUnit: Math.max(0, Number(e.target.value)) })} className="h-8 w-24" title="Weight in grams per unit" />
+                  onChange={(e) => updateLayer(selectedSku.id, layer.id, { weightPerUnit: Math.max(0, Number(e.target.value)) })} className="h-8 w-24" title={`Weight in ${unitSystem === 'mg' ? 'grams' : 'ounces'} per unit`} />
                 <div className="flex justify-center">
                   <Checkbox checked={layer.included}
                     onCheckedChange={(v) => updateLayer(selectedSku.id, layer.id, { included: !!v })} />
