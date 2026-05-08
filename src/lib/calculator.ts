@@ -985,6 +985,10 @@ function calculateCashFlow(
       commissionsPaid,
       debtServicePaid: debtPaid,
       capexPaid,
+      marketingSalaryTotal,
+      marketingExpenseTotal,
+      shippingSalaryTotal,
+      shippingBonusTotal,
       subscriptionRevenue,
     });
   }

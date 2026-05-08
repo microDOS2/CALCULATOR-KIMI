@@ -579,6 +579,10 @@ export interface CashFlowMonth {
   commissionsPaid: number;
   debtServicePaid: number;
   capexPaid: number;
+  marketingSalaryTotal: number;
+  marketingExpenseTotal: number;
+  shippingSalaryTotal: number;
+  shippingBonusTotal: number;
   subscriptionRevenue: number;
 }
 

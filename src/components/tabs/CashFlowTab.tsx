@@ -384,7 +384,7 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                     </TableHead>
                     <TableHead className="text-right text-red-500">
                       Cash Out
-                      <InfoTooltip text="All cash paid this period: COGS (after lead time + supplier terms), overhead, debt, commissions, and capital expenditures." label="Cash Out" />
+                      <InfoTooltip text="All cash paid this period: COGS (after lead time + supplier terms), overhead, commissions, marketing, shipping employees, debt, and capital expenditures." label="Cash Out" />
                     </TableHead>
                     <TableHead className="text-right">
                       Net
@@ -399,6 +399,9 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                         <TableHead className="text-right text-xs">Revenue</TableHead>
                         <TableHead className="text-right text-xs">COGS</TableHead>
                         <TableHead className="text-right text-xs">Overhead</TableHead>
+                        <TableHead className="text-right text-xs">Commissions</TableHead>
+                        <TableHead className="text-right text-xs">Marketing</TableHead>
+                        <TableHead className="text-right text-xs">Shipping</TableHead>
                         <TableHead className="text-right text-xs">Debt/CapEx</TableHead>
                       </>
                     )}
@@ -426,6 +429,9 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).revenueCollected)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).cogsPaid)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).overheadPaid)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).commissionsPaid)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).marketingSalaryTotal + (row as any).marketingExpenseTotal)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).shippingSalaryTotal + (row as any).shippingBonusTotal)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).debtServicePaid + (row as any).capexPaid)}</TableCell>
                           </>
                         )}
@@ -460,6 +466,9 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                               <div><span className="text-muted-foreground">Rev:</span> {money((row as any).revenueCollected)}</div>
                               <div><span className="text-muted-foreground">COGS:</span> {money((row as any).cogsPaid)}</div>
                               <div><span className="text-muted-foreground">OH:</span> {money((row as any).overheadPaid)}</div>
+                              <div><span className="text-muted-foreground">Comm:</span> {money((row as any).commissionsPaid)}</div>
+                              <div><span className="text-muted-foreground">Mktg:</span> {money((row as any).marketingSalaryTotal + (row as any).marketingExpenseTotal)}</div>
+                              <div><span className="text-muted-foreground">Ship:</span> {money((row as any).shippingSalaryTotal + (row as any).shippingBonusTotal)}</div>
                               <div><span className="text-muted-foreground">Debt/ CapEx:</span> {money((row as any).debtServicePaid + (row as any).capexPaid)}</div>
                             </>
                           )}
