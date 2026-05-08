@@ -368,17 +368,19 @@ export function calculate(state: CalculatorState): CalculationResult {
   const totalWeightPerPack = totalWeightPerUnit * weightedUnitsPerPack;
   const totalUnitWeightPerPack = (totalWeightPerPack / 1000) + totalPackagingWeightPerPack;
 
-  // Shipping cost: use rate table if enabled, otherwise flat rate
-  const shipPerPack = includeShip
+  // Per-channel shipping costs
+  const shipPerPackR = includeShip
     ? (state.useShippingRateTable && state.shippingRateBrackets.length > 0
       ? getShippingFromRateTable(totalUnitWeightPerPack, state.shippingRateBrackets)
       : shippingPerPack)
     : 0;
+  const shipPerPackW = includeShip ? state.shippingPerPackW : 0;
+  const shipPerPackD = includeShip ? state.shippingPerPackD : 0;
 
-  // Operating profit per pack — shipping applies to ALL channels
-  const opR = gpR - ohPerPackR - shipPerPack;
-  const opW = gpW - ohPerPackW - shipPerPack;
-  const opD = gpD - ohPerPackD - shipPerPack;
+  // Operating profit per pack — per-channel shipping
+  const opR = gpR - ohPerPackR - shipPerPackR;
+  const opW = gpW - ohPerPackW - shipPerPackW;
+  const opD = gpD - ohPerPackD - shipPerPackD;
 
   // Operating margin
   const omR = avgPriceR > 0 ? opR / avgPriceR : 0;
@@ -405,9 +407,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     if (afTier.initialBasis === 'product_only') {
       commissionBasis = avgPriceR;
     } else if (afTier.initialBasis === 'product_plus_shipping') {
-      commissionBasis = avgPriceR + shipPerPack;
+      commissionBasis = avgPriceR + shipPerPackR;
     } else if (afTier.initialBasis === 'total') {
-      commissionBasis = avgPriceR + shipPerPack + retailTaxAmount;
+      commissionBasis = avgPriceR + shipPerPackR + retailTaxAmount;
     }
 
     if (afTier.initialType === 'percentage') {
@@ -420,7 +422,7 @@ export function calculate(state: CalculatorState): CalculationResult {
 
     afInitialCommission = afCommissionPerPack * afPacks;
     const afCogs = cogsPerPack * afPacks;
-    const afShipping = includeShip ? shipPerPack * afPacks : 0;
+    const afShipping = includeShip ? shipPerPackR * afPacks : 0;
     afNetProfit = afGrossRevenue - afCogs - afShipping - afInitialCommission;
   }
 
@@ -455,9 +457,9 @@ export function calculate(state: CalculatorState): CalculationResult {
 
   // Break-even
   const fixedCosts = beIncludeOverhead ? ohTotal : 0;
-  const contribR = gpR - shipPerPack;
-  const contribW = gpW - shipPerPack;
-  const contribD = gpD - shipPerPack;
+  const contribR = gpR - shipPerPackR;
+  const contribW = gpW - shipPerPackW;
+  const contribD = gpD - shipPerPackD;
   const contribB = brev > 0 ? bopp + ohPerPack : 0;
 
   const beUnitsR = contribR > 0 ? fixedCosts / contribR : Infinity;
@@ -511,9 +513,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     const priceW = priceR * (1 - wDisc / 100);
     const priceD = priceW * (1 - dDisc / 100);
 
-    const retailProfit = retailQty * (priceR - cogsPerPack - shipPerPack);
-    const wholesaleProfit = wholesaleQty * (priceW - cogsPerPack - shipPerPack);
-    const distributorProfit = distributorQty * (priceD - cogsPerPack - shipPerPack);
+    const retailProfit = retailQty * (priceR - cogsPerPack - shipPerPackR);
+    const wholesaleProfit = wholesaleQty * (priceW - cogsPerPack - shipPerPackW);
+    const distributorProfit = distributorQty * (priceD - cogsPerPack - shipPerPackD);
     const totalProfit = retailProfit + wholesaleProfit + distributorProfit;
 
     // Overhead allocation for this line item (proportional to packs per channel)
@@ -585,7 +587,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     },
     ohTotal,
     ohPerPack,
-    shipPerPack
+    shipPerPackR,
+    shipPerPackW,
+    shipPerPackD
   );
 
   // Aggregate packaging costs across SKUs for chart (weighted by order qty)
@@ -712,7 +716,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     ohPerPackW,
     ohPerPackD,
     overheadPerUnit,
-    shipPerPack,
+    shipPerPack: shipPerPackR,
+    shippingPerPackW: shipPerPackW,
+    shippingPerPackD: shipPerPackD,
     brev,
     bgpp,
     bgmp,
@@ -1086,7 +1092,9 @@ function calculateCommissions(
   },
   _ohTotal: number,
   ohPerPack: number,
-  shipPerPack: number
+  shipPerPackR: number,
+  shipPerPackW: number,
+  shipPerPackD: number
 ): CommissionResults {
   const { commissions, skus, monthlyVolumes } = state;
   const { president, vps, rsms, sps } = commissions;
@@ -1222,9 +1230,9 @@ function calculateCommissions(
 
   const totalRevenue = perf.R.rev + perf.W.rev + perf.D.rev;
   const totalOpProfit =
-    (C.gpR - ohPerPack - shipPerPack) * totalPacksR +
-    (C.gpW - ohPerPack) * totalPacksW +
-    (C.gpD - ohPerPack) * totalPacksD;
+    (C.gpR - ohPerPack - shipPerPackR) * totalPacksR +
+    (C.gpW - ohPerPack - shipPerPackW) * totalPacksW +
+    (C.gpD - ohPerPack - shipPerPackD) * totalPacksD;
 
   const totalComm =
     spsWithPay.reduce((sum, sp) => sum + sp.totalPay, 0) +

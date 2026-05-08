@@ -137,6 +137,8 @@ const createDefaultState = (): CalculatorState => {
     dDisc: 25,
     includeShip: true,
     shippingPerPack: 2.5,
+    shippingPerPackW: 2.5,
+    shippingPerPackD: 2.5,
     shippingRateBrackets: [
       { maxWeightGrams: 100, cost: 3.50 },
       { maxWeightGrams: 250, cost: 4.50 },
@@ -360,6 +362,9 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
     shippingEmployeesEnabled: raw.shippingEmployeesEnabled ?? false,
     shippingEmployees: raw.shippingEmployees ?? [],
     shippingMaterials: raw.shippingMaterials ?? [],
+    // v2: Per-channel shipping costs (default to same as retail for old data)
+    shippingPerPackW: raw.shippingPerPackW ?? raw.shippingPerPack ?? 2.5,
+    shippingPerPackD: raw.shippingPerPackD ?? raw.shippingPerPack ?? 2.5,
   };
 
   return migrated;

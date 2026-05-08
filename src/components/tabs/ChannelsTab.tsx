@@ -173,17 +173,31 @@ export function ChannelsTab({ state, result, updateState, mode = 'all' }: Channe
                   <div className="flex items-center gap-2">
                     <Checkbox checked={state.includeShip} onCheckedChange={(v) => updateState({ includeShip: !!v })} />
                     <span className="text-sm">Include shipping</span>
-                    <InfoTooltip text="When enabled, shipping cost is added to the COGS for each pack. Disable if shipping is free or included in your product price." label="Include Shipping" />
+                    <InfoTooltip text="When enabled, shipping cost is added to COGS for all channels. Each channel can have a different shipping cost." label="Include Shipping" />
                   </div>
-                  {!state.useShippingRateTable && (
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                        Flat Shipping $/Pack
-                        <InfoTooltip text="Fixed shipping cost per pack. Used when weight-based shipping is disabled." label="Flat Shipping" />
-                      </Label>
-                      <Input type="number" step="0.01" className="w-24 h-7"
-                        value={state.shippingPerPack}
-                        onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })} />
+                  {state.includeShip && !state.useShippingRateTable && (
+                    <div className="space-y-2">
+                      <Label className="text-xs text-muted-foreground">Flat Shipping $/Pack per Channel</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div>
+                          <span className="text-[10px] text-indigo-600 font-medium">Retail</span>
+                          <Input type="number" step="0.01" className="h-7"
+                            value={state.shippingPerPack}
+                            onChange={(e) => updateState({ shippingPerPack: Number(e.target.value) })} />
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-teal-600 font-medium">Wholesale</span>
+                          <Input type="number" step="0.01" className="h-7"
+                            value={state.shippingPerPackW}
+                            onChange={(e) => updateState({ shippingPerPackW: Number(e.target.value) })} />
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-teal-700 font-medium">Distributor</span>
+                          <Input type="number" step="0.01" className="h-7"
+                            value={state.shippingPerPackD}
+                            onChange={(e) => updateState({ shippingPerPackD: Number(e.target.value) })} />
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

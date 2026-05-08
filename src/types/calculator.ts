@@ -312,6 +312,8 @@ export interface CalculationResult {
 
   // Shipping
   shipPerPack: number;
+  shippingPerPackW: number;
+  shippingPerPackD: number;
 
   // Blended
   brev: number;
@@ -532,6 +534,8 @@ export interface CalculatorState {
   dDisc: number;
   includeShip: boolean;
   shippingPerPack: number;
+  shippingPerPackW: number;
+  shippingPerPackD: number;
   shippingRateBrackets: ShippingRateBracket[];
   useShippingRateTable: boolean;
   ohR: boolean;
