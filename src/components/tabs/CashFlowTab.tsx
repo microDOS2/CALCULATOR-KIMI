@@ -12,7 +12,7 @@ import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { CashFlowChart } from "@/components/CashFlowChart";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
 import { Input } from "@/components/ui/input";
-import { Landmark, HardHat, Plus, Trash2 } from "lucide-react";
+import { Landmark, HardHat, Plus, Trash2, Wallet, Clock, Truck } from "lucide-react";
 
 interface CashFlowTabProps {
   state: CalculatorState;
@@ -78,9 +78,110 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
         </FormulaTooltip>
       </div>
 
+      {/* Cash Flow Settings */}
+      <div className="flex items-center gap-2 py-1">
+        <div className="h-0.5 flex-1 bg-gradient-to-r from-teal-300 via-orange-300 to-transparent" />
+        <span className="text-xs font-bold text-teal-600 uppercase tracking-wider bg-teal-100 px-2 py-0.5 rounded">Cash Flow Tools</span>
+        <div className="h-0.5 flex-1 bg-gradient-to-l from-orange-300 via-teal-300 to-transparent" />
+      </div>
+
+      <Card className="border-dashed border-2 bg-gradient-to-br from-teal-100 via-teal-50 to-white dark:from-teal-900/30 dark:via-teal-950/20 dark:to-transparent shadow-md border-l-4 border-l-teal-400">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Wallet className="h-5 w-5 text-teal-500" />
+            Cash Flow Settings
+            <span className="bg-teal-100 text-teal-700 text-[10px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider">Tool</span>
+            <InfoTooltip
+              text="These settings control the timing of all cash movements. Starting cash is your opening bank balance. Lead time is days from PO to delivery. Payment terms are days from sale to cash collection. Together they determine whether you have enough cash to operate."
+              label="Cash Flow Settings"
+            />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4 pt-0">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs font-medium flex items-center gap-1">
+                <Wallet className="h-3 w-3 text-teal-500" />
+                Starting Cash ($)
+                <InfoTooltip text="Your bank balance at the start of the forecast period. This is the foundation all cash flows build on." label="Starting Cash" />
+              </Label>
+              <Input
+                type="number"
+                value={state.startingCashBalance}
+                onChange={(e) => updateState({ startingCashBalance: Number(e.target.value) })}
+                className="h-8"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-medium flex items-center gap-1">
+                <Clock className="h-3 w-3 text-teal-500" />
+                Lead Time (days)
+                <InfoTooltip text="Days from placing a purchase order with your supplier to receiving the goods. Affects when COGS cash outflow happens." label="Lead Time" />
+              </Label>
+              <Input
+                type="number"
+                value={state.inventoryLeadTimeDays}
+                onChange={(e) => updateState({ inventoryLeadTimeDays: Number(e.target.value) })}
+                className="h-8"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-medium flex items-center gap-1">
+                <Landmark className="h-3 w-3 text-teal-500" />
+                Debt Service ($/mo)
+                <InfoTooltip text="Fixed monthly loan or debt payments. Paid regardless of sales volume. Shown in the Debt Service card below for detail." label="Debt Service" />
+              </Label>
+              <Input
+                type="number"
+                value={state.debtServiceMonthly}
+                onChange={(e) => updateState({ debtServiceMonthly: Math.max(0, Number(e.target.value)) })}
+                className="h-8"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-medium flex items-center gap-1">
+              <Truck className="h-3.5 w-3.5 text-teal-500" />
+              Customer Payment Terms (days after sale)
+              <InfoTooltip text="How many days after a sale before you collect cash from each channel. Retail = immediate (0 days). Wholesale typically NET 30. Distributor often NET 60 or 90. These delays directly affect your cash flow timing." label="Payment Terms" />
+            </Label>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Retail</Label>
+                <Input
+                  type="number"
+                  value={state.customerPaymentTerms.retailDays}
+                  onChange={(e) => updateState({ customerPaymentTerms: { ...state.customerPaymentTerms, retailDays: Number(e.target.value) } })}
+                  className="h-8"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Wholesale</Label>
+                <Input
+                  type="number"
+                  value={state.customerPaymentTerms.wholesaleDays}
+                  onChange={(e) => updateState({ customerPaymentTerms: { ...state.customerPaymentTerms, wholesaleDays: Number(e.target.value) } })}
+                  className="h-8"
+                />
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Distributor</Label>
+                <Input
+                  type="number"
+                  value={state.customerPaymentTerms.distributorDays}
+                  onChange={(e) => updateState({ customerPaymentTerms: { ...state.customerPaymentTerms, distributorDays: Number(e.target.value) } })}
+                  className="h-8"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Capital Expenditures */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-dashed border-2 bg-orange-50/50 dark:bg-orange-950/20 border-l-4 border-l-orange-400">
+        <Card className="border-dashed border-2 bg-gradient-to-br from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:via-orange-950/20 dark:to-transparent shadow-md border-l-4 border-l-orange-400">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <HardHat className="h-5 w-5 text-orange-500" />
@@ -172,7 +273,7 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
         </Card>
 
         {/* Debt Service */}
-        <Card className="border-dashed border-2 bg-orange-50/50 dark:bg-orange-950/20 border-l-4 border-l-orange-400">
+        <Card className="border-dashed border-2 bg-gradient-to-br from-orange-100 via-orange-50 to-white dark:from-orange-900/30 dark:via-orange-950/20 dark:to-transparent shadow-md border-l-4 border-l-orange-400">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm flex items-center gap-2">
               <Landmark className="h-5 w-5 text-orange-500" />

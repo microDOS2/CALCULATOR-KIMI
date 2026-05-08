@@ -246,9 +246,16 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
             />
           </div>
 
+          {/* Advanced Tool Cards */}
+          <div className="flex items-center gap-2 py-1 mt-2">
+            <div className="h-0.5 flex-1 bg-gradient-to-r from-sky-300 via-emerald-300 to-transparent" />
+            <span className="text-xs font-bold text-sky-600 uppercase tracking-wider bg-sky-100 px-2 py-0.5 rounded">Shipping & Tax Tools</span>
+            <div className="h-0.5 flex-1 bg-gradient-to-l from-emerald-300 via-sky-300 to-transparent" />
+          </div>
+
           {/* Weight-Based Shipping Rates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <Card className="border-dashed border-2 bg-sky-50/50 dark:bg-sky-950/20 border-l-4 border-l-sky-400">
+            <Card className="border-dashed border-2 bg-gradient-to-br from-sky-100 via-sky-50 to-white dark:from-sky-900/30 dark:via-sky-950/20 dark:to-transparent shadow-md border-l-4 border-l-sky-400">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Truck className="h-5 w-5 text-sky-500" />
@@ -326,7 +333,7 @@ export function ChannelsTab({ state, result, updateState }: ChannelsTabProps) {
             </Card>
 
             {/* Tax & Duty Configuration */}
-            <Card className="border-dashed border-2 bg-emerald-50/50 dark:bg-emerald-950/20 border-l-4 border-l-emerald-400">
+            <Card className="border-dashed border-2 bg-gradient-to-br from-emerald-100 via-emerald-50 to-white dark:from-emerald-900/30 dark:via-emerald-950/20 dark:to-transparent shadow-md border-l-4 border-l-emerald-400">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Receipt className="h-5 w-5 text-emerald-500" />

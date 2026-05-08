@@ -213,7 +213,7 @@ export function ProductTab({
               </div>
 
               {/* MOQ Tier Editor */}
-              <Card className="border-dashed border-2 bg-amber-50/50 dark:bg-amber-950/20 border-l-4 border-l-amber-400">
+              <Card className="border-dashed border-2 bg-gradient-to-br from-amber-100 via-amber-50 to-white dark:from-amber-900/30 dark:via-amber-950/20 dark:to-transparent shadow-md border-l-4 border-l-amber-400">
                 <CardHeader className="py-2 px-3">
                   <CardTitle className="text-xs flex items-center gap-1.5">
                     <Scale className="h-3.5 w-3.5 text-amber-500" />
@@ -297,6 +297,11 @@ export function ProductTab({
           })}
 
           {/* CSV Bulk Import */}
+          <div className="flex items-center gap-2 py-1">
+            <div className="h-0.5 flex-1 bg-gradient-to-r from-blue-300 to-transparent" />
+            <span className="text-xs font-bold text-blue-600 uppercase tracking-wider bg-blue-100 px-2 py-0.5 rounded">Import & Pricing Tools</span>
+            <div className="h-0.5 flex-1 bg-gradient-to-l from-blue-300 to-transparent" />
+          </div>
           <CsvImportSection
             existingIngredients={state.ingredients}
             unitSystem={state.unitSystem}

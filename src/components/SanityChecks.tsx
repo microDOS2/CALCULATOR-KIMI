@@ -258,7 +258,7 @@ export function SanityChecks({ result }: SanityChecksProps) {
   };
 
   return (
-    <Card className="border-l-4 border-l-rose-400 bg-rose-50/50 dark:bg-rose-950/20">
+    <Card className="border-l-4 border-l-rose-400 bg-gradient-to-br from-rose-100 via-rose-50 to-white dark:from-rose-900/30 dark:via-rose-950/20 dark:to-transparent shadow-md">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <ShieldCheck className="h-5 w-5 text-rose-500" />

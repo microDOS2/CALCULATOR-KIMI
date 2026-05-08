@@ -204,7 +204,7 @@ export function AssumptionsAuditTrail({ state, result }: AssumptionsAuditTrailPr
   const categories = [...new Set(rows.map((r) => r.category))];
 
   return (
-    <Card className="border-l-4 border-l-slate-400 bg-slate-50/50 dark:bg-slate-950/20">
+    <Card className="border-l-4 border-l-slate-400 bg-gradient-to-br from-slate-100 via-slate-50 to-white dark:from-slate-900/30 dark:via-slate-950/20 dark:to-transparent shadow-md">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-slate-500" />

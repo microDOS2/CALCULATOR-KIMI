@@ -84,7 +84,7 @@ export function BatchWhatIfTab({ state }: BatchWhatIfTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="border-l-4 border-l-violet-400 bg-violet-50/50 dark:bg-violet-950/20">
+      <Card className="border-l-4 border-l-violet-400 bg-gradient-to-br from-violet-100 via-violet-50 to-white dark:from-violet-900/30 dark:via-violet-950/20 dark:to-transparent shadow-lg">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Table2 className="h-5 w-5 text-violet-500" />
