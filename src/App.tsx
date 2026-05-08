@@ -140,16 +140,16 @@ function App() {
 
             {/* Group 3: Operations — Emerald */}
             <TabsTrigger value="po" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-              <span className="text-xs mr-1 font-bold opacity-70">5</span>Orders
+              <span className="text-xs mr-1 font-bold opacity-70">6</span>Orders
             </TabsTrigger>
             <TabsTrigger value="commissions" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-              <span className="text-xs mr-1 font-bold opacity-70">6</span>Commissions
+              <span className="text-xs mr-1 font-bold opacity-70">7</span>Commissions
             </TabsTrigger>
             <TabsTrigger value="thirdparty" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-              <span className="text-xs mr-1 font-bold opacity-70">7</span>Third Party
+              <span className="text-xs mr-1 font-bold opacity-70">8</span>Third Party
             </TabsTrigger>
             <TabsTrigger value="overrides" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
-              <span className="text-xs mr-1 font-bold opacity-70">8</span>Overrides
+              <span className="text-xs mr-1 font-bold opacity-70">9</span>Overrides
             </TabsTrigger>
             <TabsTrigger value="charts" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
               <span className="text-xs mr-1 font-bold opacity-70">10</span>Charts
