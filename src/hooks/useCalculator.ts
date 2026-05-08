@@ -786,7 +786,7 @@ export function useCalculator() {
       const entry = createAuditEntry("System", `Added Marketing Employee "${newName}"`, `marketingEmployees.${prev.marketingEmployees.length}`, "—", "New marketing employee");
       return {
         ...prev,
-        marketingEmployees: [...prev.marketingEmployees, { id: uid(), name: newName, title: "", salary: 0 }],
+        marketingEmployees: [...prev.marketingEmployees, { id: uid(), name: newName, title: "", isHourly: false, salary: 0, hourlyRate: 0, hoursPerWeek: 40 }],
         auditLog: trimAuditLog([...prev.auditLog, entry]),
       };
     });
@@ -848,7 +848,7 @@ export function useCalculator() {
       const entry = createAuditEntry("System", `Added Shipping Employee "${newName}"`, `shippingEmployees.${prev.shippingEmployees.length}`, "—", "New shipping employee");
       return {
         ...prev,
-        shippingEmployees: [...prev.shippingEmployees, { id: uid(), name: newName, title: "", salary: 0, perItemBonus: 0, perItemBonusEnabled: false }],
+        shippingEmployees: [...prev.shippingEmployees, { id: uid(), name: newName, title: "", isHourly: false, salary: 0, hourlyRate: 0, hoursPerWeek: 40, perItemBonus: 0, perItemBonusEnabled: false }],
         auditLog: trimAuditLog([...prev.auditLog, entry]),
       };
     });

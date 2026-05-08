@@ -54,7 +54,7 @@ export function MarketingTab({
   const [activeSection, setActiveSection] = useState<"employees" | "expenses">("employees");
   const enabled = state.marketingEnabled;
 
-  const totalSalary = marketingEmployees.reduce((s, e) => s + e.salary, 0);
+  const totalSalary = marketingEmployees.reduce((s, e) => s + (e.isHourly ? e.hourlyRate * e.hoursPerWeek * 52 / 12 : e.salary), 0);
   const totalExpenses = marketingExpenses.reduce((s, e) => s + e.amount, 0);
   const grandTotal = totalSalary + totalExpenses;
 
@@ -169,9 +169,12 @@ export function MarketingTab({
                 </Card>
               )}
 
-              {marketingEmployees.map((emp) => (
+              {marketingEmployees.map((emp) => {
+                const computedMonthly = emp.isHourly ? emp.hourlyRate * emp.hoursPerWeek * 52 / 12 : emp.salary;
+                return (
                 <Card key={emp.id}>
-                  <CardContent className="p-3">
+                  <CardContent className="p-3 space-y-3">
+                    {/* Row 1: Name, Title, Hourly toggle */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">NAME</span>
@@ -181,26 +184,64 @@ export function MarketingTab({
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">TITLE</span>
                         <Input value={emp.title} onChange={(e) => updateMarketingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Marketing Manager" title="Job title or role" />
                       </div>
-                      <div className="relative">
-                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">SALARY/MO</span>
-                        <div className="relative">
-                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                          <Input type="number" step="100" value={emp.salary} onChange={(e) => updateMarketingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Monthly base salary before taxes and bonuses" />
-                        </div>
+                      <div className="flex items-center gap-3">
+                        <Label className="flex items-center gap-2 text-xs cursor-pointer">
+                          <Switch checked={emp.isHourly} onCheckedChange={(v) => updateMarketingEmployee(emp.id, { isHourly: v })} />
+                          <span className={emp.isHourly ? "font-medium text-pink-700" : "text-muted-foreground"}>
+                            {emp.isHourly ? "Hourly" : "Salary"}
+                          </span>
+                        </Label>
+                        <InfoTooltip text="Toggle between monthly salary (fixed amount per month) and hourly rate (computed from hours per week). Use hourly for part-time staff, contractors, or seasonal workers." label="Salary vs Hourly" />
                       </div>
                       <div className="flex items-end gap-2">
                         <div className="flex-1 text-xs text-muted-foreground pb-2">
-                          Annual: {money(emp.salary * 12)}
-                          <InfoTooltip text="Annual cost = monthly salary x 12. This is a fixed cost that does not vary with sales volume. Use this figure for annual budget planning and investor discussions." label="Annual Salary" />
+                          <span className="text-pink-700 font-medium">{money(computedMonthly)}/mo</span>
+                          {emp.isHourly && <span className="text-[10px] ml-1">(computed)</span>}
+                          <InfoTooltip text={`${emp.isHourly ? `Hourly rate x ${emp.hoursPerWeek} hrs/week x 52 weeks / 12 months = ${money(computedMonthly)}/mo` : `Fixed monthly salary = ${money(emp.salary)}/mo`}. Annual: ${money(computedMonthly * 12)}`} label="Monthly Cost" />
                         </div>
                         <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeMarketingEmployee(emp.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
+
+                    {/* Row 2: Salary OR Hourly inputs */}
+                    {!emp.isHourly ? (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">SALARY/MO</span>
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                            <Input type="number" step="100" value={emp.salary} onChange={(e) => updateMarketingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Monthly base salary before taxes and bonuses" />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground pt-5">
+                          Annual: <span className="font-medium text-pink-700">{money(emp.salary * 12)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">HOURLY RATE</span>
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                            <Input type="number" step="0.50" value={emp.hourlyRate} onChange={(e) => updateMarketingEmployee(emp.id, { hourlyRate: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0.00" title="Hourly wage rate before taxes" />
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">HOURS/WEEK</span>
+                          <Input type="number" step="1" value={emp.hoursPerWeek} onChange={(e) => updateMarketingEmployee(emp.id, { hoursPerWeek: Number(e.target.value) })} className="pt-5" placeholder="40" title="Average hours worked per week" />
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground pt-5">
+                          Computed: <span className="font-medium text-pink-700">{money(computedMonthly)}/mo</span>
+                          <span className="text-[10px] ml-1">({emp.hourlyRate > 0 ? `${emp.hoursPerWeek}hrs x $${emp.hourlyRate}/hr x 52 / 12` : "set rate & hours"})</span>
+                        </div>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
-              ))}
+              )}
+            )}
             </div>
           )}
 

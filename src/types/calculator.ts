@@ -85,7 +85,10 @@ export interface MarketingEmployee {
   id: string;
   name: string;
   title: string;
-  salary: number; // monthly base salary
+  isHourly: boolean;
+  salary: number; // monthly base salary (used when isHourly=false)
+  hourlyRate: number;
+  hoursPerWeek: number;
 }
 
 export interface MarketingExpense {
@@ -104,7 +107,10 @@ export interface ShippingEmployee {
   id: string;
   name: string;
   title: string; // editable role name: "Warehouse", "Pick/Pack", "Delivery", etc.
-  salary: number; // monthly base salary
+  isHourly: boolean;
+  salary: number; // monthly base salary (used when isHourly=false)
+  hourlyRate: number;
+  hoursPerWeek: number;
   perItemBonus: number; // $ per pack shipped (0 = no bonus)
   perItemBonusEnabled: boolean; // toggle for production bonus
 }

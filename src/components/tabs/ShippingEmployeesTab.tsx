@@ -37,7 +37,7 @@ export function ShippingEmployeesTab({
 }: ShippingEmployeesTabProps) {
   const enabled = state.shippingEmployeesEnabled;
 
-  const totalSalary = shippingEmployees.reduce((s, e) => s + e.salary, 0);
+  const totalSalary = shippingEmployees.reduce((s, e) => s + (e.isHourly ? e.hourlyRate * e.hoursPerWeek * 52 / 12 : e.salary), 0);
   const totalPerItem = shippingEmployees.reduce((s, e) => s + (e.perItemBonusEnabled ? e.perItemBonus : 0), 0);
   const totalMaterials = shippingMaterials.reduce((s, m) => s + m.costPerPack, 0);
 
@@ -315,10 +315,12 @@ export function ShippingEmployeesTab({
           )}
 
           <div className="space-y-3">
-            {shippingEmployees.map((emp) => (
+            {shippingEmployees.map((emp) => {
+              const computedMonthly = emp.isHourly ? emp.hourlyRate * emp.hoursPerWeek * 52 / 12 : emp.salary;
+              return (
               <Card key={emp.id} className="overflow-hidden">
                 <CardContent className="p-3 space-y-3">
-                  {/* Row 1: Name, Title, Salary */}
+                  {/* Row 1: Name, Title, Hourly toggle */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">NAME</span>
@@ -328,23 +330,60 @@ export function ShippingEmployeesTab({
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">ROLE / TITLE</span>
                       <Input value={emp.title} onChange={(e) => updateShippingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Warehouse Lead" title="Job role: Warehouse Lead, Packer, Fulfillment Coordinator, Shipping Manager, etc." />
                     </div>
-                    <div className="relative">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">BASE SALARY/MO</span>
-                      <div className="relative">
-                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                        <Input type="number" step="100" value={emp.salary} onChange={(e) => updateShippingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Fixed monthly base salary before taxes and bonuses. Paid regardless of shipment volume." />
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <Label className="flex items-center gap-2 text-xs cursor-pointer">
+                        <Switch checked={emp.isHourly} onCheckedChange={(v) => updateShippingEmployee(emp.id, { isHourly: v })} />
+                        <span className={emp.isHourly ? "font-medium text-cyan-700" : "text-muted-foreground"}>
+                          {emp.isHourly ? "Hourly" : "Salary"}
+                        </span>
+                      </Label>
+                      <InfoTooltip text="Toggle between monthly salary (fixed amount per month) and hourly rate (computed from hours per week). Use hourly for part-time warehouse staff, seasonal packers, or temporary fulfillment help." label="Salary vs Hourly" />
                     </div>
                     <div className="flex items-end gap-2">
                       <div className="flex-1 text-xs text-muted-foreground pb-2">
-                        Annual: {money(emp.salary * 12)}
-                        <InfoTooltip text="Annual fixed cost = monthly salary x 12. This employee costs this much per year even if zero packs ship. Use this for annual budgeting and labor cost planning." label="Annual Labor Cost" />
+                        <span className="text-cyan-700 font-medium">{money(computedMonthly)}/mo</span>
+                        {emp.isHourly && <span className="text-[10px] ml-1">(computed)</span>}
+                        <InfoTooltip text={`${emp.isHourly ? `Hourly rate x ${emp.hoursPerWeek} hrs/week x 52 weeks / 12 months = ${money(computedMonthly)}/mo` : `Fixed monthly salary = ${money(emp.salary)}/mo`}. Annual: ${money(computedMonthly * 12)}`} label="Monthly Cost" />
                       </div>
                       <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeShippingEmployee(emp.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
+
+                  {/* Row 2: Salary OR Hourly inputs */}
+                  {!emp.isHourly ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="relative">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">BASE SALARY/MO</span>
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                          <Input type="number" step="100" value={emp.salary} onChange={(e) => updateShippingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Fixed monthly base salary before taxes. Paid regardless of shipment volume." />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground pt-5">
+                        Annual: <span className="font-medium text-cyan-700">{money(emp.salary * 12)}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="relative">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">HOURLY RATE</span>
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+                          <Input type="number" step="0.50" value={emp.hourlyRate} onChange={(e) => updateShippingEmployee(emp.id, { hourlyRate: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0.00" title="Hourly wage rate before taxes" />
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">HOURS/WEEK</span>
+                        <Input type="number" step="1" value={emp.hoursPerWeek} onChange={(e) => updateShippingEmployee(emp.id, { hoursPerWeek: Number(e.target.value) })} className="pt-5" placeholder="40" title="Average hours worked per week" />
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground pt-5">
+                        Computed: <span className="font-medium text-cyan-700">{money(computedMonthly)}/mo</span>
+                        <span className="text-[10px] ml-1">({emp.hourlyRate > 0 ? `${emp.hoursPerWeek}hrs x $${emp.hourlyRate}/hr x 52 / 12` : "set rate & hours"})</span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Row 2: Per-Item Bonus Toggle */}
                   <div className="flex items-center gap-4 pt-2 border-t">
@@ -378,7 +417,8 @@ export function ShippingEmployeesTab({
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )}
+          )}
           </div>
 
           {/* Cost Summary */}
