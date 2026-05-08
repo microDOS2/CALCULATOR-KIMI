@@ -102,7 +102,7 @@ const defaultThirdPartyCompanies: ThirdPartyCompany[] = [
 const createDefaultState = (): CalculatorState => {
   const skuId1 = uid();
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     unitSystem: 'mg' as const,
     skus: [
       {
@@ -296,7 +296,7 @@ const decodeState = (hash: string): CalculatorState | null => {
   }
 };
 
-const CURRENT_SCHEMA_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 2;
 
 /**
  * Migration runner: takes any decoded/loaded state and ensures it matches
@@ -332,13 +332,15 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
       ...ing,
       moqTiers: ing.moqTiers ?? [],
     })),
-    // v2: Force chR=false on all commission roles (commissions are B2B only)
-    commissions: {
-      president: { ...(raw.commissions?.president ?? defaults.commissions.president), chR: false },
-      vps: (raw.commissions?.vps ?? defaults.commissions.vps).map((vp) => ({ ...vp, chR: false })),
-      rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, chR: false })),
-      sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, chR: false })),
-    },
+    // v2: Commissions are B2B only — force all channel flags false on old data
+    commissions: (raw.schemaVersion ?? 0) < 2
+      ? {
+          president: { ...(raw.commissions?.president ?? defaults.commissions.president), chR: false, chW: false, chD: false },
+          vps: (raw.commissions?.vps ?? defaults.commissions.vps).map((vp) => ({ ...vp, chR: false, chW: false, chD: false })),
+          rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, chR: false, chW: false, chD: false })),
+          sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, chR: false, chW: false, chD: false })),
+        }
+      : (raw.commissions ?? defaults.commissions),
   };
 
   return migrated;
