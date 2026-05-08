@@ -20,6 +20,7 @@ interface FeatureSection {
 const groupColors: Record<string, { badge: string; text: string; border: string; name: string }> = {
   core:      { badge: "bg-blue-100 text-blue-700",       text: "text-blue-700",       border: "border-l-blue-400",       name: "Foundation" },
   b2c:       { badge: "bg-indigo-100 text-indigo-700",   text: "text-indigo-700",     border: "border-l-indigo-400",     name: "B2C Sales" },
+  b2b:       { badge: "bg-teal-100 text-teal-700",       text: "text-teal-700",       border: "border-l-teal-400",       name: "B2B Sales" },
   ops:       { badge: "bg-emerald-100 text-emerald-700", text: "text-emerald-700",    border: "border-l-emerald-400",    name: "Operations" },
   power:     { badge: "bg-violet-100 text-violet-700",   text: "text-violet-700",     border: "border-l-violet-400",     name: "Dashboard & Power" },
   forecast:  { badge: "bg-amber-100 text-amber-700",       text: "text-amber-700",       border: "border-l-amber-400",       name: "Forecasting" },
@@ -89,25 +90,13 @@ const features: FeatureSection[] = [
   },
   {
     number: 5,
-    title: "Channels (Tab 4) — Blank Slate Selection",
-    groupColor: "core",
-    groupName: "Core Setup",
-    items: [
-      { text: "Channel Toggles — Retail, Wholesale, Distributor all start unchecked. User must consciously enable each" },
-      { text: "Discount Configuration — Wholesale discount % and Distributor discount % off retail price" },
-      { text: "Per-Channel Shipping Costs — Independent shipping cost per channel ($/pack). Retail defaults to $2.50, W/D default to $0 (must be user-defined)" },
-      { text: "Cost Per Pack Explained — Tooltip documentation: $350 pallet / 144 packs = $2.43/pack. NOT per shipment" },
-      { text: "Blank Slate Warning Banner — Prominent message when all channels are off, guiding user to enable at least one" },
-      { text: "Import Duty — Configurable import duty rate on distributor channel" },
-    ],
-  },
-  {
-    number: 6,
-    title: "Retail + Affiliates (Tabs 4-5)",
+    title: "B2C Sales — Retail + Affiliates (Tab 4)",
     groupColor: "b2c",
     groupName: "B2C Sales",
     items: [
+      { text: "Channel Toggles — Retail starts unchecked (Blank Slate). User must consciously enable" },
       { text: "Retail Price Configuration — Set direct-to-consumer selling price" },
+      { text: "Per-Channel Shipping — Retail shipping cost ($/pack), defaults to $2.50 with cost-per-pack tooltip" },
       { text: "Flat Shipping Rate Per Channel — Fixed cost per pack per channel (not inherited across channels)" },
       { text: "Weight-Based Shipping Rates — Carrier-like pricing with editable weight brackets" },
       { text: "Retail Sales Tax — Configurable sales tax rate with customer-facing price display" },
@@ -117,6 +106,20 @@ const features: FeatureSection[] = [
       { text: "Volume Assumptions — Monthly referrals, avg order size, click-to-purchase rate" },
       { text: "Payout Schedule — Day of month, delay period, minimum threshold" },
       { text: "Impact Summary — Gross revenue, commission cost, net profit, commission % of revenue" },
+    ],
+  },
+  {
+    number: 6,
+    title: "B2B Sales — Wholesale + Distributor (Tab 5)",
+    groupColor: "b2b",
+    groupName: "B2B Sales",
+    items: [
+      { text: "Channel Toggles — Wholesale and Distributor both start unchecked (Blank Slate)" },
+      { text: "Wholesale Discount — Percentage off retail price for wholesale buyers" },
+      { text: "Distributor Discount — Deeper percentage off retail price for distributors" },
+      { text: "Per-Channel Shipping — W/D shipping defaults to $0 (must be user-defined). Cost-per-pack tooltip with pallet example" },
+      { text: "Import Duty — Configurable import duty rate on distributor channel" },
+      { text: "Empty-State Warning — Prominent message when no B2B channels enabled" },
     ],
   },
   {
@@ -132,7 +135,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 8,
-    title: "Marketing Employees (Tab: Marketing)",
+    title: "Marketing Employees (Tab 20)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -147,7 +150,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 9,
-    title: "Shipping Employees (Tab: Shipping)",
+    title: "Shipping Employees (Tab 21)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -185,7 +188,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 12,
-    title: "Overrides (Tab 8: Overrides)",
+    title: "Overrides — Named Individuals (Tab 9)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -202,7 +205,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 13,
-    title: "Third-Party Services (Tab 9: Third Party)",
+    title: "Third-Party Services (Tab 8)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -373,8 +376,8 @@ const features: FeatureSection[] = [
       { text: "CSV Export — All key metrics in spreadsheet format" },
       { text: "Excel Export — Full data export" },
       { text: "Onboarding Wizard — 10-step guided tour for first-time users (re-openable via \"?\" button)" },
-      { text: "Comprehensive User Guide — Complete walkthrough of all tabs with Blank Slate philosophy, Cost Per Pack explanation, and Flow Chart" },
-      { text: "Feature List Button — Complete inventory of all features organized by tab group" },
+      { text: "Comprehensive User Guide — Complete walkthrough of all 22 tabs with Blank Slate philosophy, Cost Per Pack explanation, Import/Export Reference, and Flow Chart" },
+      { text: "Feature List Button — Complete inventory of all 25 feature categories organized by tab group" },
       { text: "Info Tooltips Everywhere — Detailed explanations on every input and metric" },
       { text: "Color-Coded Tool Cards — Every advanced feature in a visually distinct card" },
       { text: "Tab Color Groups — Visual navigation: Blue (Foundation), Indigo (B2C), Teal (B2B), Emerald (Ops), Violet (Dashboard), Amber (Forecast), Slate (Manage), Rose (Simulate)" },
@@ -400,7 +403,7 @@ export function FeatureList() {
             Complete Feature List
           </DialogTitle>
           <DialogDescription className="text-sm">
-            19 feature categories across 17 tabs. Each tab group has a color so you can navigate at a glance.
+            25 feature categories across 22 tabs. Each tab group has a color so you can navigate at a glance.
           </DialogDescription>
         </DialogHeader>
 
@@ -410,11 +413,12 @@ export function FeatureList() {
           <div className="flex flex-wrap gap-2">
             {[
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
-              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
+              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4" },
+              { label: "B2B Sales", cls: "bg-teal-100 text-teal-700 border-teal-200", tabs: "5" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10, 20-21" },
               { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
               { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
-              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-18" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-19" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
@@ -452,7 +456,7 @@ export function FeatureList() {
           })}
 
           <div className="pt-4 border-t text-center text-xs text-muted-foreground">
-            Channel Calculator v12 — Blank Slate Philosophy, 17 tabs, 25 feature categories, 50+ major features, fully client-side.
+            Channel Calculator v12 — Blank Slate Philosophy, 22 tabs, 25 feature categories, 50+ major features, fully client-side.
           </div>
         </div>
       </DialogContent>
