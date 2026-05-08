@@ -203,25 +203,37 @@ export function ShippingEmployeesTab({
             <Card className="border-l-4 border-l-cyan-500 shadow-md bg-gradient-to-br from-white to-cyan-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-cyan-700">{shippingEmployees.length}</p>
-                <p className="text-xs text-muted-foreground">Team Members</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Team Members
+                  <InfoTooltip text="Number of in-house shipping/logistics employees. Each has a base salary and optional per-pack production bonus. These are personnel costs separate from carrier shipping costs and material costs." label="Shipping Team" />
+                </p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-sky-500 shadow-md bg-gradient-to-br from-white to-sky-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-sky-700">{money(totalSalary)}</p>
-                <p className="text-xs text-muted-foreground">Base Salaries/mo</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Base Salaries/mo
+                  <InfoTooltip text="Sum of all shipping employee base salaries per month. These are fixed costs paid regardless of how many packs ship. Contrast with per-pack bonuses which are variable costs tied to shipment volume." label="Base Salaries" />
+                </p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-teal-500 shadow-md bg-gradient-to-br from-white to-teal-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-teal-700">{money(totalPerItem)}</p>
-                <p className="text-xs text-muted-foreground">Per-Pack Bonus</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Per-Pack Bonus
+                  <InfoTooltip text="Total per-pack bonus across all employees who have the bonus enabled. This is a variable cost — the more packs shipped, the higher this cost. Example: 3 employees x $0.25/pack = $0.75/pack total bonus. Paid on every pack shipped through any channel." label="Per-Pack Bonus" />
+                </p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-violet-500 shadow-md bg-gradient-to-br from-white to-violet-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-violet-700">{money(totalMaterials)}</p>
-                <p className="text-xs text-muted-foreground">Materials/pack</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Materials/pack
+                  <InfoTooltip text="Sum of all shipping material costs per pack (boxes, tape, labels, bubble wrap, etc.). These are variable costs that scale with shipment volume. Total materials = cost per pack x total monthly packs across all channels." label="Shipping Materials Cost" />
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -287,6 +299,7 @@ export function ShippingEmployeesTab({
             <h3 className="text-sm font-semibold flex items-center gap-2">
               <Truck className="h-4 w-4 text-cyan-500" />
               Shipping Employees
+              <InfoTooltip text="In-house shipping/logistics personnel. Each employee has a fixed monthly base salary plus an optional per-pack production bonus. The bonus is paid on every pack shipped through any channel. Use this to model warehouse staff, packers, fulfillment coordinators, and shipping managers." label="Shipping Employees" />
             </h3>
             <Button size="sm" variant="outline" onClick={addShippingEmployee}>
               <Plus className="h-4 w-4 mr-1" /> Add Employee
@@ -309,22 +322,23 @@ export function ShippingEmployeesTab({
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">NAME</span>
-                      <Input value={emp.name} onChange={(e) => updateShippingEmployee(emp.id, { name: e.target.value })} className="pt-5" placeholder="Employee Name" />
+                      <Input value={emp.name} onChange={(e) => updateShippingEmployee(emp.id, { name: e.target.value })} className="pt-5" placeholder="Employee Name" title="Employee's full name" />
                     </div>
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">ROLE / TITLE</span>
-                      <Input value={emp.title} onChange={(e) => updateShippingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Warehouse Lead" />
+                      <Input value={emp.title} onChange={(e) => updateShippingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Warehouse Lead" title="Job role: Warehouse Lead, Packer, Fulfillment Coordinator, Shipping Manager, etc." />
                     </div>
                     <div className="relative">
                       <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">BASE SALARY/MO</span>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                        <Input type="number" step="100" value={emp.salary} onChange={(e) => updateShippingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" />
+                        <Input type="number" step="100" value={emp.salary} onChange={(e) => updateShippingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Fixed monthly base salary before taxes and bonuses. Paid regardless of shipment volume." />
                       </div>
                     </div>
                     <div className="flex items-end gap-2">
                       <div className="flex-1 text-xs text-muted-foreground pb-2">
                         Annual: {money(emp.salary * 12)}
+                        <InfoTooltip text="Annual fixed cost = monthly salary x 12. This employee costs this much per year even if zero packs ship. Use this for annual budgeting and labor cost planning." label="Annual Labor Cost" />
                       </div>
                       <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeShippingEmployee(emp.id)}>
                         <Trash2 className="h-4 w-4" />
@@ -376,26 +390,41 @@ export function ShippingEmployeesTab({
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                   <div>
-                    <p className="text-xs text-muted-foreground">Carrier</p>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                      Carrier
+                      <InfoTooltip text="Per-pack carrier cost from the Channels tab (Retail $/pack, Wholesale $/pack, Distributor $/pack). This is what you pay UPS/FedEx/freight per pack. If shipping is excluded from COGS, this shows $0 with a strikethrough." label="Carrier Cost" />
+                    </p>
                     <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground line-through"}`}>
                       {state.includeShip ? money(state.shippingPerPack) : "$0"}/p
                     </p>
                     {!state.includeShip && <p className="text-[10px] text-red-500">Excluded from COGS</p>}
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Materials</p>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                      Materials
+                      <InfoTooltip text="Variable cost per pack for shipping materials: boxes, tape, labels, bubble wrap, packing peanuts, etc. Sum of all material costs below. Scales directly with shipment volume — the more you ship, the higher this cost." label="Materials Cost" />
+                    </p>
                     <p className="text-lg font-bold text-violet-700">{money(totalMaterials)}/p</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Personnel (fixed)</p>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                      Personnel (fixed)
+                      <InfoTooltip text="Fixed monthly cost of all shipping employee base salaries. Paid every month regardless of how many packs ship. This is a labor overhead cost separate from carrier and material costs." label="Fixed Personnel" />
+                    </p>
                     <p className="text-lg font-bold text-sky-700">{money(totalSalary)}/mo</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Personnel (var)</p>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                      Personnel (var)
+                      <InfoTooltip text="Variable per-pack bonus paid to shipping employees who have the bonus enabled. Paid on every pack shipped through any channel. Example: 2 employees x $0.30/pack bonus = $0.60/pack total variable labor cost." label="Variable Personnel" />
+                    </p>
                     <p className="text-lg font-bold text-teal-700">{money(totalPerItem)}/p</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Total / pack</p>
+                    <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                      Total / pack
+                      <InfoTooltip text="Combined per-pack shipping cost = Carrier (if in COGS) + Materials + Per-Pack Bonus. This is the total logistics cost for each pack that leaves your warehouse. Does NOT include the fixed monthly salaries which are overhead." label="Total Per-Pack Cost" />
+                    </p>
                     <p className="text-lg font-bold text-cyan-700">
                       {money((state.includeShip ? state.shippingPerPack : 0) + totalMaterials + totalPerItem)}/p
                     </p>

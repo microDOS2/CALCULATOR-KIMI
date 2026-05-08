@@ -102,19 +102,28 @@ export function MarketingTab({
             <Card className="border-l-4 border-l-pink-500 shadow-md bg-gradient-to-br from-white to-pink-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-pink-700">{money(totalSalary)}</p>
-                <p className="text-xs text-muted-foreground">Team Salaries/mo</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Team Salaries/mo
+                  <InfoTooltip text="Sum of all marketing employee base salaries per month. These are fixed costs — paid regardless of sales volume. Each employee's salary is set individually below." label="Team Salaries" />
+                </p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-fuchsia-500 shadow-md bg-gradient-to-br from-white to-fuchsia-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-fuchsia-700">{money(totalExpenses)}</p>
-                <p className="text-xs text-muted-foreground">Expenditures/mo</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Expenditures/mo
+                  <InfoTooltip text="Sum of all marketing expenses per month, filtered by channel. An expense only counts toward a channel's total if that channel's checkbox is checked below. Use this to understand marketing spend per channel." label="Marketing Expenditures" />
+                </p>
               </CardContent>
             </Card>
             <Card className="border-l-4 border-l-rose-500 shadow-md bg-gradient-to-br from-white to-rose-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-rose-700">{money(grandTotal)}</p>
-                <p className="text-xs text-muted-foreground">Total Marketing/mo</p>
+                <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                  Total Marketing/mo
+                  <InfoTooltip text="Combined monthly marketing cost = Team Salaries + Expenditures. This feeds into the Executive Dashboard as a cost driver and affects operating profit calculations for each channel that carries marketing overhead." label="Total Marketing Cost" />
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -143,7 +152,10 @@ export function MarketingTab({
           {activeSection === "employees" && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Marketing Employees</h3>
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  Marketing Employees
+                  <InfoTooltip text="Fixed-cost marketing team members. Each has a name, title, and monthly base salary. These salaries are overhead — paid regardless of sales volume. They differ from marketing expenses which are variable channel-tied expenditures." label="Marketing Employees" />
+                </h3>
                 <Button size="sm" variant="outline" onClick={addMarketingEmployee}>
                   <Plus className="h-4 w-4 mr-1" /> Add Employee
                 </Button>
@@ -163,22 +175,23 @@ export function MarketingTab({
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">NAME</span>
-                        <Input value={emp.name} onChange={(e) => updateMarketingEmployee(emp.id, { name: e.target.value })} className="pt-5" placeholder="Employee Name" />
+                        <Input value={emp.name} onChange={(e) => updateMarketingEmployee(emp.id, { name: e.target.value })} className="pt-5" placeholder="Employee Name" title="Employee's full name" />
                       </div>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">TITLE</span>
-                        <Input value={emp.title} onChange={(e) => updateMarketingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Marketing Manager" />
+                        <Input value={emp.title} onChange={(e) => updateMarketingEmployee(emp.id, { title: e.target.value })} className="pt-5" placeholder="e.g. Marketing Manager" title="Job title or role" />
                       </div>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">SALARY/MO</span>
                         <div className="relative">
                           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                          <Input type="number" step="100" value={emp.salary} onChange={(e) => updateMarketingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" />
+                          <Input type="number" step="100" value={emp.salary} onChange={(e) => updateMarketingEmployee(emp.id, { salary: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Monthly base salary before taxes and bonuses" />
                         </div>
                       </div>
                       <div className="flex items-end gap-2">
                         <div className="flex-1 text-xs text-muted-foreground pb-2">
                           Annual: {money(emp.salary * 12)}
+                          <InfoTooltip text="Annual cost = monthly salary x 12. This is a fixed cost that does not vary with sales volume. Use this figure for annual budget planning and investor discussions." label="Annual Salary" />
                         </div>
                         <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeMarketingEmployee(emp.id)}>
                           <Trash2 className="h-4 w-4" />
@@ -195,7 +208,10 @@ export function MarketingTab({
           {activeSection === "expenses" && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold">Marketing Expenditures</h3>
+                <h3 className="text-sm font-semibold flex items-center gap-2">
+                  Marketing Expenditures
+                  <InfoTooltip text="Variable marketing costs tied to specific channels. Each expense has a category (Digital Ads, Trade Shows, Content, PR, Influencer, Custom), a description, a monthly amount, and channel attribution. Unlike employee salaries, these can be toggled per-channel — so you can attribute Google Ads spend to Retail only, while trade show costs go to Wholesale." label="Marketing Expenditures" />
+                </h3>
                 <Button size="sm" variant="outline" onClick={addMarketingExpense}>
                   <Plus className="h-4 w-4 mr-1" /> Add Expense
                 </Button>
@@ -229,13 +245,13 @@ export function MarketingTab({
                       </div>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">DESCRIPTION</span>
-                        <Input value={exp.name} onChange={(e) => updateMarketingExpense(exp.id, { name: e.target.value })} className="pt-5" placeholder="e.g. Google Ads Q1" />
+                        <Input value={exp.name} onChange={(e) => updateMarketingExpense(exp.id, { name: e.target.value })} className="pt-5" placeholder="e.g. Google Ads Q1" title="Descriptive name for this expenditure line item" />
                       </div>
                       <div className="relative">
                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-medium">AMOUNT/MO</span>
                         <div className="relative">
                           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
-                          <Input type="number" step="100" value={exp.amount} onChange={(e) => updateMarketingExpense(exp.id, { amount: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" />
+                          <Input type="number" step="100" value={exp.amount} onChange={(e) => updateMarketingExpense(exp.id, { amount: Number(e.target.value) })} className="pl-5 pt-5" placeholder="0" title="Monthly spend for this line item" />
                         </div>
                       </div>
                       <div className="flex items-end gap-2">
@@ -275,7 +291,10 @@ export function MarketingTab({
               {marketingExpenses.length > 0 && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Expenditure Summary by Channel</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      Expenditure Summary by Channel
+                      <InfoTooltip text="Marketing expenses summed per channel. Only expenses with a channel's checkbox checked are included in that channel's total. Use this to see which channel consumes the most marketing budget and to evaluate marketing ROI per channel." label="Channel Summary" />
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <Table>
