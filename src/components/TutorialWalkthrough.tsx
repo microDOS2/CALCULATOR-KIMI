@@ -120,8 +120,8 @@ const steps: TutorialStep[] = [
           Toggle which channels carry overhead — this affects operating profit per channel.
         </p>
         <p className="text-sm text-muted-foreground">
-          Optional tabs for advanced cost modeling: <strong>Marketing</strong>, <strong>Shipping Employees</strong>,
-          <strong>Third Party</strong> services, and <strong>Campaigns</strong> for promotions.
+          Optional tabs for advanced cost modeling: <strong>Marketing</strong> (salary or hourly employees + channel-tied expenditures),
+          <strong>Shipping Employees</strong> (salary or hourly + per-pack production bonus + materials), <strong>Third Party</strong> services, and <strong>Campaigns</strong>.
         </p>
       </div>
     ),

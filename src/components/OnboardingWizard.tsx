@@ -41,7 +41,7 @@ const steps = [
   {
     icon: Store,
     title: "Step 4: Add Operating Costs",
-    body: "In the Costs tab, enter monthly overhead (rent, salaries, utilities, marketing) and set monthly volumes per SKU. Toggle overhead allocation per channel. Optional: add Marketing, Shipping Employees, Third Party services, or Campaigns for promotions.",
+    body: "In the Costs tab, enter monthly overhead (rent, salaries, utilities, marketing) and set monthly volumes per SKU. Toggle overhead allocation per channel. Optional tabs: Marketing (salary or hourly employees + per-channel ad spend), Shipping Employees (salary or hourly + per-pack bonus + materials), Third Party services, or Campaigns.",
   },
   {
     icon: BarChart3,

@@ -100,6 +100,12 @@ export function Guide() {
                 <span className="font-medium text-blue-700">Overhead (Tab 4)</span> — Enter your monthly overhead costs (rent, salaries, utilities, marketing). Toggle whether overhead is allocated to each channel. This directly affects operating profit.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Marketing Employees</span> — Add marketing staff with salary OR hourly rate. Toggle each employee between fixed monthly pay and hourly (rate x hours/week x 52 / 12). Add channel-tied expenditures (Digital Ads, Trade Shows, Content, PR, Influencer) toggled per-channel.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Shipping Employees</span> — Add warehouse/shipping staff with salary OR hourly rate. Optional per-pack production bonus (paid on every pack shipped through any channel). Add shipping materials (boxes, tape, labels) with per-pack costs.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
                 <span className="font-medium text-emerald-700">3rd Party (Tab 5)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
