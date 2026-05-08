@@ -498,6 +498,7 @@ export interface CalculatorState {
   capitalExpenditures: { id: string; name: string; amount: number; month: number }[];
   debtServiceMonthly: number;
   campaigns: Campaign[];
+  auditLog: AuditLogEntry[];
 }
 
 // Cash Flow Types
@@ -526,6 +527,16 @@ export interface CashFlowWeek {
   cashOut: number;
   netCashFlow: number;
   endingBalance: number;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: number; // epoch ms
+  category: 'Product' | 'Ingredients' | 'Packaging' | 'Channels' | 'Shipping' | 'Overhead' | 'Tax' | 'Volume' | 'Cash Flow' | 'Subscriptions' | 'Commissions' | 'Overrides' | 'Affiliates' | 'Campaigns' | 'Third Party' | 'System';
+  field: string; // human-readable field name
+  path: string; // dot-notation path e.g. "skus.0.retailPrice"
+  oldValue: string;
+  newValue: string;
 }
 
 export interface CashFlowResult {

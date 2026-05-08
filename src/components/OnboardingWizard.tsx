@@ -13,7 +13,7 @@ const tabColorLegend = [
   { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10" },
   { label: "Dashboard & Power", cls: "bg-violet-200 text-violet-800", tabs: "11-13" },
   { label: "Forecast", cls: "bg-amber-200 text-amber-800", tabs: "14-16" },
-  { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "17-18" },
+  { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "17-19" },
   { label: "Simulate", cls: "bg-rose-200 text-rose-800", tabs: "●" },
 ];
 

@@ -13,6 +13,7 @@ import type {
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
 import { useUndoRedo } from "./useUndoRedo";
+import { diffState, createAuditEntry, trimAuditLog } from "@/lib/audit";
 import LZString from "lz-string";
 
 let uidCounter = 0;
@@ -254,6 +255,7 @@ const createDefaultState = (): CalculatorState => {
     capitalExpenditures: [],
     debtServiceMonthly: 0,
     campaigns: [],
+    auditLog: [],
   };
 };
 
@@ -439,7 +441,16 @@ export function useCalculator() {
   }, [state]);
 
   const updateState = useCallback((patch: Partial<CalculatorState>) => {
-    setState((prev) => ({ ...prev, ...patch }));
+    setState((prev) => {
+      const next = { ...prev, ...patch };
+      // Diff and append audit log entries for meaningful changes
+      const changes = diffState(prev, next);
+      if (changes.length > 0) {
+        const mergedLog = trimAuditLog([...prev.auditLog, ...changes]);
+        return { ...next, auditLog: mergedLog };
+      }
+      return next;
+    });
   }, []);
 
   // SKU
@@ -456,22 +467,29 @@ export function useCalculator() {
         mixD: 0,
         packaging: createDefaultPackaging(),
       };
+      const entry = createAuditEntry("Product", `Added SKU "${newSku.name}"`, `skus.${prev.skus.length}`, "—", `Units: ${newSku.unitsPerPack}, Price: $${newSku.retailPrice}`);
       return {
         ...prev,
         skus: [...prev.skus, newSku],
         order: [...prev.order, { skuId: id, qty: 0 }],
         monthlyVolumes: [...prev.monthlyVolumes, { skuId: id, qty: 1000 }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
       };
     });
   }, []);
 
   const removeSKU = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      skus: prev.skus.filter((s) => s.id !== id),
-      order: prev.order.filter((o) => o.skuId !== id),
-      monthlyVolumes: prev.monthlyVolumes.filter((m) => m.skuId !== id),
-    }));
+    setState((prev) => {
+      const sku = prev.skus.find((s) => s.id === id);
+      const entry = createAuditEntry("Product", `Removed SKU "${sku?.name || id}"`, `skus.${prev.skus.findIndex((s) => s.id === id)}`, sku ? `Units: ${sku.unitsPerPack}, Price: $${sku.retailPrice}` : "—", "Removed");
+      return {
+        ...prev,
+        skus: prev.skus.filter((s) => s.id !== id),
+        order: prev.order.filter((o) => o.skuId !== id),
+        monthlyVolumes: prev.monthlyVolumes.filter((m) => m.skuId !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateSKU = useCallback((id: string, patch: Partial<SKU>) => {
@@ -492,13 +510,18 @@ export function useCalculator() {
 
   // Ingredients
   const addIngredient = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      ingredients: [
-        ...prev.ingredients,
-        { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0, supplierPaymentDays: 30, moqTiers: [] },
-      ],
-    }));
+    setState((prev) => {
+      const idx = prev.ingredients.length;
+      const entry = createAuditEntry("Ingredients", `Added Ingredient #${idx + 1}`, `ingredients.${idx}`, "—", "New ingredient added");
+      return {
+        ...prev,
+        ingredients: [
+          ...prev.ingredients,
+          { id: uid(), name: "", mgPerUnit: 0, costPerMg: 0, supplierPaymentDays: 30, moqTiers: [] },
+        ],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const setIngredients = useCallback((ingredients: Ingredient[]) => {
@@ -521,10 +544,15 @@ export function useCalculator() {
   );
 
   const removeIngredient = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      ingredients: prev.ingredients.filter((i) => i.id !== id),
-    }));
+    setState((prev) => {
+      const ing = prev.ingredients.find((i) => i.id === id);
+      const entry = createAuditEntry("Ingredients", `Removed Ingredient "${ing?.name || id}"`, `ingredients.${prev.ingredients.findIndex((i) => i.id === id)}`, `${ing?.mgPerUnit}mg @ $${ing?.costPerMg}/mg`, "Removed");
+      return {
+        ...prev,
+        ingredients: prev.ingredients.filter((i) => i.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   // Packaging (per-SKU)
@@ -577,25 +605,30 @@ export function useCalculator() {
 
   // Subscriptions
   const addSubscriptionPlan = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      subscriptionPlans: [
-        ...prev.subscriptionPlans,
-        {
-          id: uid(),
-          name: `Plan ${prev.subscriptionPlans.length + 1}`,
-          monthlyPrice: 49.99,
-          items: prev.skus.length > 0
-            ? [{ skuId: prev.skus[0].id, skuName: prev.skus[0].name, packsPerMonth: 1 }]
-            : [],
-          startingSubscribers: 100,
-          monthlyGrowthRate: 5,
-          monthlyChurnRate: 3,
-          included: true,
-          cac: 25,
-        },
-      ],
-    }));
+    setState((prev) => {
+      const newName = `Plan ${prev.subscriptionPlans.length + 1}`;
+      const entry = createAuditEntry("Subscriptions", `Added "${newName}"`, `subscriptionPlans.${prev.subscriptionPlans.length}`, "—", "$49.99/mo, 100 subs");
+      return {
+        ...prev,
+        subscriptionPlans: [
+          ...prev.subscriptionPlans,
+          {
+            id: uid(),
+            name: newName,
+            monthlyPrice: 49.99,
+            items: prev.skus.length > 0
+              ? [{ skuId: prev.skus[0].id, skuName: prev.skus[0].name, packsPerMonth: 1 }]
+              : [],
+            startingSubscribers: 100,
+            monthlyGrowthRate: 5,
+            monthlyChurnRate: 3,
+            included: true,
+            cac: 25,
+          },
+        ],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateSubscriptionPlan = useCallback(
@@ -611,10 +644,15 @@ export function useCalculator() {
   );
 
   const removeSubscriptionPlan = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      subscriptionPlans: prev.subscriptionPlans.filter((p) => p.id !== id),
-    }));
+    setState((prev) => {
+      const plan = prev.subscriptionPlans.find((p) => p.id === id);
+      const entry = createAuditEntry("Subscriptions", `Removed "${plan?.name || id}"`, `subscriptionPlans.${prev.subscriptionPlans.findIndex((p) => p.id === id)}`, `$${plan?.monthlyPrice}/mo, ${plan?.startingSubscribers} subs`, "Removed");
+      return {
+        ...prev,
+        subscriptionPlans: prev.subscriptionPlans.filter((p) => p.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const addSubscriptionItem = useCallback((planId: string, skuId: string, skuName: string) => {
@@ -663,10 +701,14 @@ export function useCalculator() {
 
   // Overhead
   const addOverhead = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      overhead: [...prev.overhead, { id: uid(), name: "", cost: 0 }],
-    }));
+    setState((prev) => {
+      const entry = createAuditEntry("Overhead", `Added Overhead Item #${prev.overhead.length + 1}`, `overhead.${prev.overhead.length}`, "—", "New overhead line");
+      return {
+        ...prev,
+        overhead: [...prev.overhead, { id: uid(), name: "", cost: 0 }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateOverhead = useCallback(
@@ -682,10 +724,15 @@ export function useCalculator() {
   );
 
   const removeOverhead = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      overhead: prev.overhead.filter((o) => o.id !== id),
-    }));
+    setState((prev) => {
+      const oh = prev.overhead.find((o) => o.id === id);
+      const entry = createAuditEntry("Overhead", `Removed "${oh?.name || id}"`, `overhead.${prev.overhead.findIndex((o) => o.id === id)}`, `${oh?.name}: $${oh?.cost}/mo`, "Removed");
+      return {
+        ...prev,
+        overhead: prev.overhead.filter((o) => o.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateMonthlyVolume = useCallback(
@@ -702,38 +749,48 @@ export function useCalculator() {
 
   // Commissions
   const addVP = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        vps: [
-          ...prev.commissions.vps,
-          {
-            id: uid(),
-            name: `VP ${prev.commissions.vps.length + 1}`,
-            type: "pctGrossRev",
-            val: 2,
-            chR: true,
-            chW: true,
-            chD: true,
-            includePres: true,
-          },
-        ],
-      },
-    }));
+    setState((prev) => {
+      const newName = `VP ${prev.commissions.vps.length + 1}`;
+      const entry = createAuditEntry("Commissions", `Added VP "${newName}"`, `commissions.vps.${prev.commissions.vps.length}`, "—", "2% Gross Rev");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          vps: [
+            ...prev.commissions.vps,
+            {
+              id: uid(),
+              name: newName,
+              type: "pctGrossRev",
+              val: 2,
+              chR: true,
+              chW: true,
+              chD: true,
+              includePres: true,
+            },
+          ],
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const removeVP = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        vps: prev.commissions.vps.filter((v) => v.id !== id),
-        rsms: prev.commissions.rsms.map((r) =>
-          r.assignedVP === id ? { ...r, assignedVP: "" } : r
-        ),
-      },
-    }));
+    setState((prev) => {
+      const vp = prev.commissions.vps.find((v) => v.id === id);
+      const entry = createAuditEntry("Commissions", `Removed VP "${vp?.name || id}"`, `commissions.vps.${prev.commissions.vps.findIndex((v) => v.id === id)}`, `${vp?.val}% Gross Rev`, "Removed");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          vps: prev.commissions.vps.filter((v) => v.id !== id),
+          rsms: prev.commissions.rsms.map((r) =>
+            r.assignedVP === id ? { ...r, assignedVP: "" } : r
+          ),
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateVP = useCallback(
@@ -752,38 +809,48 @@ export function useCalculator() {
   );
 
   const addRSM = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        rsms: [
-          ...prev.commissions.rsms,
-          {
-            id: uid(),
-            name: `RSM ${prev.commissions.rsms.length + 1}`,
-            type: "pctGrossRev",
-            val: 3,
-            chR: true,
-            chW: true,
-            chD: true,
-            assignedVP: "",
-          },
-        ],
-      },
-    }));
+    setState((prev) => {
+      const newName = `RSM ${prev.commissions.rsms.length + 1}`;
+      const entry = createAuditEntry("Commissions", `Added RSM "${newName}"`, `commissions.rsms.${prev.commissions.rsms.length}`, "—", "3% Gross Rev");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          rsms: [
+            ...prev.commissions.rsms,
+            {
+              id: uid(),
+              name: newName,
+              type: "pctGrossRev",
+              val: 3,
+              chR: true,
+              chW: true,
+              chD: true,
+              assignedVP: "",
+            },
+          ],
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const removeRSM = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        rsms: prev.commissions.rsms.filter((r) => r.id !== id),
-        sps: prev.commissions.sps.map((s) =>
-          s.assignedRSM === id ? { ...s, assignedRSM: "" } : s
-        ),
-      },
-    }));
+    setState((prev) => {
+      const rsm = prev.commissions.rsms.find((r) => r.id === id);
+      const entry = createAuditEntry("Commissions", `Removed RSM "${rsm?.name || id}"`, `commissions.rsms.${prev.commissions.rsms.findIndex((r) => r.id === id)}`, `${rsm?.val}% Gross Rev`, "Removed");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          rsms: prev.commissions.rsms.filter((r) => r.id !== id),
+          sps: prev.commissions.sps.map((s) =>
+            s.assignedRSM === id ? { ...s, assignedRSM: "" } : s
+          ),
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateRSM = useCallback(
@@ -802,39 +869,49 @@ export function useCalculator() {
   );
 
   const addSP = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        sps: [
-          ...prev.commissions.sps,
-          {
-            id: uid(),
-            name: `Rep ${prev.commissions.sps.length + 1}`,
-            type: "pctGrossRev",
-            val: 5,
-            chR: true,
-            chW: true,
-            chD: true,
-            assignedRSM: "",
-            assignedVp_R: "",
-            assignedVp_W: "",
-            assignedVp_D: "",
-            bonuses: [],
-          },
-        ],
-      },
-    }));
+    setState((prev) => {
+      const newName = `Rep ${prev.commissions.sps.length + 1}`;
+      const entry = createAuditEntry("Commissions", `Added Salesperson "${newName}"`, `commissions.sps.${prev.commissions.sps.length}`, "—", "5% Gross Rev");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          sps: [
+            ...prev.commissions.sps,
+            {
+              id: uid(),
+              name: newName,
+              type: "pctGrossRev",
+              val: 5,
+              chR: true,
+              chW: true,
+              chD: true,
+              assignedRSM: "",
+              assignedVp_R: "",
+              assignedVp_W: "",
+              assignedVp_D: "",
+              bonuses: [],
+            },
+          ],
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const removeSP = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      commissions: {
-        ...prev.commissions,
-        sps: prev.commissions.sps.filter((s) => s.id !== id),
-      },
-    }));
+    setState((prev) => {
+      const sp = prev.commissions.sps.find((s) => s.id === id);
+      const entry = createAuditEntry("Commissions", `Removed Salesperson "${sp?.name || id}"`, `commissions.sps.${prev.commissions.sps.findIndex((s) => s.id === id)}`, `${sp?.val}% Gross Rev`, "Removed");
+      return {
+        ...prev,
+        commissions: {
+          ...prev.commissions,
+          sps: prev.commissions.sps.filter((s) => s.id !== id),
+        },
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateSP = useCallback(
@@ -962,27 +1039,37 @@ export function useCalculator() {
 
   // Overrides
   const addOverride = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      overrides: [
-        ...prev.overrides,
-        {
-          id: uid(),
-          name: `Override ${prev.overrides.length + 1}`,
-          percentage: 1,
-          channels: { retail: true, wholesale: false, distributor: false, affiliate: false },
-          basis: 'gross' as const,
-          enabled: true,
-        },
-      ],
-    }));
+    setState((prev) => {
+      const newName = `Override ${prev.overrides.length + 1}`;
+      const entry = createAuditEntry("Overrides", `Added "${newName}"`, `overrides.${prev.overrides.length}`, "—", "1% gross — Retail");
+      return {
+        ...prev,
+        overrides: [
+          ...prev.overrides,
+          {
+            id: uid(),
+            name: newName,
+            percentage: 1,
+            channels: { retail: true, wholesale: false, distributor: false, affiliate: false },
+            basis: 'gross' as const,
+            enabled: true,
+          },
+        ],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const removeOverride = useCallback((id: string) => {
-    setState((prev) => ({
-      ...prev,
-      overrides: prev.overrides.filter((o) => o.id !== id),
-    }));
+    setState((prev) => {
+      const ov = prev.overrides.find((o) => o.id === id);
+      const entry = createAuditEntry("Overrides", `Removed "${ov?.name || id}"`, `overrides.${prev.overrides.findIndex((o) => o.id === id)}`, `${ov?.percentage}% ${ov?.basis} — ${Object.entries(ov?.channels || {}).filter(([, v]) => v).map(([k]) => k).join(", ")}`, "Removed");
+      return {
+        ...prev,
+        overrides: prev.overrides.filter((o) => o.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
   }, []);
 
   const updateOverride = useCallback((id: string, patch: Partial<OverrideEntry>) => {

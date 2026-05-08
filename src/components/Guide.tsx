@@ -19,7 +19,7 @@ export function Guide() {
             User Guide
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Complete walkthrough of all 17 tabs and every feature.
+            Complete walkthrough of all 18 tabs and every feature.
           </DialogDescription>
         </DialogHeader>
 
@@ -33,7 +33,7 @@ export function Guide() {
               { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
               { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
               { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
-              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-18" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-19" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
@@ -107,6 +107,9 @@ export function Guide() {
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
                 <span className="font-medium text-slate-700">Compare (Tab 17)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
+              </li>
+              <li className="pl-1 border-l-2 border-l-slate-300">
+                <span className="font-medium text-slate-700">Audit Log (Tab 18)</span> — A complete temporal change log that records every meaningful edit to your model with timestamp, category, field name, and old→new value diff. Filter by category (Product, Channels, Overrides, etc.) or search by field name. Shows 4 summary stats (total entries, categories touched, first/latest change). Clearable. This is the true audit trail — not a snapshot, but a chronological record of who changed what and when.
               </li>
             </ol>
           </section>

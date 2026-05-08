@@ -24,6 +24,7 @@ import { CashFlowTab } from "@/components/tabs/CashFlowTab";
 import { AffiliatesTab } from "@/components/tabs/AffiliatesTab";
 import { B2BSalesTab } from "@/components/tabs/B2BSalesTab";
 import { OverridesTab } from "@/components/tabs/OverridesTab";
+import { AuditLogTab } from "@/components/tabs/AuditLogTab";
 
 function App() {
   const calc = useCalculator();
@@ -185,6 +186,9 @@ function App() {
             </TabsTrigger>
             <TabsTrigger value="compare" className="bg-slate-100/70 text-slate-800 hover:bg-slate-200 data-[state=active]:!bg-slate-300 data-[state=active]:!text-slate-950 dark:bg-slate-900/30 dark:text-slate-200 dark:hover:bg-slate-800/50 dark:data-[state=active]:!bg-slate-700 dark:data-[state=active]:!text-slate-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
               <span className="text-xs mr-1 font-bold opacity-70">18</span>Compare
+            </TabsTrigger>
+            <TabsTrigger value="auditlog" className="bg-slate-100/70 text-slate-800 hover:bg-slate-200 data-[state=active]:!bg-slate-300 data-[state=active]:!text-slate-950 dark:bg-slate-900/30 dark:text-slate-200 dark:hover:bg-slate-800/50 dark:data-[state=active]:!bg-slate-700 dark:data-[state=active]:!text-slate-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">19</span>Audit Log
             </TabsTrigger>
 
             <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
@@ -363,6 +367,10 @@ function App() {
 
           <TabsContent value="compare">
             <CompareTab scenarios={calc.scenarios} />
+          </TabsContent>
+
+          <TabsContent value="auditlog">
+            <AuditLogTab state={calc.state} updateState={calc.updateState} />
           </TabsContent>
 
           <TabsContent value="simulate">
