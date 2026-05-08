@@ -95,15 +95,21 @@ export function ShippingEmployeesTab({
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-lg font-bold text-amber-700">{money(state.shippingPerPack)}</p>
+                  <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground line-through"}`}>
+                    {state.includeShip ? money(state.shippingPerPack) : "$0"}
+                  </p>
                   <p className="text-[10px] text-muted-foreground">Per pack (carrier fee)</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-amber-700">{state.includeShip ? "Included" : "Excluded"}</p>
+                  <p className={`text-lg font-bold ${state.includeShip ? "text-green-700" : "text-red-600"}`}>
+                    {state.includeShip ? "Included" : "Excluded"}
+                  </p>
                   <p className="text-[10px] text-muted-foreground">In COGS calc</p>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-amber-700">{state.useShippingRateTable ? "Rate Table" : "Flat Rate"}</p>
+                  <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground"}`}>
+                    {state.includeShip ? (state.useShippingRateTable ? "Rate Table" : "Flat Rate") : "—"}
+                  </p>
                   <p className="text-[10px] text-muted-foreground">Pricing model</p>
                 </div>
               </div>
@@ -289,7 +295,10 @@ export function ShippingEmployeesTab({
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                   <div>
                     <p className="text-xs text-muted-foreground">Carrier</p>
-                    <p className="text-lg font-bold text-amber-700">{money(state.shippingPerPack)}/p</p>
+                    <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground line-through"}`}>
+                      {state.includeShip ? money(state.shippingPerPack) : "$0"}/p
+                    </p>
+                    {!state.includeShip && <p className="text-[10px] text-red-500">Excluded from COGS</p>}
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Materials</p>
@@ -305,7 +314,9 @@ export function ShippingEmployeesTab({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Total / pack</p>
-                    <p className="text-lg font-bold text-cyan-700">{money(state.shippingPerPack + totalMaterials + totalPerItem)}/p</p>
+                    <p className="text-lg font-bold text-cyan-700">
+                      {money((state.includeShip ? state.shippingPerPack : 0) + totalMaterials + totalPerItem)}/p
+                    </p>
                   </div>
                 </div>
               </CardContent>
