@@ -2,13 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Scale } from "lucide-react";
 import { FormulaTooltip, FormulaBadge } from "@/components/FormulaTooltip";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import type { CalculatorState, CalculationResult, SKU, Ingredient } from "@/types/calculator";
 import { money3, MG_PER_OZ, toOz, fmtWeight } from "@/lib/calculator";
 import { CsvImportSection } from "@/components/CsvImportSection";
-import { useState } from "react";
 
 interface ProductTabProps {
   state: CalculatorState;
@@ -187,7 +186,7 @@ export function ProductTab({
             <span></span>
           </div>
           {state.ingredients.map((ing) => {
-            const [showTiers, setShowTiers] = useState(false);
+
             return (
             <div key={ing.id} className="space-y-2">
               <div className="grid grid-cols-[1fr_auto_auto_auto] gap-2 items-center">
@@ -214,77 +213,84 @@ export function ProductTab({
               </div>
 
               {/* MOQ Tier Editor */}
-              <div className="pl-2">
-                <button
-                  onClick={() => setShowTiers(!showTiers)}
-                  className="text-xs text-muted-foreground hover:text-foreground underline"
-                >
-                  {showTiers ? "Hide" : "Edit"} volume pricing tiers
-                  {ing.moqTiers && ing.moqTiers.length > 0 && (
-                    <span className="ml-1 text-primary font-medium">({ing.moqTiers.length} tiers)</span>
+              <Card className="border-dashed border-2">
+                <CardHeader className="py-2 px-3">
+                  <CardTitle className="text-xs flex items-center gap-1.5">
+                    <Scale className="h-3.5 w-3.5 text-primary" />
+                    Volume Pricing Tiers
+                    <span className="text-muted-foreground font-normal">
+                      {ing.moqTiers && ing.moqTiers.length > 0 && `(${ing.moqTiers.length} tiers)`}
+                    </span>
+                    <InfoTooltip
+                      text="Set lower cost-per-mg when ordering larger quantities. The calculator auto-selects the right tier based on total order volume. Example: $0.70/mg at 1kg, $0.55/mg at 5kg."
+                      label="MOQ Pricing Tiers"
+                    />
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 pt-0 pb-3 px-3">
+                  <p className="text-[10px] text-muted-foreground">
+                    Lower cost-per-mg when ordering larger quantities. Auto-selected based on order volume.
+                  </p>
+                  {ing.moqTiers.length === 0 && (
+                    <p className="text-[10px] text-amber-600 bg-amber-50 rounded p-1.5">
+                      No tiers yet. Click Add Tier to set volume discounts.
+                    </p>
                   )}
-                </button>
-                {showTiers && (
-                  <div className="mt-2 space-y-2 border-l-2 border-primary/20 pl-3">
-                    <div className="text-xs text-muted-foreground">
-                      Set lower cost-per-mg when ordering larger quantities. The calculator auto-selects the right tier based on total order volume.
-                    </div>
-                    {ing.moqTiers.map((tier, idx) => (
-                      <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
-                        <div className="space-y-0.5">
-                          <Label className="text-[10px] text-muted-foreground">Min Order (mg)</Label>
-                          <Input
-                            type="number"
-                            value={tier.minOrderMg}
-                            onChange={(e) => {
-                              const newTiers = [...ing.moqTiers];
-                              newTiers[idx] = { ...tier, minOrderMg: Math.max(0, Number(e.target.value)) };
-                              updateIngredient(ing.id, { moqTiers: newTiers });
-                            }}
-                            className="h-7 text-xs"
-                          />
-                        </div>
-                        <div className="space-y-0.5">
-                          <Label className="text-[10px] text-muted-foreground">Cost / mg ($)</Label>
-                          <Input
-                            type="number"
-                            step="0.000001"
-                            value={tier.costPerMg}
-                            onChange={(e) => {
-                              const newTiers = [...ing.moqTiers];
-                              newTiers[idx] = { ...tier, costPerMg: Math.max(0, Number(e.target.value)) };
-                              updateIngredient(ing.id, { moqTiers: newTiers });
-                            }}
-                            className="h-7 text-xs"
-                          />
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-destructive h-7"
-                          onClick={() => {
-                            const newTiers = ing.moqTiers.filter((_, i) => i !== idx);
+                  {ing.moqTiers.map((tier, idx) => (
+                    <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                      <div className="space-y-0.5">
+                        <Label className="text-[10px] text-muted-foreground">Min Order (mg)</Label>
+                        <Input
+                          type="number"
+                          value={tier.minOrderMg}
+                          onChange={(e) => {
+                            const newTiers = [...ing.moqTiers];
+                            newTiers[idx] = { ...tier, minOrderMg: Math.max(0, Number(e.target.value)) };
                             updateIngredient(ing.id, { moqTiers: newTiers });
                           }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                          className="h-7 text-xs"
+                        />
                       </div>
-                    ))}
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-xs"
-                      onClick={() => {
-                        const newTiers = [...ing.moqTiers, { minOrderMg: 1000, costPerMg: ing.costPerMg * 0.9 }];
-                        updateIngredient(ing.id, { moqTiers: newTiers });
-                      }}
-                    >
-                      <Plus className="h-3 w-3 mr-1" /> Add Tier
-                    </Button>
-                  </div>
-                )}
-              </div>
+                      <div className="space-y-0.5">
+                        <Label className="text-[10px] text-muted-foreground">Cost / mg ($)</Label>
+                        <Input
+                          type="number"
+                          step="0.000001"
+                          value={tier.costPerMg}
+                          onChange={(e) => {
+                            const newTiers = [...ing.moqTiers];
+                            newTiers[idx] = { ...tier, costPerMg: Math.max(0, Number(e.target.value)) };
+                            updateIngredient(ing.id, { moqTiers: newTiers });
+                          }}
+                          className="h-7 text-xs"
+                        />
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-destructive h-7 self-end"
+                        onClick={() => {
+                          const newTiers = ing.moqTiers.filter((_, i) => i !== idx);
+                          updateIngredient(ing.id, { moqTiers: newTiers });
+                        }}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs w-full"
+                    onClick={() => {
+                      const newTiers = [...ing.moqTiers, { minOrderMg: 1000, costPerMg: ing.costPerMg * 0.9 }];
+                      updateIngredient(ing.id, { moqTiers: newTiers });
+                    }}
+                  >
+                    <Plus className="h-3 w-3 mr-1" /> Add Tier
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
             );
           })}

@@ -117,13 +117,13 @@ function App() {
             <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
             <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
             <TabsTrigger value="dashboard"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Dashboard</TabsTrigger>
-            <TabsTrigger value="goalseek"><span className="text-xs text-muted-foreground mr-1 font-bold">9.5</span>Goal Seek</TabsTrigger>
-            <TabsTrigger value="batch"><span className="text-xs text-muted-foreground mr-1 font-bold">9.6</span>Batch</TabsTrigger>
-            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Subscriptions</TabsTrigger>
-            <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Cash Flow</TabsTrigger>
-            <TabsTrigger value="campaigns"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Campaigns</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Scenarios</TabsTrigger>
-            <TabsTrigger value="compare"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Compare</TabsTrigger>
+            <TabsTrigger value="goalseek"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Goal Seek</TabsTrigger>
+            <TabsTrigger value="batch"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Batch</TabsTrigger>
+            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Subscriptions</TabsTrigger>
+            <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">13</span>Cash Flow</TabsTrigger>
+            <TabsTrigger value="campaigns"><span className="text-xs text-muted-foreground mr-1 font-bold">14</span>Campaigns</TabsTrigger>
+            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">15</span>Scenarios</TabsTrigger>
+            <TabsTrigger value="compare"><span className="text-xs text-muted-foreground mr-1 font-bold">16</span>Compare</TabsTrigger>
             <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
             <TabsTrigger value="simulate"><span className="text-xs text-primary mr-1 font-bold">●</span>Simulate</TabsTrigger>
           </TabsList>
@@ -241,9 +241,11 @@ function App() {
 
           <TabsContent value="cashflow">
             <CashFlowTab
+              state={calc.state}
               result={calc.result}
               isWeekly={cashFlowWeekly}
               onToggleWeekly={() => setCashFlowWeekly((v) => !v)}
+              updateState={calc.updateState}
             />
           </TabsContent>
 

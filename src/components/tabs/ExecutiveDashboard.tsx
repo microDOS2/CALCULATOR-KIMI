@@ -81,6 +81,9 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
         <InfoTooltip text="All KPIs update in real-time as you adjust inputs across any tab. Use this view to quickly assess the health of your business model without navigating through individual tabs." label="Dashboard" />
       </p>
 
+      {/* Sanity Checks — at top as a validation gate */}
+      <SanityChecks result={result} />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="Blended Gross Margin"
@@ -238,9 +241,6 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* D1: Sanity Checks */}
-      <SanityChecks result={result} />
 
       {/* D2: Assumptions Audit Trail */}
       <AssumptionsAuditTrail state={state} result={result} />

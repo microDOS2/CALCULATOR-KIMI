@@ -198,7 +198,7 @@ export function GoalSeekTab({ state }: GoalSeekTabProps) {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="border-l-4 border-l-primary">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Crosshair className="h-5 w-5 text-primary" />

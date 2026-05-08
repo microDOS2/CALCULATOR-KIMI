@@ -5,20 +5,24 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 
-import type { CalculationResult } from "@/types/calculator";
+import type { CalculatorState, CalculationResult } from "@/types/calculator";
 import { money3, money } from "@/lib/calculator";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { FormulaTooltip } from "@/components/FormulaTooltip";
 import { CashFlowChart } from "@/components/CashFlowChart";
 import { DesktopTable, MobileOnly } from "@/components/ResponsiveTable";
+import { Input } from "@/components/ui/input";
+import { Landmark, HardHat, Plus, Trash2 } from "lucide-react";
 
 interface CashFlowTabProps {
+  state: CalculatorState;
   result: CalculationResult;
   isWeekly: boolean;
   onToggleWeekly: () => void;
+  updateState: (patch: Partial<CalculatorState>) => void;
 }
 
-export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabProps) {
+export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateState }: CashFlowTabProps) {
   const cf = result.cashFlow;
   if (!cf || cf.months.length === 0) {
     return (
@@ -72,6 +76,138 @@ export function CashFlowTab({ result, isWeekly, onToggleWeekly }: CashFlowTabPro
             </CardContent>
           </Card>
         </FormulaTooltip>
+      </div>
+
+      {/* Capital Expenditures */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-dashed border-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <HardHat className="h-5 w-5 text-primary" />
+              Capital Expenditures
+              <InfoTooltip
+                text="One-time investments (equipment, vehicles, facility improvements) by month. These appear as cash outflows in the respective month. Use this to model major purchases that affect your cash position."
+                label="Capital Expenditures"
+              />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 pt-0">
+            {state.capitalExpenditures.length === 0 && (
+              <div className="text-xs text-amber-600 bg-amber-50 rounded-md p-2.5 flex items-start gap-2">
+                <Landmark className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>No CapEx items yet. Add equipment, vehicles, or facility investments to model their cash impact.</span>
+              </div>
+            )}
+            {state.capitalExpenditures.map((capex, idx) => (
+              <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
+                <div className="space-y-0.5">
+                  <Label className="text-[10px] text-muted-foreground">Name</Label>
+                  <Input
+                    className="h-7 text-xs"
+                    value={capex.name}
+                    onChange={(e) => {
+                      const updated = [...state.capitalExpenditures];
+                      updated[idx] = { ...capex, name: e.target.value };
+                      updateState({ capitalExpenditures: updated });
+                    }}
+                  />
+                </div>
+                <div className="space-y-0.5">
+                  <Label className="text-[10px] text-muted-foreground">Amount ($)</Label>
+                  <Input
+                    type="number"
+                    className="h-7 text-xs"
+                    value={capex.amount}
+                    onChange={(e) => {
+                      const updated = [...state.capitalExpenditures];
+                      updated[idx] = { ...capex, amount: Number(e.target.value) };
+                      updateState({ capitalExpenditures: updated });
+                    }}
+                  />
+                </div>
+                <div className="space-y-0.5">
+                  <Label className="text-[10px] text-muted-foreground">Month</Label>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={12}
+                      className="h-7 text-xs w-14"
+                      value={capex.month}
+                      onChange={(e) => {
+                        const updated = [...state.capitalExpenditures];
+                        updated[idx] = { ...capex, month: Math.max(1, Math.min(12, Number(e.target.value))) };
+                        updateState({ capitalExpenditures: updated });
+                      }}
+                    />
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-destructive h-7 w-7 p-0"
+                      onClick={() => {
+                        const updated = state.capitalExpenditures.filter((_, i) => i !== idx);
+                        updateState({ capitalExpenditures: updated });
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-xs w-full"
+              onClick={() => {
+                updateState({
+                  capitalExpenditures: [...state.capitalExpenditures, { id: `capex-${Date.now()}`, name: "", amount: 0, month: 1 }],
+                });
+              }}
+            >
+              <Plus className="h-3 w-3 mr-1" /> Add CapEx Item
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Debt Service */}
+        <Card className="border-dashed border-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Landmark className="h-5 w-5 text-primary" />
+              Debt Service
+              <InfoTooltip
+                text="Fixed monthly loan or debt payments that reduce your cash balance. Enter the total monthly payment across all loans. This is treated as a recurring cash outflow every month."
+                label="Debt Service"
+              />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 pt-0">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium">Monthly Debt Payment ($)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  step="0.01"
+                  className="w-36 h-7"
+                  value={state.debtServiceMonthly}
+                  onChange={(e) => updateState({ debtServiceMonthly: Math.max(0, Number(e.target.value)) })}
+                />
+                {state.debtServiceMonthly > 0 && (
+                  <span className="text-xs text-green-600">
+                    {money3(state.debtServiceMonthly)}/mo in cash flow
+                  </span>
+                )}
+              </div>
+            </div>
+            {state.debtServiceMonthly === 0 && (
+              <div className="text-xs text-amber-600 bg-amber-50 rounded-md p-2.5 flex items-start gap-2">
+                <Landmark className="h-4 w-4 shrink-0 mt-0.5" />
+                <span>No debt service set. If you have monthly loan payments, enter the amount to see their impact on cash flow.</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Cash Flow Chart */}
