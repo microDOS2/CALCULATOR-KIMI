@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import { ArrowRight, ArrowDown, Layers, ShoppingCart, Truck, Building2, Users, DollarSign, TrendingUp, Package, ToggleLeft, BarChart3 } from "lucide-react";
+import { ArrowRight, ArrowDown, Layers, ShoppingCart, Truck, Building2, Users, DollarSign, TrendingUp, Package, ToggleLeft, BarChart3, Megaphone } from "lucide-react";
 
 type NodeId = string;
 
@@ -54,7 +54,7 @@ const nodes: FlowNode[] = [
     borderColor: "border-indigo-300",
     description: "Toggle R/W/D on/off. Set prices",
     inputs: ["cogs"],
-    outputs: ["shipping", "overhead", "commissions", "affiliates", "cashflow"],
+    outputs: ["shipping", "overhead", "commissions", "affiliates", "marketing", "overrides", "cashflow"],
     formula: "Revenue = Price x Volume per channel",
   },
   {
@@ -106,6 +106,18 @@ const nodes: FlowNode[] = [
     formula: "Affiliate Commission = % of Retail Revenue",
   },
   {
+    id: "marketing",
+    label: "Marketing",
+    icon: Megaphone,
+    color: "text-pink-700",
+    bgColor: "bg-pink-50",
+    borderColor: "border-pink-300",
+    description: "Per-channel marketing spend",
+    inputs: ["channels"],
+    outputs: ["cashflow"],
+    formula: "Marketing Cost = Sum of expenses on each channel",
+  },
+  {
     id: "overrides",
     label: "Overrides",
     icon: DollarSign,
@@ -125,9 +137,9 @@ const nodes: FlowNode[] = [
     bgColor: "bg-amber-50",
     borderColor: "border-amber-300",
     description: "12-month in/out projection",
-    inputs: ["channels", "shipping", "overhead", "commissions", "affiliates", "overrides"],
+    inputs: ["channels", "shipping", "overhead", "commissions", "affiliates", "marketing", "overrides"],
     outputs: ["dashboard"],
-    formula: "Net Cash = Cash In - Cash Out (COGS + OH + Ship + Comm + Overrides)",
+    formula: "Net Cash = Cash In - Cash Out (COGS + OH + Ship + Comm + Mktg + Overrides)",
   },
   {
     id: "dashboard",
@@ -150,12 +162,14 @@ const edges = [
   { from: "channels", to: "overhead", label: "carries" },
   { from: "channels", to: "commissions", label: "generates" },
   { from: "channels", to: "affiliates", label: "feeds" },
+  { from: "channels", to: "marketing", label: "promotes" },
   { from: "channels", to: "overrides", label: "feeds" },
   { from: "channels", to: "cashflow", label: "revenue" },
   { from: "shipping", to: "cashflow", label: "cost" },
   { from: "overhead", to: "cashflow", label: "cost" },
   { from: "commissions", to: "cashflow", label: "payout" },
   { from: "affiliates", to: "cashflow", label: "payout" },
+  { from: "marketing", to: "cashflow", label: "spend" },
   { from: "overrides", to: "cashflow", label: "payout" },
   { from: "cashflow", to: "dashboard", label: "drives" },
 ];
@@ -213,8 +227,8 @@ export function DependencyFlowChart() {
 
             {/* Row 3: Cost Centers */}
             <div className={`flex ${horizontal ? "flex-col gap-2" : "flex-row flex-wrap gap-2"} ${horizontal ? "" : "w-full justify-center"}`}>
-              {["shipping", "overhead", "commissions", "affiliates", "overrides"].map((id) =>
-                <div key={id} className={horizontal ? "" : "flex-1 min-w-[120px] max-w-[160px]"}>
+              {["shipping", "overhead", "commissions", "affiliates", "marketing", "overrides"].map((id) =>
+                <div key={id} className={horizontal ? "" : "flex-1 min-w-[100px] max-w-[140px]"}>
                   {renderNode(id, horizontal, hoveredNode, setHoveredNode, activeEdges)}
                 </div>
               )}
@@ -272,6 +286,7 @@ export function DependencyFlowChart() {
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-indigo-400" /> B2C Sales</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400" /> Shipping</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-slate-400" /> Overhead</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-pink-400" /> Marketing</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Commissions/Overrides</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-violet-400" /> Dashboard</span>
         </div>
