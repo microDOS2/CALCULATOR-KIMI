@@ -186,9 +186,12 @@ export function CsvImportCard({ title, columns, tooltip, onImport, entityName }:
               {useFilePicker ? "Upload File" : "Paste CSV Text"}
             </span>
           </Label>
+          <InfoTooltip text="Choose your preferred input method: paste CSV text directly (great for copying from Excel/Google Sheets) or upload a .csv/.txt file from your computer." label="Input Method" />
+          <div className="flex-1" />
           <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800" onClick={handleDownloadTemplate}>
             <Download className="h-3 w-3 mr-1" /> Download Template
           </Button>
+          <InfoTooltip text="Downloads a CSV file with the correct column headers and one example row. Open it in Excel or Google Sheets, fill in your data, then paste or upload it back here. This ensures your columns match exactly what the importer expects." label="Template Download" />
         </div>
 
         {/* Input: textarea or file picker */}
@@ -230,11 +233,15 @@ export function CsvImportCard({ title, columns, tooltip, onImport, entityName }:
           <Button size="sm" variant="outline" onClick={handlePreview} disabled={!csvText.trim()}>
             <Upload className="h-3.5 w-3.5 mr-1" /> Preview
           </Button>
+          <InfoTooltip text="Validates all rows before importing. Shows how many rows are valid vs. how many have errors. Fix errors in your CSV and click Preview again. Only valid rows can be imported." label="Preview Validation" />
           {importResult && (
             <Button size="sm" onClick={handleImport} disabled={importResult.valid.length === 0}>
               <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
               Import {importResult.valid.length} {entityName}{importResult.valid.length !== 1 ? "s" : ""}
             </Button>
+          )}
+          {importResult && (
+            <InfoTooltip text={`Adds the ${importResult.valid.length} validated ${entityName}(s) to your existing list. Does NOT replace current entries — new entries are appended. Delete duplicates manually if needed.`} label="Import Action" />
           )}
         </div>
 

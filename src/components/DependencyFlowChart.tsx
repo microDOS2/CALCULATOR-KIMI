@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import { ArrowRight, ArrowDown, Layers, ShoppingCart, Truck, Building2, Users, DollarSign, TrendingUp, Package, ToggleLeft, BarChart3, Megaphone } from "lucide-react";
+import { ArrowRight, ArrowDown, Layers, ShoppingCart, Truck, Building2, Users, DollarSign, TrendingUp, Package, ToggleLeft, BarChart3, Megaphone, FileInput, FileOutput } from "lucide-react";
 
 type NodeId = string;
 
@@ -150,8 +150,32 @@ const nodes: FlowNode[] = [
     borderColor: "border-violet-300",
     description: "KPIs, sanity checks, audit trail",
     inputs: ["cashflow"],
-    outputs: [],
+    outputs: ["export"],
     formula: "Blended Margin, Break-Even, Operating Profit per channel",
+  },
+  {
+    id: "import",
+    label: "CSV Import",
+    icon: FileInput,
+    color: "text-sky-700",
+    bgColor: "bg-sky-50",
+    borderColor: "border-sky-300",
+    description: "Bulk data entry via CSV files or paste: Product ingredients, Marketing employees/expenses, Shipping employees/materials",
+    inputs: [],
+    outputs: ["product", "marketing", "shipping"],
+    formula: "Paste or upload .csv/.txt → validate → preview → import into target tab",
+  },
+  {
+    id: "export",
+    label: "Export",
+    icon: FileOutput,
+    color: "text-sky-700",
+    bgColor: "bg-sky-50",
+    borderColor: "border-sky-300",
+    description: "Export results: .channelcalc scenario files, CSV per-tab data, PDF one-pager, Excel full export",
+    inputs: ["dashboard"],
+    outputs: [],
+    formula: "Full model state → .channelcalc / CSV / PDF / Excel",
   },
 ];
 
@@ -172,6 +196,10 @@ const edges = [
   { from: "marketing", to: "cashflow", label: "spend" },
   { from: "overrides", to: "cashflow", label: "payout" },
   { from: "cashflow", to: "dashboard", label: "drives" },
+  { from: "import", to: "product", label: "ingredients CSV" },
+  { from: "import", to: "marketing", label: "employees/expenses CSV" },
+  { from: "import", to: "shipping", label: "employees/materials CSV" },
+  { from: "dashboard", to: "export", label: "results" },
 ];
 
 export function DependencyFlowChart() {
@@ -207,47 +235,66 @@ export function DependencyFlowChart() {
         <div className={horizontal ? "overflow-x-auto" : ""}>
           {/* Flow visualization */}
           <div
-            className={`flex ${horizontal ? "flex-row items-center gap-3 min-w-[800px]" : "flex-col gap-4"} py-2`}
+            className={`flex ${horizontal ? "flex-row items-start gap-3 min-w-[900px]" : "flex-col gap-4"} py-2`}
           >
-            {/* Row 1: Product → COGS */}
-            <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
-              {renderNodePair("product", "cogs", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+            {/* IMPORT LAYER — left side */}
+            <div className={`flex ${horizontal ? "flex-col gap-2 justify-center" : "flex-row gap-2 w-full justify-center"} ${horizontal ? "min-w-[90px]" : ""}`}>
+              <div className="text-[9px] text-sky-600 font-medium text-center uppercase tracking-wider mb-1">Data In</div>
+              {renderNode("import", horizontal, hoveredNode, setHoveredNode, activeEdges)}
             </div>
 
-            {/* Arrow to channels */}
-            {renderArrow(horizontal)}
+            {horizontal && renderArrow(horizontal)}
 
-            {/* Row 2: Channels (center hub) */}
-            <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
-              {renderNode("channels", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+            {/* MAIN FLOW */}
+            <div className={`flex ${horizontal ? "flex-row items-center gap-3 flex-1" : "flex-col gap-4 w-full"}`}>
+              {/* Row 1: Product → COGS */}
+              <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
+                {renderNodePair("product", "cogs", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+              </div>
+
+              {/* Arrow to channels */}
+              {renderArrow(horizontal)}
+
+              {/* Row 2: Channels (center hub) */}
+              <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
+                {renderNode("channels", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+              </div>
+
+              {/* Arrow to cost centers */}
+              {renderArrow(horizontal)}
+
+              {/* Row 3: Cost Centers */}
+              <div className={`flex ${horizontal ? "flex-col gap-2" : "flex-row flex-wrap gap-2"} ${horizontal ? "" : "w-full justify-center"}`}>
+                {["shipping", "overhead", "commissions", "affiliates", "marketing", "overrides"].map((id) =>
+                  <div key={id} className={horizontal ? "" : "flex-1 min-w-[100px] max-w-[140px]"}>
+                    {renderNode(id, horizontal, hoveredNode, setHoveredNode, activeEdges)}
+                  </div>
+                )}
+              </div>
+
+              {/* Arrow to cash flow */}
+              {renderArrow(horizontal)}
+
+              {/* Row 4: Cash Flow */}
+              <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
+                {renderNode("cashflow", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+              </div>
+
+              {/* Arrow to dashboard */}
+              {renderArrow(horizontal)}
+
+              {/* Row 5: Dashboard */}
+              <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
+                {renderNode("dashboard", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+              </div>
             </div>
 
-            {/* Arrow to cost centers */}
-            {renderArrow(horizontal)}
+            {horizontal && renderArrow(horizontal)}
 
-            {/* Row 3: Cost Centers */}
-            <div className={`flex ${horizontal ? "flex-col gap-2" : "flex-row flex-wrap gap-2"} ${horizontal ? "" : "w-full justify-center"}`}>
-              {["shipping", "overhead", "commissions", "affiliates", "marketing", "overrides"].map((id) =>
-                <div key={id} className={horizontal ? "" : "flex-1 min-w-[100px] max-w-[140px]"}>
-                  {renderNode(id, horizontal, hoveredNode, setHoveredNode, activeEdges)}
-                </div>
-              )}
-            </div>
-
-            {/* Arrow to cash flow */}
-            {renderArrow(horizontal)}
-
-            {/* Row 4: Cash Flow */}
-            <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
-              {renderNode("cashflow", horizontal, hoveredNode, setHoveredNode, activeEdges)}
-            </div>
-
-            {/* Arrow to dashboard */}
-            {renderArrow(horizontal)}
-
-            {/* Row 5: Dashboard */}
-            <div className={`flex ${horizontal ? "flex-row items-center gap-3" : "flex-col gap-2"} ${horizontal ? "" : "w-full"}`}>
-              {renderNode("dashboard", horizontal, hoveredNode, setHoveredNode, activeEdges)}
+            {/* EXPORT LAYER — right side */}
+            <div className={`flex ${horizontal ? "flex-col gap-2 justify-center" : "flex-row gap-2 w-full justify-center"} ${horizontal ? "min-w-[90px]" : ""}`}>
+              <div className="text-[9px] text-sky-600 font-medium text-center uppercase tracking-wider mb-1">Data Out</div>
+              {renderNode("export", horizontal, hoveredNode, setHoveredNode, activeEdges)}
             </div>
           </div>
         </div>
@@ -289,6 +336,7 @@ export function DependencyFlowChart() {
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-pink-400" /> Marketing</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Commissions/Overrides</span>
           <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-violet-400" /> Dashboard</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-sky-400" /> Import/Export</span>
         </div>
       </CardContent>
     </Card>

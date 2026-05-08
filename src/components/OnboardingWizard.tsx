@@ -46,7 +46,7 @@ const steps = [
   {
     icon: BarChart3,
     title: "Step 5: Analyze & Visualize",
-    body: "The Charts tab shows a Sensitivity Tornado Chart (which inputs most affect margin), a cost breakdown pie chart, and channel profit comparison bars. The Dashboard (violet) shows KPIs, sanity checks against benchmarks, and a complete assumptions audit trail.",
+    body: "The Charts tab shows a Sensitivity Tornado Chart (which inputs most affect margin), a cost breakdown pie chart, and channel profit comparison bars. The Dashboard (violet) shows KPIs, sanity checks against benchmarks, and a complete assumptions audit trail. Check the Guide tab for the interactive Dependency Flow Chart that shows how every component connects.",
   },
   {
     icon: Target,
@@ -56,7 +56,7 @@ const steps = [
   {
     icon: Table2,
     title: "Step 7: Compare & Save Scenarios",
-    body: "Save model configurations as named scenarios with notes (Tab 17). Use the Compare tab to load two scenarios side-by-side with 13 key metrics and green/red delta indicators. Notes help you remember why you saved each scenario.",
+    body: "Save model configurations as named scenarios with notes (Tab 17). Export scenarios as .channelcalc files to share or backup. Import .channelcalc files to restore a complete model state. Use the Compare tab to load two scenarios side-by-side with 13 key metrics and green/red delta indicators.",
   },
   {
     icon: ShieldCheck,

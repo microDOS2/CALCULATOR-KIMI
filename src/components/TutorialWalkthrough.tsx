@@ -5,7 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   Package, ShoppingCart, Truck, Building2, Users, BarChart3,
-  TrendingUp, ArrowRight, ArrowLeft, Lightbulb, GraduationCap, CheckCircle, Sparkles
+  TrendingUp, ArrowRight, ArrowLeft, Lightbulb, GraduationCap, CheckCircle, Sparkles,
+  FileInput, FileSpreadsheet
 } from "lucide-react";
 
 const TUTORIAL_KEY = "channel_calc_tutorial_seen_v1";
@@ -134,8 +135,41 @@ const steps: TutorialStep[] = [
     highlight: "overhead",
   },
   {
+    icon: FileInput,
+    title: "Step 5: Bulk Import & Export (Optional)",
+    body: (
+      <div className="space-y-3">
+        <p>
+          Save time by importing data in bulk instead of entering items one-by-one.
+          Look for the <strong>blue dashed-border CSV Import cards</strong> on these tabs:
+        </p>
+        <ul className="space-y-2 text-sm">
+          <li className="flex items-start gap-2">
+            <FileSpreadsheet className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+            <span><strong>Product (Tab 1)</strong> — Import ingredients CSV: name, mgPerUnit, costPerMg, supplierPaymentDays</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <FileSpreadsheet className="h-4 w-4 text-pink-500 shrink-0 mt-0.5" />
+            <span><strong>Marketing</strong> — Import employees (name, title, isHourly, salary, hourlyRate, hoursPerWeek) and expenses (category, name, amount, channelR, channelW, channelD)</span>
+          </li>
+          <li className="flex items-start gap-2">
+            <FileSpreadsheet className="h-4 w-4 text-cyan-500 shrink-0 mt-0.5" />
+            <span><strong>Shipping</strong> — Import employees (name, title, isHourly, salary, perItemBonus...) and materials (name, costPerPack)</span>
+          </li>
+        </ul>
+        <p className="text-sm text-muted-foreground">
+          <strong>How it works:</strong> Click "Download Template" to get the exact column format. Fill in your data. Then paste the CSV text or upload a .csv file. Click Preview to validate, then Import to add. Each tab also has an Export button to download current data.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          <strong>Scenarios (Tab 17)</strong> — Export your complete model as a <strong>.channelcalc</strong> file. Share it, back it up, or import it later to restore your exact configuration.
+        </p>
+      </div>
+    ),
+    highlight: "import",
+  },
+  {
     icon: Users,
-    title: "Step 5: Three Payment Systems",
+    title: "Step 6: Three Payment Systems",
     body: (
       <div className="space-y-3">
         <p>Your model has three completely separate payment systems:</p>
@@ -162,7 +196,7 @@ const steps: TutorialStep[] = [
   },
   {
     icon: TrendingUp,
-    title: "Step 6: Forecast Cash Flow",
+    title: "Step 7: Forecast Cash Flow",
     body: (
       <div className="space-y-3">
         <p>
@@ -179,7 +213,7 @@ const steps: TutorialStep[] = [
   },
   {
     icon: BarChart3,
-    title: "Step 7: Read the Dashboard",
+    title: "Step 8: Read the Dashboard",
     body: (
       <div className="space-y-3">
         <p>
