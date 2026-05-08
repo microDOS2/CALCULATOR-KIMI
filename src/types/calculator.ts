@@ -81,6 +81,34 @@ export interface OverrideCalc {
   }>;
 }
 
+export interface MarketingEmployee {
+  id: string;
+  name: string;
+  title: string;
+  salary: number; // monthly base salary
+}
+
+export interface MarketingExpense {
+  id: string;
+  category: 'Digital Ads' | 'Trade Shows' | 'Content' | 'PR' | 'Influencer' | 'Custom';
+  name: string; // custom description
+  amount: number; // monthly spend
+  channels: {
+    retail: boolean;
+    wholesale: boolean;
+    distributor: boolean;
+  };
+}
+
+export interface ShippingEmployee {
+  id: string;
+  name: string;
+  title: string; // editable role name: "Warehouse", "Pick/Pack", "Delivery", etc.
+  salary: number; // monthly base salary
+  perItemBonus: number; // $ per pack shipped (0 = no bonus)
+  perItemBonusEnabled: boolean; // toggle for production bonus
+}
+
 export interface Salesperson {
   id: string;
   name: string;
@@ -504,6 +532,13 @@ export interface CalculatorState {
   debtServiceMonthly: number;
   campaigns: Campaign[];
   auditLog: AuditLogEntry[];
+  // Marketing — outsourceable marketing team + channel-tied expenditures
+  marketingEnabled: boolean;
+  marketingEmployees: MarketingEmployee[];
+  marketingExpenses: MarketingExpense[];
+  // Shipping Employees — outsourceable warehouse/logistics team
+  shippingEmployeesEnabled: boolean;
+  shippingEmployees: ShippingEmployee[];
 }
 
 // Cash Flow Types

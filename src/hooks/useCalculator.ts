@@ -9,6 +9,9 @@ import type {
   ThirdPartyCompany,
   Scenario,
   OverrideEntry,
+  MarketingEmployee,
+  MarketingExpense,
+  ShippingEmployee,
 } from "@/types/calculator";
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
@@ -260,6 +263,11 @@ const createDefaultState = (): CalculatorState => {
     debtServiceMonthly: 0,
     campaigns: [],
     auditLog: [],
+    marketingEnabled: false,
+    marketingEmployees: [],
+    marketingExpenses: [],
+    shippingEmployeesEnabled: false,
+    shippingEmployees: [],
   };
 };
 
@@ -343,6 +351,12 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
       rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, baseSalary: rsm.baseSalary ?? 0, chR: false })),
       sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, baseSalary: sp.baseSalary ?? 0, chR: false })),
     },
+    // v2: Add marketing and shipping (default off/empty for old data)
+    marketingEnabled: raw.marketingEnabled ?? false,
+    marketingEmployees: raw.marketingEmployees ?? [],
+    marketingExpenses: raw.marketingExpenses ?? [],
+    shippingEmployeesEnabled: raw.shippingEmployeesEnabled ?? false,
+    shippingEmployees: raw.shippingEmployees ?? [],
   };
 
   return migrated;
@@ -755,6 +769,100 @@ export function useCalculator() {
         auditLog: trimAuditLog([...prev.auditLog, entry]),
       };
     });
+  }, []);
+
+  // Marketing
+  const addMarketingEmployee = useCallback(() => {
+    setState((prev) => {
+      const newName = `Marketing ${prev.marketingEmployees.length + 1}`;
+      const entry = createAuditEntry("System", `Added Marketing Employee "${newName}"`, `marketingEmployees.${prev.marketingEmployees.length}`, "—", "New marketing employee");
+      return {
+        ...prev,
+        marketingEmployees: [...prev.marketingEmployees, { id: uid(), name: newName, title: "", salary: 0 }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const removeMarketingEmployee = useCallback((id: string) => {
+    setState((prev) => {
+      const emp = prev.marketingEmployees.find((e) => e.id === id);
+      const entry = createAuditEntry("System", `Removed Marketing "${emp?.name || id}"`, `marketingEmployees.${prev.marketingEmployees.findIndex((e) => e.id === id)}`, `$${emp?.salary}/mo — ${emp?.title}`, "Removed");
+      return {
+        ...prev,
+        marketingEmployees: prev.marketingEmployees.filter((e) => e.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const updateMarketingEmployee = useCallback((id: string, patch: Partial<MarketingEmployee>) => {
+    setState((prev) => ({
+      ...prev,
+      marketingEmployees: prev.marketingEmployees.map((e) => e.id === id ? { ...e, ...patch } : e),
+    }));
+  }, []);
+
+  const addMarketingExpense = useCallback(() => {
+    setState((prev) => {
+      const entry = createAuditEntry("System", `Added Marketing Expense`, `marketingExpenses.${prev.marketingExpenses.length}`, "—", "New expense");
+      return {
+        ...prev,
+        marketingExpenses: [...prev.marketingExpenses, { id: uid(), category: "Custom" as const, name: "", amount: 0, channels: { retail: true, wholesale: true, distributor: true } }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const removeMarketingExpense = useCallback((id: string) => {
+    setState((prev) => {
+      const exp = prev.marketingExpenses.find((e) => e.id === id);
+      const entry = createAuditEntry("System", `Removed Marketing Expense "${exp?.name || id}"`, `marketingExpenses.${prev.marketingExpenses.findIndex((e) => e.id === id)}`, `${exp?.category}: $${exp?.amount}/mo`, "Removed");
+      return {
+        ...prev,
+        marketingExpenses: prev.marketingExpenses.filter((e) => e.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const updateMarketingExpense = useCallback((id: string, patch: Partial<MarketingExpense>) => {
+    setState((prev) => ({
+      ...prev,
+      marketingExpenses: prev.marketingExpenses.map((e) => e.id === id ? { ...e, ...patch } : e),
+    }));
+  }, []);
+
+  // Shipping Employees
+  const addShippingEmployee = useCallback(() => {
+    setState((prev) => {
+      const newName = `Shipping ${prev.shippingEmployees.length + 1}`;
+      const entry = createAuditEntry("System", `Added Shipping Employee "${newName}"`, `shippingEmployees.${prev.shippingEmployees.length}`, "—", "New shipping employee");
+      return {
+        ...prev,
+        shippingEmployees: [...prev.shippingEmployees, { id: uid(), name: newName, title: "", salary: 0, perItemBonus: 0, perItemBonusEnabled: false }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const removeShippingEmployee = useCallback((id: string) => {
+    setState((prev) => {
+      const emp = prev.shippingEmployees.find((e) => e.id === id);
+      const entry = createAuditEntry("System", `Removed Shipping "${emp?.name || id}"`, `shippingEmployees.${prev.shippingEmployees.findIndex((e) => e.id === id)}`, `$${emp?.salary}/mo — ${emp?.title}`, "Removed");
+      return {
+        ...prev,
+        shippingEmployees: prev.shippingEmployees.filter((e) => e.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const updateShippingEmployee = useCallback((id: string, patch: Partial<ShippingEmployee>) => {
+    setState((prev) => ({
+      ...prev,
+      shippingEmployees: prev.shippingEmployees.map((e) => e.id === id ? { ...e, ...patch } : e),
+    }));
   }, []);
 
   const updateMonthlyVolume = useCallback(
@@ -1234,5 +1342,21 @@ export function useCalculator() {
     updateSubscriptionItem,
     removeSubscriptionItem,
     sensitivity,
+    // Marketing
+    marketingEnabled: state.marketingEnabled,
+    marketingEmployees: state.marketingEmployees,
+    marketingExpenses: state.marketingExpenses,
+    addMarketingEmployee,
+    removeMarketingEmployee,
+    updateMarketingEmployee,
+    addMarketingExpense,
+    removeMarketingExpense,
+    updateMarketingExpense,
+    // Shipping Employees
+    shippingEmployeesEnabled: state.shippingEmployeesEnabled,
+    shippingEmployees: state.shippingEmployees,
+    addShippingEmployee,
+    removeShippingEmployee,
+    updateShippingEmployee,
   };
 }

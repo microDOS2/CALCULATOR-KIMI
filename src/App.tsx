@@ -25,6 +25,8 @@ import { AffiliatesTab } from "@/components/tabs/AffiliatesTab";
 import { B2BSalesTab } from "@/components/tabs/B2BSalesTab";
 import { OverridesTab } from "@/components/tabs/OverridesTab";
 import { AuditLogTab } from "@/components/tabs/AuditLogTab";
+import { MarketingTab } from "@/components/tabs/MarketingTab";
+import { ShippingEmployeesTab } from "@/components/tabs/ShippingEmployeesTab";
 
 function App() {
   const calc = useCalculator();
@@ -189,6 +191,16 @@ function App() {
             </TabsTrigger>
             <TabsTrigger value="auditlog" className="bg-slate-100/70 text-slate-800 hover:bg-slate-200 data-[state=active]:!bg-slate-300 data-[state=active]:!text-slate-950 dark:bg-slate-900/30 dark:text-slate-200 dark:hover:bg-slate-800/50 dark:data-[state=active]:!bg-slate-700 dark:data-[state=active]:!text-slate-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
               <span className="text-xs mr-1 font-bold opacity-70">19</span>Audit Log
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Group 7: Outsourceable Cost Centers */}
+            <TabsTrigger value="marketing" className="bg-pink-100/70 text-pink-800 hover:bg-pink-200 data-[state=active]:!bg-pink-300 data-[state=active]:!text-pink-950 dark:bg-pink-900/30 dark:text-pink-200 dark:hover:bg-pink-800/50 dark:data-[state=active]:!bg-pink-700 dark:data-[state=active]:!text-pink-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">20</span>Marketing
+            </TabsTrigger>
+            <TabsTrigger value="shipping" className="bg-cyan-100/70 text-cyan-800 hover:bg-cyan-200 data-[state=active]:!bg-cyan-300 data-[state=active]:!text-cyan-950 dark:bg-cyan-900/30 dark:text-cyan-200 dark:hover:bg-cyan-800/50 dark:data-[state=active]:!bg-cyan-700 dark:data-[state=active]:!text-cyan-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">21</span>Shipping
             </TabsTrigger>
 
             <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
@@ -371,6 +383,32 @@ function App() {
 
           <TabsContent value="auditlog">
             <AuditLogTab state={calc.state} updateState={calc.updateState} />
+          </TabsContent>
+
+          <TabsContent value="marketing">
+            <MarketingTab
+              state={calc.state}
+              updateState={calc.updateState}
+              marketingEmployees={calc.marketingEmployees}
+              marketingExpenses={calc.marketingExpenses}
+              addMarketingEmployee={calc.addMarketingEmployee}
+              removeMarketingEmployee={calc.removeMarketingEmployee}
+              updateMarketingEmployee={calc.updateMarketingEmployee}
+              addMarketingExpense={calc.addMarketingExpense}
+              removeMarketingExpense={calc.removeMarketingExpense}
+              updateMarketingExpense={calc.updateMarketingExpense}
+            />
+          </TabsContent>
+
+          <TabsContent value="shipping">
+            <ShippingEmployeesTab
+              state={calc.state}
+              updateState={calc.updateState}
+              shippingEmployees={calc.shippingEmployees}
+              addShippingEmployee={calc.addShippingEmployee}
+              removeShippingEmployee={calc.removeShippingEmployee}
+              updateShippingEmployee={calc.updateShippingEmployee}
+            />
           </TabsContent>
 
           <TabsContent value="simulate">

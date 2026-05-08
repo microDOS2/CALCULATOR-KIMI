@@ -588,7 +588,7 @@ export function calculate(state: CalculatorState): CalculationResult {
   const overrides = calculateOverrides(state, totalRevenueR, totalRevenueW, totalRevenueD, afGrossRevenue);
 
   // Cash flow (depends on overrides)
-  const cashFlow = calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal, overrides.totalOverrideCost);
+  const cashFlow = calculateCashFlow(state, brev, totalMonthlyVolume, cogsPerPack, ohTotal, overrides.totalOverrideCost, commResults.totalBaseSalary);
 
   return {
     unitSystem: state.unitSystem,
@@ -831,6 +831,7 @@ function calculateCashFlow(
   cogsPerPack: number,
   ohTotal: number,
   overrideCost: number,
+  commissionTotalBaseSalary: number,
 ): CalculationResult["cashFlow"] {
   const {
     customerPaymentTerms,
@@ -894,14 +895,24 @@ function calculateCashFlow(
     const cogsPaid = m > Math.ceil((inventoryLeadTimeDays + 30) / 30) ? cogsPerPack * totalMonthlyVolume : 0;
 
     const overheadPaid = ohTotal;
-    const commissionsPaid = 0; // simplified - could integrate commission results
+    const commissionsPaid = commissionTotalBaseSalary; // commission base salaries (fixed cost)
     const overridesPaid = overrideCost; // monthly override payouts
     const debtPaid = debtServiceMonthly;
     const capexPaid = capitalExpenditures
       .filter((c) => c.month === m)
       .reduce((s, c) => s + c.amount, 0);
 
-    const cashOut = cogsPaid + overheadPaid + commissionsPaid + overridesPaid + debtPaid + capexPaid;
+    // Marketing costs (only if enabled)
+    const marketingSalaryTotal = state.marketingEnabled ? state.marketingEmployees.reduce((s, e) => s + e.salary, 0) : 0;
+    const marketingExpenseTotal = state.marketingEnabled ? state.marketingExpenses.reduce((s, e) => s + e.amount, 0) : 0;
+
+    // Shipping employee costs (only if enabled)
+    const shippingSalaryTotal = state.shippingEmployeesEnabled ? state.shippingEmployees.reduce((s, e) => s + e.salary, 0) : 0;
+    const shippingBonusTotal = state.shippingEmployeesEnabled
+      ? state.shippingEmployees.reduce((s, e) => s + (e.perItemBonusEnabled ? e.perItemBonus * totalMonthlyVolume : 0), 0)
+      : 0;
+
+    const cashOut = cogsPaid + overheadPaid + commissionsPaid + overridesPaid + debtPaid + capexPaid + marketingSalaryTotal + marketingExpenseTotal + shippingSalaryTotal + shippingBonusTotal;
 
     const netCashFlow = cashIn - cashOut;
     balance = startingBalance + netCashFlow;
