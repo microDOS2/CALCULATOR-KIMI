@@ -7,6 +7,46 @@ import { Calculator, Package, Store, BarChart3, Target, Table2, ShieldCheck, Hel
 
 const WIZARD_KEY = "channel_calc_wizard_seen_v4";
 
+// All 22 tabs with their visual styling matching the actual app
+const allTabs = [
+  { num: 1, label: "Product", color: "bg-blue-500", group: "Foundation" },
+  { num: 2, label: "Pack", color: "bg-blue-500", group: "Foundation" },
+  { num: 3, label: "Costs", color: "bg-blue-500", group: "Foundation" },
+  { num: 4, label: "B2C", color: "bg-indigo-500", group: "B2C Sales" },
+  { num: 5, label: "B2B", color: "bg-teal-500", group: "B2B Sales" },
+  { num: 6, label: "Orders", color: "bg-emerald-500", group: "Operations" },
+  { num: 7, label: "Comm", color: "bg-emerald-500", group: "Operations" },
+  { num: 8, label: "3rd", color: "bg-emerald-500", group: "Operations" },
+  { num: 9, label: "Over", color: "bg-emerald-500", group: "Operations" },
+  { num: 10, label: "Charts", color: "bg-emerald-500", group: "Operations" },
+  { num: 11, label: "Dash", color: "bg-violet-500", group: "Dashboard" },
+  { num: 12, label: "Seek", color: "bg-violet-500", group: "Dashboard" },
+  { num: 13, label: "Batch", color: "bg-violet-500", group: "Dashboard" },
+  { num: 14, label: "Subs", color: "bg-amber-500", group: "Forecast" },
+  { num: 15, label: "Cash", color: "bg-amber-500", group: "Forecast" },
+  { num: 16, label: "Camp", color: "bg-amber-500", group: "Forecast" },
+  { num: 17, label: "Scen", color: "bg-slate-500", group: "Manage" },
+  { num: 18, label: "Comp", color: "bg-slate-500", group: "Manage" },
+  { num: 19, label: "Audit", color: "bg-slate-500", group: "Manage" },
+  { num: 20, label: "Mktg", color: "bg-pink-500", group: "Ops" },
+  { num: 21, label: "Ship", color: "bg-cyan-500", group: "Ops" },
+  { num: 22, label: "●", color: "bg-rose-500", group: "Simulate" },
+];
+
+// Which tabs to highlight for each wizard step
+const stepTabHighlights: number[][] = [
+  [], // Welcome - no tabs
+  [3], // Step 1: Costs tab (channel toggles)
+  [1, 2], // Step 2: Product + Packaging
+  [3], // Step 3: Costs (prices, shipping, overhead)
+  [3, 8, 16, 20, 21], // Step 4: Costs + optional tabs
+  [4, 5, 10, 11], // Step 5: B2C + B2B + Charts + Dashboard
+  [12, 13], // Step 6: Goal Seek + Batch
+  [17, 18], // Step 7: Scenarios + Compare
+  [11], // Step 8: Dashboard
+  [14, 15, 20, 21], // Step 9: Subs + Cash Flow + optional
+];
+
 const tabColorLegend = [
   { label: "Foundation", cls: "bg-blue-200 text-blue-800", tabs: "1-3" },
   { label: "B2C Sales", cls: "bg-indigo-200 text-indigo-800", tabs: "4" },
@@ -139,6 +179,37 @@ export function OnboardingWizard() {
               {current.body}
             </DialogDescription>
           </DialogHeader>
+
+          {/* Visual Tab Bar — shows all 22 tabs with relevant ones highlighted */}
+          <div className="space-y-1.5">
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+              {step === 0 ? "App Layout — 22 Tabs" : `Relevant Tabs for Step ${step}`}
+            </p>
+            <div className="flex flex-wrap gap-[3px]">
+              {allTabs.map((t) => {
+                const isHighlighted = stepTabHighlights[step]?.includes(t.num);
+                return (
+                  <div
+                    key={t.num}
+                    className={`relative flex flex-col items-center gap-[1px] transition-all ${
+                      isHighlighted ? "scale-110 z-10" : "opacity-40 scale-95"
+                    }`}
+                    title={`Tab ${t.num}: ${t.label} (${t.group})`}
+                  >
+                    <div className={`w-6 h-5 rounded-[3px] ${t.color} flex items-center justify-center shadow-sm`}>
+                      <span className="text-[7px] font-bold text-white leading-none">{t.num}</span>
+                    </div>
+                    <span className={`text-[6px] font-medium leading-none ${isHighlighted ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t.label}
+                    </span>
+                    {isHighlighted && (
+                      <div className="absolute -bottom-1 w-1 h-1 rounded-full bg-primary" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           {/* Color legend bar */}
           <div className="flex flex-wrap gap-1.5 pt-2 pb-1">
