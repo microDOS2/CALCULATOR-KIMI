@@ -244,7 +244,7 @@ const steps: TutorialStep[] = [
             <li>Ctrl+Z undoes up to 50 steps</li>
             <li>URL encodes your full model (shareable links)</li>
             <li>Auto-saves every 30 seconds</li>
-            <li>Reopen this tutorial anytime via the Guide button</li>
+            <li>Reopen this tutorial anytime via the Tutorial button in the header</li>
           </ul>
         </div>
       </div>

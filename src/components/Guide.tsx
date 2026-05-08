@@ -20,7 +20,7 @@ export function Guide() {
             User Guide
           </DialogTitle>
           <DialogDescription className="text-sm">
-            Complete walkthrough of all 18 tabs and every feature.
+            Complete walkthrough of all 22 tabs and every feature.
           </DialogDescription>
         </DialogHeader>
 
@@ -30,8 +30,9 @@ export function Guide() {
           <div className="flex flex-wrap gap-2">
             {[
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
-              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
+              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4" },
+              { label: "B2B Sales", cls: "bg-teal-100 text-teal-700 border-teal-200", tabs: "5" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10, 20-21" },
               { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
               { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
               { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-19" },
@@ -109,22 +110,13 @@ export function Guide() {
                 <span className="font-medium text-blue-700">Packaging (Tab 2)</span> — Define packaging layers per SKU (jar, bottle, label, box). Set unit cost and weight (grams) for each layer. Packaging weight is used for <strong>weight-based shipping rates</strong>.
               </li>
               <li className="pl-1 border-l-2 border-l-blue-300">
-                <span className="font-medium text-indigo-700">Retail (Tab 4)</span> — Set your retail selling price and direct e-commerce configuration. Toggle retail channel on/off. Use the <strong>Weight-Based Shipping Rates</strong> card (sky blue) to replace flat-rate shipping with carrier-like pricing by package weight. Use the <strong>Tax &amp; Duty</strong> card (emerald green) to add Sales Tax on retail. Formula tooltips on every metric show the calculation on hover.
-              </li>
-              <li className="pl-1 border-l-2 border-l-indigo-300">
-                <span className="font-medium text-indigo-700">Affiliates (Tab 5)</span> — <strong>B2C referral channel.</strong> Affiliates drive customers to your retail storefront at the same retail price, but you pay commission <em>after</em> the sale. Configure commission type (percentage or flat), rate, attribution model (first/last click), cookie duration, and payout schedule. The impact summary shows gross revenue, commission cost, and net profit after commission. Enable subscription renewal commissions with sliding scale tiers.
+                <span className="font-medium text-blue-700">Costs (Tab 3)</span> — <strong>Foundation tab.</strong> Choose your channels (all start unchecked). Set discount percentages. Enter monthly overhead (rent, salaries, utilities). Toggle overhead per channel. Set monthly volumes per SKU. Per-Channel Shipping Costs card sets carrier costs per channel.
               </li>
               <li className="pl-1 border-l-2 border-l-blue-300">
-                <span className="font-medium text-blue-700">Overhead (Tab 4)</span> — Enter your monthly overhead costs (rent, salaries, utilities, marketing). Toggle whether overhead is allocated to each channel. This directly affects operating profit.
+                <span className="font-medium text-indigo-700">B2C Sales (Tab 4)</span> — <strong>Retail + Affiliates combined.</strong> Set retail price, shipping (flat rate or weight-based), and sales tax. Configure the Affiliate program (B2C referrals) — commission type, attribution model (first/last click), cookie duration, payout schedule. Only active when Retail is enabled.
               </li>
-              <li className="pl-1 border-l-2 border-l-emerald-300">
-                <span className="font-medium text-emerald-700">Marketing Employees</span> — Add marketing staff with salary OR hourly rate. Toggle each employee between fixed monthly pay and hourly (rate x hours/week x 52 / 12). Add channel-tied expenditures (Digital Ads, Trade Shows, Content, PR, Influencer) toggled per-channel.
-              </li>
-              <li className="pl-1 border-l-2 border-l-emerald-300">
-                <span className="font-medium text-emerald-700">Shipping Employees</span> — Add warehouse/shipping staff with salary OR hourly rate. Optional per-pack production bonus (paid on every pack shipped through any channel). Add shipping materials (boxes, tape, labels) with per-pack costs.
-              </li>
-              <li className="pl-1 border-l-2 border-l-emerald-300">
-                <span className="font-medium text-emerald-700">3rd Party (Tab 5)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
+              <li className="pl-1 border-l-2 border-l-indigo-300">
+                <span className="font-medium text-teal-700">B2B Sales (Tab 5)</span> — <strong>Wholesale + Distributor combined.</strong> Set wholesale and distributor discounts off retail price. Configure import duty for distributor channel. Empty-state warning when both B2B channels are off.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
                 <span className="font-medium text-emerald-700">PO (Tab 6)</span> — View purchase order projections. The calculator generates POs for raw materials and finished goods based on your production plan and ingredient lead times.
@@ -133,7 +125,10 @@ export function Guide() {
                 <span className="font-medium text-emerald-700">Commissions (Tab 7)</span> — Configure sales commissions. Set commission % per channel and see the total commission impact on your operating profit.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
-                <span className="font-medium text-emerald-700">Overrides (Tab 8)</span> — <strong>Named individual payments.</strong> A third payment system separate from Affiliates and Commissions. Create override entries with a name, percentage, gross/net basis, and channel selection (Retail, Wholesale, Distributor, Affiliate). Use for consultants, advisors, partners, or anyone who receives a revenue share. Each override shows its monthly impact. Enable/disable individually.
+                <span className="font-medium text-emerald-700">3rd Party (Tab 8)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Overrides (Tab 9)</span> — <strong>Named individual payments.</strong> A third payment system separate from Affiliates and Commissions. Create override entries with a name, percentage, gross/net basis, and channel selection (Retail, Wholesale, Distributor, Affiliate). Use for consultants, advisors, partners, or anyone who receives a revenue share. Each override shows its monthly impact. Enable/disable individually.
               </li>
               <li className="pl-1 border-l-2 border-l-emerald-300">
                 <span className="font-medium text-emerald-700">Charts (Tab 10)</span> — Visual breakdown of your business. <strong>Sensitivity Tornado Chart</strong> shows which inputs most affect your blended margin (diverging bars for ±10% changes). Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels. Time-series charts appear in their respective tabs.
@@ -142,28 +137,34 @@ export function Guide() {
                 <span className="font-medium text-violet-700">Dashboard (Tab 11)</span> — One-screen "Mission Control". Starts with the <strong>Sanity Checks</strong> panel (rose red) that validates your model against 9 industry benchmarks. Below that, 10 live KPI cards with industry benchmark ranges and trend indicators. At the bottom, the <strong>Assumptions Audit Trail</strong> (slate gray) lists every assumption in your model. Use this for investor meetings or bank applications.
               </li>
               <li className="pl-1 border-l-2 border-l-violet-300">
-                <span className="font-medium text-violet-700">Goal Seek (Tab 11)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Work backward from a target. Select what you want to achieve (e.g., "$50 gross profit per pack"), pick which input to adjust (e.g., "Retail Price"), and the solver finds the exact value that hits your target using 30-iteration binary search. Supports 5 target metrics and 7 adjustable inputs including ingredient/packaging cost multipliers.
+                <span className="font-medium text-violet-700">Goal Seek (Tab 12)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Work backward from a target. Select what you want to achieve (e.g., "$50 gross profit per pack"), pick which input to adjust (e.g., "Retail Price"), and the solver finds the exact value that hits your target using 30-iteration binary search. Supports 5 target metrics and 7 adjustable inputs including ingredient/packaging cost multipliers.
               </li>
               <li className="pl-1 border-l-2 border-l-violet-300">
-                <span className="font-medium text-violet-700">Batch (Tab 12)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Test multiple values for a single input at once. Enter comma-separated values (e.g., "20, 25, 30, 35, 40" for retail price) and get a comparison table with gross profit, margin, break-even, COGS, and break-even packs for each value. Rows highlight green when profit improves vs. the previous row, red when it declines.
+                <span className="font-medium text-violet-700">Batch What-If (Tab 13)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Test multiple values for a single input at once. Enter comma-separated values (e.g., "20, 25, 30, 35, 40" for retail price) and get a comparison table with gross profit, margin, break-even, COGS, and break-even packs for each value. Rows highlight green when profit improves vs. the previous row, red when it declines.
               </li>
               <li className="pl-1 border-l-2 border-l-amber-300">
-                <span className="font-medium text-amber-700">Subscriptions (Tab 13)</span> — Model recurring revenue with subscription plans. Set monthly price, churn rate, and growth rate. See a 12-month projection of subscribers, MRR, and cumulative profit. Includes subscriber growth chart and revenue chart per plan. Toggle between monthly table view and mobile-friendly card view.
+                <span className="font-medium text-amber-700">Subscriptions (Tab 14)</span> — Model recurring revenue with subscription plans. Set monthly price, churn rate, and growth rate. See a 12-month projection of subscribers, MRR, and cumulative profit. Includes subscriber growth chart and revenue chart per plan. Toggle between monthly table view and mobile-friendly card view.
               </li>
               <li className="pl-1 border-l-2 border-l-amber-300">
-                <span className="font-medium text-amber-700">Cash Flow (Tab 14)</span> — Profitability does not equal viability. This tab projects 12 months of cash inflows and outflows, including payment term delays (NET 30/60/90), ingredient PO lead times, and debt service. Use the <strong>Capital Expenditures</strong> card (orange) to model one-time investments. Use the <strong>Debt Service</strong> card (orange) for monthly loan payments. Toggle between Monthly and Weekly views. Includes a 12-month cash balance bar chart. Watch for the red warning cards if your balance drops below $5,000.
+                <span className="font-medium text-amber-700">Cash Flow (Tab 15)</span> — Profitability does not equal viability. This tab projects 12 months of cash inflows and outflows, including payment term delays (NET 30/60/90), ingredient PO lead times, and debt service. Use the <strong>Capital Expenditures</strong> card (orange) to model one-time investments. Use the <strong>Debt Service</strong> card (orange) for monthly loan payments. Toggle between Monthly and Weekly views. Includes a 12-month cash balance bar chart. Watch for the red warning cards if your balance drops below $5,000.
               </li>
               <li className="pl-1 border-l-2 border-l-amber-300">
-                <span className="font-medium text-amber-700">Campaigns (Tab 15)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive). Includes before/during/after revenue comparison chart.
+                <span className="font-medium text-amber-700">Campaigns (Tab 16)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive). Includes before/during/after revenue comparison chart.
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
-                <span className="font-medium text-slate-700">Scenarios (Tab 16)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 17 tabs. Notes help you remember the rationale behind each saved scenario.
+                <span className="font-medium text-slate-700">Scenarios (Tab 17)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 17 tabs. Notes help you remember the rationale behind each saved scenario.
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
-                <span className="font-medium text-slate-700">Compare (Tab 17)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
+                <span className="font-medium text-slate-700">Compare (Tab 18)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
               </li>
               <li className="pl-1 border-l-2 border-l-slate-300">
-                <span className="font-medium text-slate-700">Audit Log (Tab 18)</span> — A complete temporal change log that records every meaningful edit to your model with timestamp, category, field name, and old→new value diff. Filter by category (Product, Channels, Overrides, etc.) or search by field name. Shows 4 summary stats (total entries, categories touched, first/latest change). Clearable. This is the true audit trail — not a snapshot, but a chronological record of who changed what and when.
+                <span className="font-medium text-slate-700">Audit Log (Tab 19)</span> — A complete temporal change log that records every meaningful edit to your model with timestamp, category, field name, and old→new value diff. Filter by category (Product, Channels, Overrides, etc.) or search by field name. Shows 4 summary stats (total entries, categories touched, first/latest change). Clearable. This is the true audit trail — not a snapshot, but a chronological record of who changed what and when.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Marketing (Tab 20)</span> — Add marketing staff with salary OR hourly rate (rate x hours/week x 52 / 12). Add channel-tied expenditures (Digital Ads, Trade Shows, Content, PR, Influencer) toggled per-channel. <strong>CSV import/export</strong> for employees and expenses.
+              </li>
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Shipping Employees (Tab 21)</span> — Add warehouse/shipping staff with salary OR hourly rate. Optional per-pack production bonus (paid on every pack shipped). Add shipping materials (boxes, tape, labels) with per-pack costs. <strong>CSV import/export</strong> for employees and materials.
               </li>
             </ol>
           </section>
@@ -265,8 +266,8 @@ export function Guide() {
               <li className="pl-1">All tables (Subscriptions, Cash Flow) render as card stacks on mobile for phone/tablet use.</li>
               <li className="pl-1">If you accidentally change something, use Ctrl+Z to undo up to 50 steps back.</li>
               <li className="pl-1">The PDF export includes a professional branded header — use it for investor decks and bank applications.</li>
-              <li className="pl-1">Use Goal Seek (violet card, Tab 10) to reverse-calculate the exact price, discount, or cost needed to hit a target margin or profit.</li>
-              <li className="pl-1">Use Batch What-If (violet card, Tab 11) to compare 5-10 scenarios at once and identify the optimal configuration.</li>
+              <li className="pl-1">Use Goal Seek (violet card, Tab 12) to reverse-calculate the exact price, discount, or cost needed to hit a target margin or profit.</li>
+              <li className="pl-1">Use Batch What-If (violet card, Tab 13) to compare 5-10 scenarios at once and identify the optimal configuration.</li>
               <li className="pl-1">Check the Sanity Checks panel (rose card) on the Dashboard first — it catches problems you might miss.</li>
               <li className="pl-1">The Assumptions Audit Trail (slate card) is perfect for due diligence and handoffs — it lists every assumption in your model.</li>
             </ul>
