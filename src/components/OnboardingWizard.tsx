@@ -28,8 +28,8 @@ const allTabs = [
   { num: 17, label: "Scen", color: "bg-slate-500", group: "Manage" },
   { num: 18, label: "Comp", color: "bg-slate-500", group: "Manage" },
   { num: 19, label: "Audit", color: "bg-slate-500", group: "Manage" },
-  { num: 20, label: "Mktg", color: "bg-pink-500", group: "Ops" },
-  { num: 21, label: "Ship", color: "bg-cyan-500", group: "Ops" },
+  { num: 20, label: "Mktg", color: "bg-pink-500", group: "Marketing" },
+  { num: 21, label: "Ship", color: "bg-cyan-500", group: "Shipping" },
   { num: 22, label: "●", color: "bg-rose-500", group: "Simulate" },
 ];
 
@@ -51,10 +51,12 @@ const tabColorLegend = [
   { label: "Foundation", cls: "bg-blue-200 text-blue-800", tabs: "1-3" },
   { label: "B2C Sales", cls: "bg-indigo-200 text-indigo-800", tabs: "4" },
   { label: "B2B Sales", cls: "bg-teal-200 text-teal-800", tabs: "5" },
-  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10, 20-21" },
+  { label: "Operations", cls: "bg-emerald-200 text-emerald-800", tabs: "6-10" },
   { label: "Dashboard & Power", cls: "bg-violet-200 text-violet-800", tabs: "11-13" },
   { label: "Forecast", cls: "bg-amber-200 text-amber-800", tabs: "14-16" },
   { label: "Manage", cls: "bg-slate-200 text-slate-800", tabs: "17-19" },
+  { label: "Marketing", cls: "bg-pink-200 text-pink-800", tabs: "20" },
+  { label: "Shipping", cls: "bg-cyan-200 text-cyan-800", tabs: "21" },
   { label: "Simulate", cls: "bg-rose-200 text-rose-800", tabs: "●" },
 ];
 

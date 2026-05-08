@@ -32,10 +32,12 @@ export function Guide() {
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
               { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4" },
               { label: "B2B Sales", cls: "bg-teal-100 text-teal-700 border-teal-200", tabs: "5" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10, 20-21" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-10" },
               { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "11-13" },
               { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "14-16" },
               { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "17-19" },
+              { label: "Marketing", cls: "bg-pink-100 text-pink-700 border-pink-200", tabs: "20" },
+              { label: "Shipping", cls: "bg-cyan-100 text-cyan-700 border-cyan-200", tabs: "21" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
