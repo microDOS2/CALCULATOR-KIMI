@@ -292,7 +292,7 @@ export function OverridesTab({ state, result, updateState }: Props) {
                     </div>
                   </div>
 
-                  {/* Row 2: Channel Toggles */}
+                  {/* Row 2: Channel Toggles — all 4 always selectable */}
                   <div className="space-y-2">
                     <Label className="text-xs font-medium">Applies to Channels</Label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -300,37 +300,32 @@ export function OverridesTab({ state, result, updateState }: Props) {
                         {
                           key: "retail" as const,
                           label: "Retail",
-                          color: "bg-indigo-100 text-indigo-700 border-indigo-300",
-                          activeColor: "bg-indigo-600 text-white",
-                          available: state.includeR,
+                          color: "bg-indigo-100 text-indigo-700 border-indigo-300 hover:bg-indigo-200",
+                          activeColor: "bg-indigo-600 text-white hover:bg-indigo-700",
                         },
                         {
                           key: "wholesale" as const,
                           label: "Wholesale",
-                          color: "bg-teal-100 text-teal-700 border-teal-300",
-                          activeColor: "bg-teal-600 text-white",
-                          available: state.includeW,
+                          color: "bg-teal-100 text-teal-700 border-teal-300 hover:bg-teal-200",
+                          activeColor: "bg-teal-600 text-white hover:bg-teal-700",
                         },
                         {
                           key: "distributor" as const,
                           label: "Distributor",
-                          color: "bg-teal-100 text-teal-700 border-teal-300",
-                          activeColor: "bg-teal-600 text-white",
-                          available: state.includeD,
+                          color: "bg-teal-100 text-teal-700 border-teal-300 hover:bg-teal-200",
+                          activeColor: "bg-teal-600 text-white hover:bg-teal-700",
                         },
                         {
                           key: "affiliate" as const,
                           label: "Affiliate",
-                          color: "bg-indigo-100 text-indigo-700 border-indigo-300",
-                          activeColor: "bg-indigo-600 text-white",
-                          available: state.affiliate.enabled,
+                          color: "bg-indigo-100 text-indigo-700 border-indigo-300 hover:bg-indigo-200",
+                          activeColor: "bg-indigo-600 text-white hover:bg-indigo-700",
                         },
                       ].map((ch) => (
                         <Tooltip key={ch.key}>
                           <TooltipTrigger asChild>
                             <button
                               onClick={() =>
-                                ch.available &&
                                 updateOverride(override.id, {
                                   channels: {
                                     ...override.channels,
@@ -338,22 +333,15 @@ export function OverridesTab({ state, result, updateState }: Props) {
                                   },
                                 })
                               }
-                              disabled={!ch.available}
-                              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
-                                !ch.available
-                                  ? "opacity-40 cursor-not-allowed bg-gray-100 text-gray-400 border-gray-200"
-                                  : override.channels[ch.key]
-                                    ? ch.activeColor
-                                    : ch.color
+                              className={`px-3 py-2 rounded-lg text-xs font-medium border transition-all cursor-pointer ${
+                                override.channels[ch.key] ? ch.activeColor : ch.color
                               }`}
                             >
                               {ch.label}
                             </button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {!ch.available ? (
-                              <p>{ch.label} channel is not included in calculations</p>
-                            ) : override.channels[ch.key] ? (
+                            {override.channels[ch.key] ? (
                               <p>Click to exclude {ch.label} revenue</p>
                             ) : (
                               <p>Click to include {ch.label} revenue</p>

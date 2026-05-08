@@ -987,10 +987,10 @@ function calculateOverrides(
     if (!override.enabled) continue;
 
     let revenue = 0;
-    if (override.channels.retail && state.includeR) revenue += totalRevenueR;
-    if (override.channels.wholesale && state.includeW) revenue += totalRevenueW;
-    if (override.channels.distributor && state.includeD) revenue += totalRevenueD;
-    if (override.channels.affiliate && state.affiliate.enabled) revenue += afGrossRevenue;
+    if (override.channels.retail) revenue += totalRevenueR;
+    if (override.channels.wholesale) revenue += totalRevenueW;
+    if (override.channels.distributor) revenue += totalRevenueD;
+    if (override.channels.affiliate) revenue += afGrossRevenue;
 
     const basisRevenue = override.basis === 'net' ? revenue : revenue; // gross and net same for now
     const amount = basisRevenue * (override.percentage / 100);
