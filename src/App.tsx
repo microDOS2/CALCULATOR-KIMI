@@ -107,25 +107,79 @@ function App() {
 
       <main className="container mx-auto py-6 px-4 sm:px-6">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="w-full justify-center flex-wrap h-auto gap-1">
-            <TabsTrigger value="product"><span className="text-xs text-muted-foreground mr-1 font-bold">1</span>Product</TabsTrigger>
-            <TabsTrigger value="packaging"><span className="text-xs text-muted-foreground mr-1 font-bold">2</span>Packaging</TabsTrigger>
-            <TabsTrigger value="channels"><span className="text-xs text-muted-foreground mr-1 font-bold">3</span>Channels</TabsTrigger>
-            <TabsTrigger value="costs"><span className="text-xs text-muted-foreground mr-1 font-bold">4</span>Costs</TabsTrigger>
-            <TabsTrigger value="po"><span className="text-xs text-muted-foreground mr-1 font-bold">5</span>Orders</TabsTrigger>
-            <TabsTrigger value="commissions"><span className="text-xs text-muted-foreground mr-1 font-bold">6</span>Commissions</TabsTrigger>
-            <TabsTrigger value="thirdparty"><span className="text-xs text-muted-foreground mr-1 font-bold">7</span>Third Party</TabsTrigger>
-            <TabsTrigger value="charts"><span className="text-xs text-muted-foreground mr-1 font-bold">8</span>Charts</TabsTrigger>
-            <TabsTrigger value="dashboard"><span className="text-xs text-muted-foreground mr-1 font-bold">9</span>Dashboard</TabsTrigger>
-            <TabsTrigger value="goalseek"><span className="text-xs text-muted-foreground mr-1 font-bold">10</span>Goal Seek</TabsTrigger>
-            <TabsTrigger value="batch"><span className="text-xs text-muted-foreground mr-1 font-bold">11</span>Batch</TabsTrigger>
-            <TabsTrigger value="subscriptions"><span className="text-xs text-muted-foreground mr-1 font-bold">12</span>Subscriptions</TabsTrigger>
-            <TabsTrigger value="cashflow"><span className="text-xs text-muted-foreground mr-1 font-bold">13</span>Cash Flow</TabsTrigger>
-            <TabsTrigger value="campaigns"><span className="text-xs text-muted-foreground mr-1 font-bold">14</span>Campaigns</TabsTrigger>
-            <TabsTrigger value="scenarios"><span className="text-xs text-muted-foreground mr-1 font-bold">15</span>Scenarios</TabsTrigger>
-            <TabsTrigger value="compare"><span className="text-xs text-muted-foreground mr-1 font-bold">16</span>Compare</TabsTrigger>
-            <div className="w-px h-5 bg-border mx-1 hidden sm:block" />
-            <TabsTrigger value="simulate"><span className="text-xs text-primary mr-1 font-bold">●</span>Simulate</TabsTrigger>
+          <TabsList className="w-full justify-center flex-wrap h-auto gap-1.5 bg-transparent">
+            {/* Group 1: Core Setup — Blue */}
+            <TabsTrigger value="product" className="bg-blue-100/70 text-blue-800 hover:bg-blue-200 data-[state=active]:!bg-blue-300 data-[state=active]:!text-blue-950 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/50 dark:data-[state=active]:!bg-blue-700 dark:data-[state=active]:!text-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">1</span>Product
+            </TabsTrigger>
+            <TabsTrigger value="packaging" className="bg-blue-100/70 text-blue-800 hover:bg-blue-200 data-[state=active]:!bg-blue-300 data-[state=active]:!text-blue-950 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/50 dark:data-[state=active]:!bg-blue-700 dark:data-[state=active]:!text-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">2</span>Packaging
+            </TabsTrigger>
+            <TabsTrigger value="channels" className="bg-blue-100/70 text-blue-800 hover:bg-blue-200 data-[state=active]:!bg-blue-300 data-[state=active]:!text-blue-950 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/50 dark:data-[state=active]:!bg-blue-700 dark:data-[state=active]:!text-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">3</span>Channels
+            </TabsTrigger>
+            <TabsTrigger value="costs" className="bg-blue-100/70 text-blue-800 hover:bg-blue-200 data-[state=active]:!bg-blue-300 data-[state=active]:!text-blue-950 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/50 dark:data-[state=active]:!bg-blue-700 dark:data-[state=active]:!text-blue-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">4</span>Costs
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Group 2: Operations — Emerald */}
+            <TabsTrigger value="po" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">5</span>Orders
+            </TabsTrigger>
+            <TabsTrigger value="commissions" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">6</span>Commissions
+            </TabsTrigger>
+            <TabsTrigger value="thirdparty" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">7</span>Third Party
+            </TabsTrigger>
+            <TabsTrigger value="charts" className="bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200 data-[state=active]:!bg-emerald-300 data-[state=active]:!text-emerald-950 dark:bg-emerald-900/30 dark:text-emerald-200 dark:hover:bg-emerald-800/50 dark:data-[state=active]:!bg-emerald-700 dark:data-[state=active]:!text-emerald-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">8</span>Charts
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Group 3: Dashboard & Power Tools — Violet */}
+            <TabsTrigger value="dashboard" className="bg-violet-100/70 text-violet-800 hover:bg-violet-200 data-[state=active]:!bg-violet-300 data-[state=active]:!text-violet-950 dark:bg-violet-900/30 dark:text-violet-200 dark:hover:bg-violet-800/50 dark:data-[state=active]:!bg-violet-700 dark:data-[state=active]:!text-violet-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">9</span>Dashboard
+            </TabsTrigger>
+            <TabsTrigger value="goalseek" className="bg-violet-100/70 text-violet-800 hover:bg-violet-200 data-[state=active]:!bg-violet-300 data-[state=active]:!text-violet-950 dark:bg-violet-900/30 dark:text-violet-200 dark:hover:bg-violet-800/50 dark:data-[state=active]:!bg-violet-700 dark:data-[state=active]:!text-violet-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">10</span>Goal Seek
+            </TabsTrigger>
+            <TabsTrigger value="batch" className="bg-violet-100/70 text-violet-800 hover:bg-violet-200 data-[state=active]:!bg-violet-300 data-[state=active]:!text-violet-950 dark:bg-violet-900/30 dark:text-violet-200 dark:hover:bg-violet-800/50 dark:data-[state=active]:!bg-violet-700 dark:data-[state=active]:!text-violet-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">11</span>Batch
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Group 4: Forecasting — Amber */}
+            <TabsTrigger value="subscriptions" className="bg-amber-100/70 text-amber-800 hover:bg-amber-200 data-[state=active]:!bg-amber-300 data-[state=active]:!text-amber-950 dark:bg-amber-900/30 dark:text-amber-200 dark:hover:bg-amber-800/50 dark:data-[state=active]:!bg-amber-700 dark:data-[state=active]:!text-amber-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">12</span>Subscriptions
+            </TabsTrigger>
+            <TabsTrigger value="cashflow" className="bg-amber-100/70 text-amber-800 hover:bg-amber-200 data-[state=active]:!bg-amber-300 data-[state=active]:!text-amber-950 dark:bg-amber-900/30 dark:text-amber-200 dark:hover:bg-amber-800/50 dark:data-[state=active]:!bg-amber-700 dark:data-[state=active]:!text-amber-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">13</span>Cash Flow
+            </TabsTrigger>
+            <TabsTrigger value="campaigns" className="bg-amber-100/70 text-amber-800 hover:bg-amber-200 data-[state=active]:!bg-amber-300 data-[state=active]:!text-amber-950 dark:bg-amber-900/30 dark:text-amber-200 dark:hover:bg-amber-800/50 dark:data-[state=active]:!bg-amber-700 dark:data-[state=active]:!text-amber-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">14</span>Campaigns
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Group 5: Management — Slate */}
+            <TabsTrigger value="scenarios" className="bg-slate-100/70 text-slate-800 hover:bg-slate-200 data-[state=active]:!bg-slate-300 data-[state=active]:!text-slate-950 dark:bg-slate-900/30 dark:text-slate-200 dark:hover:bg-slate-800/50 dark:data-[state=active]:!bg-slate-700 dark:data-[state=active]:!text-slate-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">15</span>Scenarios
+            </TabsTrigger>
+            <TabsTrigger value="compare" className="bg-slate-100/70 text-slate-800 hover:bg-slate-200 data-[state=active]:!bg-slate-300 data-[state=active]:!text-slate-950 dark:bg-slate-900/30 dark:text-slate-200 dark:hover:bg-slate-800/50 dark:data-[state=active]:!bg-slate-700 dark:data-[state=active]:!text-slate-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+              <span className="text-xs mr-1 font-bold opacity-70">16</span>Compare
+            </TabsTrigger>
+
+            <div className="w-px h-5 bg-border/40 mx-0.5 hidden sm:block" />
+
+            {/* Simulate — Special Rose (Action Tab) */}
+            <TabsTrigger value="simulate" className="bg-rose-100/70 text-rose-800 hover:bg-rose-200 data-[state=active]:!bg-rose-300 data-[state=active]:!text-rose-950 dark:bg-rose-900/30 dark:text-rose-200 dark:hover:bg-rose-800/50 dark:data-[state=active]:!bg-rose-700 dark:data-[state=active]:!text-rose-100 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm ring-1 ring-rose-300/50">
+              <span className="text-xs mr-1 font-bold">●</span>Simulate
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="product">

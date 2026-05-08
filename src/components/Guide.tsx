@@ -8,8 +8,8 @@ export function Guide() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm" variant="ghost" className="gap-1">
-          <BookOpen className="h-4 w-4" /> Guide
+        <Button size="sm" className="gap-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
+          <BookOpen className="h-4 w-4 text-emerald-600" /> Guide
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">

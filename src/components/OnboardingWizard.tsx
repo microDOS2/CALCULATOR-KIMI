@@ -99,9 +99,9 @@ export function OnboardingWizard() {
         variant="ghost"
         onClick={handleReopen}
         title="Open guided tour"
-        className="gap-1"
+        className="gap-1 bg-violet-50 hover:bg-violet-100 text-violet-700 border border-violet-200 shadow-sm"
       >
-        <HelpCircle className="h-4 w-4" />
+        <HelpCircle className="h-4 w-4 text-violet-600" />
         <span className="hidden sm:inline">?</span>
       </Button>
 

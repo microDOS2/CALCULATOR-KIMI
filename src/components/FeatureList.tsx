@@ -218,8 +218,8 @@ export function FeatureList() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="sm" variant="ghost" className="gap-1">
-          <List className="h-4 w-4" /> <span className="hidden sm:inline">Features</span>
+        <Button size="sm" className="gap-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 shadow-sm">
+          <List className="h-4 w-4 text-blue-600" /> <span className="hidden sm:inline">Features</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
