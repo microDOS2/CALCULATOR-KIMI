@@ -363,7 +363,7 @@ export interface CommissionResults {
   totalBonus: number;
   commPctGross: number;
   commPctOp: number;
-  periodMult: number;
+  periodMult?: number;
 }
 
 export interface Scenario {

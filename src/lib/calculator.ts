@@ -46,7 +46,8 @@ export function getShippingFromRateTable(weightGrams: number, brackets: Shipping
 
 export function calculateCampaignImpact(
   campaigns: Campaign[],
-  baseResult: Pick<CalculationResult, 'retail' | 'wholesale' | 'distributor' | 'totalMonthlyVolume'>
+  baseResult: Pick<CalculationResult, 'retail' | 'wholesale' | 'distributor' | 'totalMonthlyVolume'>,
+  state: Pick<CalculatorState, 'includeR' | 'includeW' | 'includeD'>
 ): CalculationResult['campaignImpact'] {
   if (!campaigns || campaigns.length === 0) {
     return { totalRevenueAtRisk: 0, totalMarginCompression: 0, netAnnualEffect: 0, affectedChannels: [] };
@@ -66,7 +67,7 @@ export function calculateCampaignImpact(
     const normalWeeklyVolume = baseResult.totalMonthlyVolume / 4.33;
     const campaignWeeklyVolume = normalWeeklyVolume * volumeMultiplier;
 
-    if (campaign.affectedChannels.retail) {
+    if (campaign.affectedChannels.retail && state.includeR) {
       affectedChannels.add("Retail");
       const normalRev = normalWeeklyVolume * baseResult.retail.price * weeks;
       const discountedPrice = baseResult.retail.price * (1 - campaign.discountPercent / 100);
@@ -75,7 +76,7 @@ export function calculateCampaignImpact(
       totalMarginCompression += (baseResult.retail.price - discountedPrice) * campaignWeeklyVolume * weeks;
       netAnnualEffect += campaignRev - normalRev;
     }
-    if (campaign.affectedChannels.wholesale) {
+    if (campaign.affectedChannels.wholesale && state.includeW) {
       affectedChannels.add("Wholesale");
       const normalRev = normalWeeklyVolume * baseResult.wholesale.price * weeks;
       const discountedPrice = baseResult.wholesale.price * (1 - campaign.discountPercent / 100);
@@ -84,7 +85,7 @@ export function calculateCampaignImpact(
       totalMarginCompression += (baseResult.wholesale.price - discountedPrice) * campaignWeeklyVolume * weeks;
       netAnnualEffect += campaignRev - normalRev;
     }
-    if (campaign.affectedChannels.distributor) {
+    if (campaign.affectedChannels.distributor && state.includeD) {
       affectedChannels.add("Distributor");
       const normalRev = normalWeeklyVolume * baseResult.distributor.price * weeks;
       const discountedPrice = baseResult.distributor.price * (1 - campaign.discountPercent / 100);
@@ -421,12 +422,13 @@ export function calculate(state: CalculatorState): CalculationResult {
     afNetProfit = afGrossRevenue - afCogs - afShipping - afInitialCommission;
   }
 
-  // Blended
-  const totalRevenue = totalRevenueR + totalRevenueW + totalRevenueD;
-  const totalGp = totalGpR + totalGpW + totalGpD;
+  // Blended — respect include flags
+  const totalRevenue = (state.includeR ? totalRevenueR : 0) + (state.includeW ? totalRevenueW : 0) + (state.includeD ? totalRevenueD : 0);
+  const totalGp = (state.includeR ? totalGpR : 0) + (state.includeW ? totalGpW : 0) + (state.includeD ? totalGpD : 0);
+  const includedPacks = (state.includeR ? totalPacksR : 0) + (state.includeW ? totalPacksW : 0) + (state.includeD ? totalPacksD : 0);
 
-  const brev = totalPacks > 0 ? totalRevenue / totalPacks : 0;
-  const bgpp = totalPacks > 0 ? totalGp / totalPacks : 0;
+  const brev = includedPacks > 0 ? totalRevenue / includedPacks : 0;
+  const bgpp = includedPacks > 0 ? totalGp / includedPacks : 0;
   const bopp = brev > 0 ? bgpp - ohPerPack : 0;
   const bgmp = brev > 0 ? bgpp / brev : 0;
   const bomp = brev > 0 ? bopp / brev : 0;
@@ -707,7 +709,7 @@ export function calculate(state: CalculatorState): CalculationResult {
       wholesale: { price: avgPriceW, gp: gpW, gm: gmW, op: opW, om: omW, costPerUnit, profitPerUnit: profitPerUnitW },
       distributor: { price: avgPriceD, gp: gpD, gm: gmD, op: opD, om: omD, costPerUnit, profitPerUnit: profitPerUnitD },
       totalMonthlyVolume,
-    }),
+    }, state),
   };
 }
 
@@ -979,8 +981,6 @@ function calculateCommissions(
   const { commissions, skus, monthlyVolumes } = state;
   const { president, vps, rsms, sps } = commissions;
 
-  const periodMult = 1;
-
   let totalPacksR = 0;
   let totalPacksW = 0;
   let totalPacksD = 0;
@@ -993,9 +993,9 @@ function calculateCommissions(
   });
 
   const perf = {
-    R: { vol: totalPacksR, rev: totalPacksR * C.priceR, gp: totalPacksR * C.gpR },
-    W: { vol: totalPacksW, rev: totalPacksW * C.priceW, gp: totalPacksW * C.gpW },
-    D: { vol: totalPacksD, rev: totalPacksD * C.priceD, gp: totalPacksD * C.gpD },
+    R: { vol: state.includeR ? totalPacksR : 0, rev: state.includeR ? totalPacksR * C.priceR : 0, gp: state.includeR ? totalPacksR * C.gpR : 0 },
+    W: { vol: state.includeW ? totalPacksW : 0, rev: state.includeW ? totalPacksW * C.priceW : 0, gp: state.includeW ? totalPacksW * C.gpW : 0 },
+    D: { vol: state.includeD ? totalPacksD : 0, rev: state.includeD ? totalPacksD * C.priceD : 0, gp: state.includeD ? totalPacksD * C.gpD : 0 },
   };
 
   const activeSPsPerChannel = {
@@ -1135,6 +1135,5 @@ function calculateCommissions(
     totalBonus,
     commPctGross: totalRevenue > 0 ? totalComm / totalRevenue : 0,
     commPctOp: totalOpProfit > 0 ? totalComm / totalOpProfit : 0,
-    periodMult,
   };
 }

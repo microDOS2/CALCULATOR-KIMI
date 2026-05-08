@@ -237,7 +237,7 @@ function runChecks(result: CalculationResult): SanityCheck[] {
 
   // 8. Overhead ratio
   if (result.ohTotal > 0) {
-    const totalRev = result.retail.price * result.totalMonthlyVolume;
+    const totalRev = result.retail.price * result.totalMonthlyVolume; // approx revenue for sanity check
     if (totalRev > 0) {
       const ohRatio = result.ohTotal / totalRev;
       const ohStatus = getBenchmarkStatus("overheadAsPercentOfRevenue", ohRatio);
