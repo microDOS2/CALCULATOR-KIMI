@@ -186,9 +186,9 @@ const createDefaultState = (): CalculatorState => {
         name: "President of Sales",
         type: "pctGrossRev",
         val: 1,
-        chR: true,
-        chW: true,
-        chD: true,
+        chR: false,
+        chW: false,
+        chD: false,
       },
       vps: [
         {
@@ -196,9 +196,9 @@ const createDefaultState = (): CalculatorState => {
           name: "VP of Sales",
           type: "pctGrossRev",
           val: 2,
-          chR: true,
-          chW: true,
-          chD: true,
+          chR: false,
+          chW: false,
+          chD: false,
           includePres: true,
         },
       ],
@@ -208,9 +208,9 @@ const createDefaultState = (): CalculatorState => {
           name: "RSM 1",
           type: "pctGrossRev",
           val: 3,
-          chR: true,
-          chW: true,
-          chD: true,
+          chR: false,
+          chW: false,
+          chD: false,
           assignedVP: "",
         },
       ],
@@ -220,9 +220,9 @@ const createDefaultState = (): CalculatorState => {
           name: "Salesperson 1",
           type: "pctGrossRev",
           val: 5,
-          chR: true,
-          chW: true,
-          chD: true,
+          chR: false,
+          chW: false,
+          chD: false,
           assignedRSM: "",
           assignedVp_R: "",
           assignedVp_W: "",
@@ -332,6 +332,13 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
       ...ing,
       moqTiers: ing.moqTiers ?? [],
     })),
+    // v2: Force chR=false on all commission roles (commissions are B2B only)
+    commissions: {
+      president: { ...(raw.commissions?.president ?? defaults.commissions.president), chR: false },
+      vps: (raw.commissions?.vps ?? defaults.commissions.vps).map((vp) => ({ ...vp, chR: false })),
+      rsms: (raw.commissions?.rsms ?? defaults.commissions.rsms).map((rsm) => ({ ...rsm, chR: false })),
+      sps: (raw.commissions?.sps ?? defaults.commissions.sps).map((sp) => ({ ...sp, chR: false })),
+    },
   };
 
   return migrated;
@@ -774,9 +781,9 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 2,
-              chR: true,
-              chW: true,
-              chD: true,
+              chR: false,
+              chW: false,
+              chD: false,
               includePres: true,
             },
           ],
@@ -806,12 +813,13 @@ export function useCalculator() {
 
   const updateVP = useCallback(
     (id: string, patch: Partial<CommissionState["vps"][0]>) => {
+      const { chR: _, ...safePatch } = patch;
       setState((prev) => ({
         ...prev,
         commissions: {
           ...prev.commissions,
           vps: prev.commissions.vps.map((v) =>
-            v.id === id ? { ...v, ...patch } : v
+            v.id === id ? { ...v, ...safePatch, chR: false } : v
           ),
         },
       }));
@@ -834,9 +842,9 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 3,
-              chR: true,
-              chW: true,
-              chD: true,
+              chR: false,
+              chW: false,
+              chD: false,
               assignedVP: "",
             },
           ],
@@ -866,12 +874,13 @@ export function useCalculator() {
 
   const updateRSM = useCallback(
     (id: string, patch: Partial<CommissionState["rsms"][0]>) => {
+      const { chR: _, ...safePatch } = patch;
       setState((prev) => ({
         ...prev,
         commissions: {
           ...prev.commissions,
           rsms: prev.commissions.rsms.map((r) =>
-            r.id === id ? { ...r, ...patch } : r
+            r.id === id ? { ...r, ...safePatch, chR: false } : r
           ),
         },
       }));
@@ -894,9 +903,9 @@ export function useCalculator() {
               name: newName,
               type: "pctGrossRev",
               val: 5,
-              chR: true,
-              chW: true,
-              chD: true,
+              chR: false,
+              chW: false,
+              chD: false,
               assignedRSM: "",
               assignedVp_R: "",
               assignedVp_W: "",
@@ -927,12 +936,13 @@ export function useCalculator() {
 
   const updateSP = useCallback(
     (id: string, patch: Partial<CommissionState["sps"][0]>) => {
+      const { chR: _, ...safePatch } = patch;
       setState((prev) => ({
         ...prev,
         commissions: {
           ...prev.commissions,
           sps: prev.commissions.sps.map((s) =>
-            s.id === id ? { ...s, ...patch } : s
+            s.id === id ? { ...s, ...safePatch, chR: false } : s
           ),
         },
       }));
@@ -1005,11 +1015,12 @@ export function useCalculator() {
 
   const updatePresident = useCallback(
     (patch: Partial<CommissionState["president"]>) => {
+      const { chR: _, ...safePatch } = patch;
       setState((prev) => ({
         ...prev,
         commissions: {
           ...prev.commissions,
-          president: { ...prev.commissions.president, ...patch },
+          president: { ...prev.commissions.president, ...safePatch, chR: false },
         },
       }));
     },

@@ -36,11 +36,8 @@ export function CommissionsTab(props: CommissionsTabProps) {
   const { president, vps, rsms, sps } = commissions;
   const comm = result.commissionResults;
 
-  const ChannelChecks = ({ chR, chW, chD, onChange }: { chR: boolean; chW: boolean; chD: boolean; onChange: (p: { chR?: boolean; chW?: boolean; chD?: boolean }) => void }) => (
+  const ChannelChecks = ({ chW, chD, onChange }: { chW: boolean; chD: boolean; onChange: (p: { chW?: boolean; chD?: boolean }) => void }) => (
     <div className="flex items-center gap-3 flex-wrap">
-      <Label className="flex items-center gap-1 text-xs cursor-pointer">
-        <Checkbox checked={chR} onCheckedChange={(v) => onChange({ chR: !!v })} /> Retail
-      </Label>
       <Label className="flex items-center gap-1 text-xs cursor-pointer">
         <Checkbox checked={chW} onCheckedChange={(v) => onChange({ chW: !!v })} /> Wholesale
       </Label>
@@ -74,7 +71,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
             </Select>
             <Input type="number" step="0.01" value={president.val} onChange={(e) => onUpdatePresident({ val: Number(e.target.value) })} className="h-8" />
           </div>
-          <ChannelChecks chR={president.chR} chW={president.chW} chD={president.chD} onChange={(p) => onUpdatePresident(p)} />
+          <ChannelChecks chW={president.chW} chD={president.chD} onChange={(p) => onUpdatePresident(p)} />
         </CardContent>
       </Card>
 
@@ -107,7 +104,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                 </div>
                 <Button size="sm" variant="ghost" className="text-destructive ml-2" onClick={() => onRemoveVP(vp.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
-              <ChannelChecks chR={vp.chR} chW={vp.chW} chD={vp.chD} onChange={(p) => onUpdateVP(vp.id, p)} />
+              <ChannelChecks chW={vp.chW} chD={vp.chD} onChange={(p) => onUpdateVP(vp.id, p)} />
               <Label className="flex items-center gap-2 text-xs cursor-pointer">
                 <Checkbox checked={vp.includePres} onCheckedChange={(v) => onUpdateVP(vp.id, { includePres: !!v })} />
                 Include in President&apos;s Override
@@ -153,7 +150,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                 </div>
                 <Button size="sm" variant="ghost" className="text-destructive ml-2" onClick={() => onRemoveRSM(rsm.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
-              <ChannelChecks chR={rsm.chR} chW={rsm.chW} chD={rsm.chD} onChange={(p) => onUpdateRSM(rsm.id, p)} />
+              <ChannelChecks chW={rsm.chW} chD={rsm.chD} onChange={(p) => onUpdateRSM(rsm.id, p)} />
             </CardContent>
           </Card>
         ))}
@@ -195,7 +192,7 @@ export function CommissionsTab(props: CommissionsTabProps) {
                 </div>
                 <Button size="sm" variant="ghost" className="text-destructive ml-2" onClick={() => onRemoveSP(sp.id)}><Trash2 className="h-4 w-4" /></Button>
               </div>
-              <ChannelChecks chR={sp.chR} chW={sp.chW} chD={sp.chD} onChange={(p) => onUpdateSP(sp.id, p)} />
+              <ChannelChecks chW={sp.chW} chD={sp.chD} onChange={(p) => onUpdateSP(sp.id, p)} />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {(["R", "W", "D"] as const).map((ch) => (
                   <Select key={ch} value={sp[`assignedVp_${ch}` as const] || "__none__"}
