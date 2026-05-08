@@ -482,6 +482,14 @@ export function calculate(state: CalculatorState): CalculationResult {
     totalCOGS: 0,
     avgCostPerUnit: 0,
     avgProfitPerUnit: 0,
+    retailOH: 0,
+    wholesaleOH: 0,
+    distributorOH: 0,
+    totalOH: 0,
+    retailOpProfit: 0,
+    wholesaleOpProfit: 0,
+    distributorOpProfit: 0,
+    totalOpProfit: 0,
   };
 
   order.forEach((orderItem) => {
@@ -508,6 +516,18 @@ export function calculate(state: CalculatorState): CalculationResult {
     const distributorProfit = distributorQty * (priceD - cogsPerPack);
     const totalProfit = retailProfit + wholesaleProfit + distributorProfit;
 
+    // Overhead allocation for this line item (proportional to packs per channel)
+    const retailOH = retailQty * ohPerPackR;
+    const wholesaleOH = wholesaleQty * ohPerPackW;
+    const distributorOH = distributorQty * ohPerPackD;
+    const totalOH = retailOH + wholesaleOH + distributorOH;
+
+    // Operating profit (gross profit - overhead allocation)
+    const retailOpProfit = retailProfit - retailOH;
+    const wholesaleOpProfit = wholesaleProfit - wholesaleOH;
+    const distributorOpProfit = distributorProfit - distributorOH;
+    const totalOpProfit = totalProfit - totalOH;
+
     poLineItems.push({
       skuId: sku.id,
       skuName: sku.name,
@@ -516,6 +536,14 @@ export function calculate(state: CalculatorState): CalculationResult {
       wholesaleProfit,
       distributorProfit,
       totalProfit,
+      retailOH,
+      wholesaleOH,
+      distributorOH,
+      totalOH,
+      retailOpProfit,
+      wholesaleOpProfit,
+      distributorOpProfit,
+      totalOpProfit,
     });
 
     poGrandTotals.totalQty += orderItem.qty;
@@ -523,6 +551,14 @@ export function calculate(state: CalculatorState): CalculationResult {
     poGrandTotals.wholesaleProfit += wholesaleProfit;
     poGrandTotals.distributorProfit += distributorProfit;
     poGrandTotals.totalProfit += totalProfit;
+    poGrandTotals.retailOH += retailOH;
+    poGrandTotals.wholesaleOH += wholesaleOH;
+    poGrandTotals.distributorOH += distributorOH;
+    poGrandTotals.totalOH += totalOH;
+    poGrandTotals.retailOpProfit += retailOpProfit;
+    poGrandTotals.wholesaleOpProfit += wholesaleOpProfit;
+    poGrandTotals.distributorOpProfit += distributorOpProfit;
+    poGrandTotals.totalOpProfit += totalOpProfit;
     poGrandTotals.totalUnits += sku.unitsPerPack * orderItem.qty;
     poGrandTotals.totalCOGS += cogsPerPack * orderItem.qty;
   });
@@ -706,6 +742,9 @@ export function calculate(state: CalculatorState): CalculationResult {
     poGrandTotals,
     commissionResults: commResults,
     totalPacks,
+    totalPacksR,
+    totalPacksW,
+    totalPacksD,
     totalUnits,
     totalMonthlyVolume,
     costBreakdown,

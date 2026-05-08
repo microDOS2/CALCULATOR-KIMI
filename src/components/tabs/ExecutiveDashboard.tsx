@@ -4,7 +4,7 @@ import { InfoTooltip } from "@/components/InfoTooltip";
 import { SanityChecks } from "@/components/SanityChecks";
 import { AssumptionsAuditTrail } from "@/components/AssumptionsAuditTrail";
 import type { CalculatorState, CalculationResult } from "@/types/calculator";
-import { money3, pct } from "@/lib/calculator";
+import { money, money3, pct } from "@/lib/calculator";
 import { formatBenchmarkRange } from "@/lib/benchmarks";
 
 interface ExecutiveDashboardProps {
@@ -59,6 +59,159 @@ function KPICard({
             </span>
           </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ChannelProfitability({ state, result }: { state: CalculatorState; result: CalculationResult }) {
+  // Per-channel marketing expenses
+  const marketingR = state.marketingEnabled
+    ? state.marketingExpenses.filter((e) => e.channels.retail).reduce((s, e) => s + e.amount, 0)
+    : 0;
+  const marketingW = state.marketingEnabled
+    ? state.marketingExpenses.filter((e) => e.channels.wholesale).reduce((s, e) => s + e.amount, 0)
+    : 0;
+  const marketingD = state.marketingEnabled
+    ? state.marketingExpenses.filter((e) => e.channels.distributor).reduce((s, e) => s + e.amount, 0)
+    : 0;
+
+  // Per-pack shipping employee bonus (if enabled)
+  const shipBonusPerPack = state.shippingEmployeesEnabled
+    ? state.shippingEmployees.reduce((s, e) => s + (e.perItemBonusEnabled ? e.perItemBonus : 0), 0)
+    : 0;
+
+  // Monthly volumes
+  const packsR = result.totalPacksR;
+  const packsW = result.totalPacksW;
+  const packsD = result.totalPacksD;
+
+  // Overhead per pack
+  const ohR = result.ohPerPackR;
+  const ohW = result.ohPerPackW;
+  const ohD = result.ohPerPackD;
+
+  // Commission results per channel
+  const commResults = result.commissionResults;
+  const hasCommissionPayout = commResults.totalComm > 0;
+
+  // Total cost per channel
+  const totalCostR = ohR * packsR + marketingR + shipBonusPerPack * packsR;
+  const totalCostW = ohW * packsW + marketingW + shipBonusPerPack * packsW;
+  const totalCostD = ohD * packsD + marketingD + shipBonusPerPack * packsD;
+
+  // Operating profit per channel
+  const opR = result.retail.gp * packsR - totalCostR;
+  const opW = result.wholesale.gp * packsW - totalCostW;
+  const opD = result.distributor.gp * packsD - totalCostD;
+
+  // Per-pack operating profit
+  const opPerPackR = packsR > 0 ? opR / packsR : 0;
+  const opPerPackW = packsW > 0 ? opW / packsW : 0;
+  const opPerPackD = packsD > 0 ? opD / packsD : 0;
+
+  const channels = [
+    {
+      label: "Retail",
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50",
+      gp: result.retail.gp,
+      gm: result.retail.gm,
+      ohPerPack: ohR,
+      marketing: marketingR,
+      shipBonus: shipBonusPerPack * packsR,
+      totalCost: totalCostR,
+      op: opPerPackR,
+    },
+    {
+      label: "Wholesale",
+      color: "text-teal-600",
+      bgColor: "bg-teal-50",
+      gp: result.wholesale.gp,
+      gm: result.wholesale.gm,
+      ohPerPack: ohW,
+      marketing: marketingW,
+      shipBonus: shipBonusPerPack * packsW,
+      totalCost: totalCostW,
+      op: opPerPackW,
+    },
+    {
+      label: "Distributor",
+      color: "text-teal-700",
+      bgColor: "bg-teal-50",
+      gp: result.distributor.gp,
+      gm: result.distributor.gm,
+      ohPerPack: ohD,
+      marketing: marketingD,
+      shipBonus: shipBonusPerPack * packsD,
+      totalCost: totalCostD,
+      op: opPerPackD,
+    },
+  ];
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          Channel Profitability (Operating Profit)
+          <InfoTooltip text="Shows gross profit, overhead allocation, marketing spend, shipping employee bonuses, and final operating profit per pack for each channel. This is the true profit after all variable and allocated fixed costs." label="Channel Operating Profit" />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          {channels.map((ch) => (
+            <div key={ch.label} className={`rounded-lg border p-3 ${ch.bgColor}`}>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold">{ch.label}</p>
+                <div className="text-right">
+                  <p className={`text-lg font-bold ${ch.op > 0 ? "text-green-600" : "text-red-600"}`}>
+                    {money3(ch.op)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">op. profit / pack</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
+                <div>
+                  <p className="text-[10px] text-muted-foreground">GP / pack</p>
+                  <p className="text-sm font-medium text-green-600">+{money3(ch.gp)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">Margin</p>
+                  <p className="text-sm font-medium">{pct(ch.gm)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground">OH / pack</p>
+                  <p className="text-sm font-medium text-amber-600">-{money3(ch.ohPerPack)}</p>
+                </div>
+                {ch.marketing > 0 && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Marketing/mo</p>
+                    <p className="text-sm font-medium text-pink-600">-{money(ch.marketing)}</p>
+                  </div>
+                )}
+                {ch.shipBonus > 0 && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground">Ship Bonus/mo</p>
+                    <p className="text-sm font-medium text-cyan-600">-{money(ch.shipBonus)}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {/* Commission note */}
+          {hasCommissionPayout && (
+            <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
+              <p className="text-xs text-orange-700 font-medium flex items-center gap-1">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Commission Payout: {money(commResults.totalComm)}/mo ({pct(commResults.commPctGross)} of revenue)
+              </p>
+              <p className="text-[10px] text-orange-600 mt-1">
+                Includes base salaries ({money(commResults.totalBaseSalary)}/mo) + variable commissions. Paid on B2B channels only.
+              </p>
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -255,45 +408,7 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
         )}
       </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Channel Profitability Snapshot</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className={`grid gap-4 text-center ${result.affiliate.enabled ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
-            <div>
-              <p className="text-xs text-muted-foreground">Retail</p>
-              <p className={`text-lg font-bold ${result.retail.gp > 0 ? "text-green-600" : "text-red-600"}`}>
-                {money3(result.retail.gp)}
-              </p>
-              <p className="text-xs text-muted-foreground">{pct(result.retail.gm)} margin</p>
-            </div>
-            {result.affiliate.enabled && (
-              <div>
-                <p className="text-xs text-muted-foreground">Affiliate</p>
-                <p className={`text-lg font-bold ${result.affiliate.netProfit > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {money3(result.affiliate.netProfit)}
-                </p>
-                <p className="text-xs text-muted-foreground">{result.affiliate.commissionAsPercentOfRevenue.toFixed(0)}% commission</p>
-              </div>
-            )}
-            <div>
-              <p className="text-xs text-muted-foreground">Wholesale</p>
-              <p className={`text-lg font-bold ${result.wholesale.gp > 0 ? "text-green-600" : "text-red-600"}`}>
-                {money3(result.wholesale.gp)}
-              </p>
-              <p className="text-xs text-muted-foreground">{pct(result.wholesale.gm)} margin</p>
-            </div>
-            <div>
-              <p className="text-xs text-muted-foreground">Distributor</p>
-              <p className={`text-lg font-bold ${result.distributor.gp > 0 ? "text-green-600" : "text-red-600"}`}>
-                {money3(result.distributor.gp)}
-              </p>
-              <p className="text-xs text-muted-foreground">{pct(result.distributor.gm)} margin</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <ChannelProfitability state={state} result={result} />
 
       {/* D2: Assumptions Audit Trail */}
       <AssumptionsAuditTrail state={state} result={result} />

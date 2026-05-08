@@ -347,6 +347,9 @@ export interface CalculationResult {
 
   // Totals
   totalPacks: number;
+  totalPacksR: number;
+  totalPacksW: number;
+  totalPacksD: number;
   totalUnits: number;
   totalMonthlyVolume: number;
 
@@ -395,6 +398,16 @@ export interface POLineItem {
   wholesaleProfit: number;
   distributorProfit: number;
   totalProfit: number;
+  // Overhead allocation per channel (for toggle view)
+  retailOH: number;
+  wholesaleOH: number;
+  distributorOH: number;
+  totalOH: number;
+  // Operating profit (gross profit - overhead)
+  retailOpProfit: number;
+  wholesaleOpProfit: number;
+  distributorOpProfit: number;
+  totalOpProfit: number;
 }
 
 export interface POGrandTotals {
@@ -407,6 +420,16 @@ export interface POGrandTotals {
   totalCOGS: number;
   avgCostPerUnit: number;
   avgProfitPerUnit: number;
+  // Overhead totals
+  retailOH: number;
+  wholesaleOH: number;
+  distributorOH: number;
+  totalOH: number;
+  // Operating profit totals
+  retailOpProfit: number;
+  wholesaleOpProfit: number;
+  distributorOpProfit: number;
+  totalOpProfit: number;
 }
 
 export interface CommissionResults {
