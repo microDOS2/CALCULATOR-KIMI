@@ -442,7 +442,18 @@ export function useCalculator() {
 
   const updateState = useCallback((patch: Partial<CalculatorState>) => {
     setState((prev) => {
-      const next = { ...prev, ...patch };
+      let next = { ...prev, ...patch };
+
+      // Auto-sync overhead flags with channel include flags
+      // If a channel is excluded, it cannot carry overhead
+      if (patch.includeR !== undefined && !patch.includeR) next = { ...next, ohR: false };
+      if (patch.includeW !== undefined && !patch.includeW) next = { ...next, ohW: false };
+      if (patch.includeD !== undefined && !patch.includeD) next = { ...next, ohD: false };
+      // If a channel is included, it must carry overhead (product creation costs are real)
+      if (patch.includeR !== undefined && patch.includeR) next = { ...next, ohR: true };
+      if (patch.includeW !== undefined && patch.includeW) next = { ...next, ohW: true };
+      if (patch.includeD !== undefined && patch.includeD) next = { ...next, ohD: true };
+
       // Diff and append audit log entries for meaningful changes
       const changes = diffState(prev, next);
       if (changes.length > 0) {

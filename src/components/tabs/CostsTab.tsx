@@ -129,19 +129,25 @@ export function CostsTab({
             ))}
           </div>
 
-          <div className="flex items-center gap-4 flex-wrap">
-            <Label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={state.ohR} onCheckedChange={(v) => updateState({ ohR: !!v })} />
-              Include in Retail
-            </Label>
-            <Label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={state.ohW} onCheckedChange={(v) => updateState({ ohW: !!v })} />
-              Include in Wholesale
-            </Label>
-            <Label className="flex items-center gap-2 text-sm cursor-pointer">
-              <Checkbox checked={state.ohD} onCheckedChange={(v) => updateState({ ohD: !!v })} />
-              Include in Distributor
-            </Label>
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              Overhead Allocation — Locked to active channels
+              <InfoTooltip text="Fixed overhead is allocated proportionally across all channels that have sales. A channel with sales must carry overhead — there is no production without operational cost. These checkboxes auto-sync with the channel include flags." label="Overhead Allocation" />
+            </p>
+            <div className="flex items-center gap-4 flex-wrap">
+              <Label className={`flex items-center gap-2 text-sm ${state.includeR ? "text-foreground" : "text-muted-foreground opacity-50"}`}>
+                <Checkbox checked={state.ohR} disabled className="opacity-100 cursor-default" />
+                Retail {state.includeR ? "(active)" : "(no sales)"}
+              </Label>
+              <Label className={`flex items-center gap-2 text-sm ${state.includeW ? "text-foreground" : "text-muted-foreground opacity-50"}`}>
+                <Checkbox checked={state.ohW} disabled className="opacity-100 cursor-default" />
+                Wholesale {state.includeW ? "(active)" : "(no sales)"}
+              </Label>
+              <Label className={`flex items-center gap-2 text-sm ${state.includeD ? "text-foreground" : "text-muted-foreground opacity-50"}`}>
+                <Checkbox checked={state.ohD} disabled className="opacity-100 cursor-default" />
+                Distributor {state.includeD ? "(active)" : "(no sales)"}
+              </Label>
+            </div>
           </div>
         </CardContent>
       </Card>

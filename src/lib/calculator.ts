@@ -352,10 +352,12 @@ export function calculate(state: CalculatorState): CalculationResult {
     (sum, sku) => sum + getSkuMonthlyVolume(sku.id, monthlyVolumes, skus),
     0
   );
-  const safeMonthlyVolume = Math.max(1, totalMonthlyVolume);
-
-  // Overhead per pack
-  const ohPerPack = ohTotal / safeMonthlyVolume;
+  // Overhead per pack — only allocated across channels where overhead is enabled
+  const includedMonthlyVolume = Math.max(
+    1,
+    (ohR ? totalPacksR : 0) + (ohW ? totalPacksW : 0) + (ohD ? totalPacksD : 0)
+  );
+  const ohPerPack = ohTotal / includedMonthlyVolume;
   const ohPerPackR = ohR ? ohPerPack : 0;
   const ohPerPackW = ohW ? ohPerPack : 0;
   const ohPerPackD = ohD ? ohPerPack : 0;
