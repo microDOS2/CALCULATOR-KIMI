@@ -405,9 +405,13 @@ function App() {
               state={calc.state}
               updateState={calc.updateState}
               shippingEmployees={calc.shippingEmployees}
+              shippingMaterials={calc.shippingMaterials}
               addShippingEmployee={calc.addShippingEmployee}
               removeShippingEmployee={calc.removeShippingEmployee}
               updateShippingEmployee={calc.updateShippingEmployee}
+              addShippingMaterial={calc.addShippingMaterial}
+              removeShippingMaterial={calc.removeShippingMaterial}
+              updateShippingMaterial={calc.updateShippingMaterial}
             />
           </TabsContent>
 

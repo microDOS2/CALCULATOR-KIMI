@@ -4,32 +4,42 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Trash2, Truck, PackageCheck } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Plus, Trash2, Truck, PackageCheck, ExternalLink, Box } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
-import type { ShippingEmployee, CalculatorState } from "@/types/calculator";
+import type { ShippingEmployee, ShippingMaterial, CalculatorState } from "@/types/calculator";
 import { money } from "@/lib/calculator";
 
 interface ShippingEmployeesTabProps {
   state: CalculatorState;
   updateState: (patch: Partial<CalculatorState>) => void;
   shippingEmployees: ShippingEmployee[];
+  shippingMaterials: ShippingMaterial[];
   addShippingEmployee: () => void;
   removeShippingEmployee: (id: string) => void;
   updateShippingEmployee: (id: string, patch: Partial<ShippingEmployee>) => void;
+  addShippingMaterial: () => void;
+  removeShippingMaterial: (id: string) => void;
+  updateShippingMaterial: (id: string, patch: Partial<ShippingMaterial>) => void;
 }
 
 export function ShippingEmployeesTab({
   state,
   updateState,
   shippingEmployees,
+  shippingMaterials,
   addShippingEmployee,
   removeShippingEmployee,
   updateShippingEmployee,
+  addShippingMaterial,
+  removeShippingMaterial,
+  updateShippingMaterial,
 }: ShippingEmployeesTabProps) {
   const enabled = state.shippingEmployeesEnabled;
 
   const totalSalary = shippingEmployees.reduce((s, e) => s + e.salary, 0);
   const totalPerItem = shippingEmployees.reduce((s, e) => s + (e.perItemBonusEnabled ? e.perItemBonus : 0), 0);
+  const totalMaterials = shippingMaterials.reduce((s, m) => s + m.costPerPack, 0);
 
   return (
     <div className="space-y-6">
@@ -41,7 +51,7 @@ export function ShippingEmployeesTab({
             Shipping & Logistics
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Warehouse, pick/pack, and logistics employee costs
+            In-house shipping: carrier cost, materials, and personnel
           </p>
         </div>
         <div className="flex items-center gap-3 bg-cyan-50 dark:bg-cyan-950/30 px-4 py-2 rounded-lg border border-cyan-200 dark:border-cyan-800">
@@ -50,9 +60,9 @@ export function ShippingEmployeesTab({
             onCheckedChange={(v) => updateState({ shippingEmployeesEnabled: v })}
           />
           <Label className="text-sm font-medium cursor-pointer">
-            {enabled ? "Enabled" : "Disabled (Outsourced)"}
+            {enabled ? "In-House Shipping" : "Outsourced (Use Third Party)"}
           </Label>
-          <InfoTooltip text="Toggle to include or exclude all shipping employee costs from calculations. When disabled, these costs are $0 — account for outsourced logistics through the Third Party tab. Carrier costs (USPS, UPS, FedEx) remain on the Costs tab." label="Shipping Toggle" />
+          <InfoTooltip text="Toggle to switch between in-house shipping (all costs below) and outsourced shipping (account for through Third Party tab). When outsourced, all shipping employee and material costs are $0." label="Shipping Toggle" />
         </div>
       </div>
 
@@ -62,10 +72,10 @@ export function ShippingEmployeesTab({
             <Truck className="h-10 w-10 text-cyan-300 mx-auto mb-3" />
             <p className="text-muted-foreground font-medium">Shipping is outsourced</p>
             <p className="text-xs text-muted-foreground mt-1">
-              All shipping employee costs are excluded. Account for outsourced logistics through the Third Party tab.
+              All shipping employee and material costs are excluded.
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Note: Carrier shipping costs (USPS, UPS, FedEx) are still managed on the Costs tab.
+              Account for outsourced logistics through the Third Party tab.
             </p>
           </CardContent>
         </Card>
@@ -73,8 +83,35 @@ export function ShippingEmployeesTab({
 
       {enabled && (
         <>
+          {/* Carrier Cost Reference */}
+          <Card className="border-l-4 border-l-amber-500 shadow-md bg-gradient-to-br from-white to-amber-50/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <ExternalLink className="h-4 w-4 text-amber-600" />
+                Carrier Shipping Cost (from Costs tab)
+                <InfoTooltip text="This is the per-pack cost you pay the carrier (USPS, UPS, FedEx) to deliver each package. It is configured on the Costs tab and is included in COGS. Shown here for reference only — edit it on the Costs tab." label="Carrier Cost Reference" />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-lg font-bold text-amber-700">{money(state.shippingPerPack)}</p>
+                  <p className="text-[10px] text-muted-foreground">Per pack (carrier fee)</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-amber-700">{state.includeShip ? "Included" : "Excluded"}</p>
+                  <p className="text-[10px] text-muted-foreground">In COGS calc</p>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-amber-700">{state.useShippingRateTable ? "Rate Table" : "Flat Rate"}</p>
+                  <p className="text-[10px] text-muted-foreground">Pricing model</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Summary Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card className="border-l-4 border-l-cyan-500 shadow-md bg-gradient-to-br from-white to-cyan-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-cyan-700">{shippingEmployees.length}</p>
@@ -90,14 +127,79 @@ export function ShippingEmployeesTab({
             <Card className="border-l-4 border-l-teal-500 shadow-md bg-gradient-to-br from-white to-teal-50/40">
               <CardContent className="p-4 text-center">
                 <p className="text-2xl font-bold text-teal-700">{money(totalPerItem)}</p>
-                <p className="text-xs text-muted-foreground">Per-Item Bonus (unit cost)</p>
+                <p className="text-xs text-muted-foreground">Per-Pack Bonus</p>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-violet-500 shadow-md bg-gradient-to-br from-white to-violet-50/40">
+              <CardContent className="p-4 text-center">
+                <p className="text-2xl font-bold text-violet-700">{money(totalMaterials)}</p>
+                <p className="text-xs text-muted-foreground">Materials/pack</p>
               </CardContent>
             </Card>
           </div>
 
+          {/* Shipping Materials Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold flex items-center gap-2">
+                <Box className="h-4 w-4 text-violet-500" />
+                Shipping Materials (Variable with Volume)
+                <InfoTooltip text="Boxes, tape, labels, bubble wrap, packing peanuts, etc. These are variable costs — the more you ship, the more materials you use. Each material has a per-pack cost that scales with monthly volume. Total materials cost = sum of all per-pack costs × total monthly packs." label="Shipping Materials" />
+              </h3>
+              <Button size="sm" variant="outline" onClick={addShippingMaterial}>
+                <Plus className="h-4 w-4 mr-1" /> Add Material
+              </Button>
+            </div>
+
+            {shippingMaterials.length === 0 && (
+              <Card className="border-dashed">
+                <CardContent className="py-6 text-center text-muted-foreground text-sm">
+                  No shipping materials. Click "Add Material" to add boxes, tape, labels, etc.
+                </CardContent>
+              </Card>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {shippingMaterials.map((mat) => (
+                <Card key={mat.id}>
+                  <CardContent className="p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={mat.name}
+                        onChange={(e) => updateShippingMaterial(mat.id, { name: e.target.value })}
+                        placeholder="Material name"
+                        className="h-8 flex-1"
+                      />
+                      <Button size="sm" variant="ghost" className="text-destructive h-8 w-8 p-0" onClick={() => removeShippingMaterial(mat.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground">$</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={mat.costPerPack}
+                        onChange={(e) => updateShippingMaterial(mat.id, { costPerPack: Number(e.target.value) })}
+                        placeholder="0.00"
+                        className="h-8 flex-1"
+                      />
+                      <span className="text-xs text-muted-foreground">/pack</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Employee List */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold">Shipping Employees</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <Truck className="h-4 w-4 text-cyan-500" />
+              Shipping Employees
+            </h3>
             <Button size="sm" variant="outline" onClick={addShippingEmployee}>
               <Plus className="h-4 w-4 mr-1" /> Add Employee
             </Button>
@@ -178,33 +280,37 @@ export function ShippingEmployeesTab({
           </div>
 
           {/* Cost Summary */}
-          {shippingEmployees.length > 0 && (
+          {shippingEmployees.length > 0 || shippingMaterials.length > 0 ? (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Cost Summary</CardTitle>
+                <CardTitle className="text-sm">Total Shipping Cost Summary</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
                   <div>
-                    <p className="text-lg font-bold text-cyan-700">{money(totalSalary)}</p>
-                    <p className="text-[10px] text-muted-foreground">Fixed/mo</p>
+                    <p className="text-xs text-muted-foreground">Carrier</p>
+                    <p className="text-lg font-bold text-amber-700">{money(state.shippingPerPack)}/p</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-teal-700">{money(totalPerItem)}</p>
-                    <p className="text-[10px] text-muted-foreground">Variable/pack</p>
+                    <p className="text-xs text-muted-foreground">Materials</p>
+                    <p className="text-lg font-bold text-violet-700">{money(totalMaterials)}/p</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-sky-700">{money(totalSalary * 12)}</p>
-                    <p className="text-[10px] text-muted-foreground">Fixed/yr</p>
+                    <p className="text-xs text-muted-foreground">Personnel (fixed)</p>
+                    <p className="text-lg font-bold text-sky-700">{money(totalSalary)}/mo</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold text-rose-700">{shippingEmployees.filter((e) => e.perItemBonusEnabled).length}</p>
-                    <p className="text-[10px] text-muted-foreground">With Bonus</p>
+                    <p className="text-xs text-muted-foreground">Personnel (var)</p>
+                    <p className="text-lg font-bold text-teal-700">{money(totalPerItem)}/p</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Total / pack</p>
+                    <p className="text-lg font-bold text-cyan-700">{money(state.shippingPerPack + totalMaterials + totalPerItem)}/p</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          )}
+          ) : null}
         </>
       )}
     </div>

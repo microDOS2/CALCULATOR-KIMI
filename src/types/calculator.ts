@@ -109,6 +109,12 @@ export interface ShippingEmployee {
   perItemBonusEnabled: boolean; // toggle for production bonus
 }
 
+export interface ShippingMaterial {
+  id: string;
+  name: string; // e.g. "Boxes", "Tape", "Labels", "Bubble Wrap"
+  costPerPack: number; // variable cost per pack shipped
+}
+
 export interface Salesperson {
   id: string;
   name: string;
@@ -562,6 +568,7 @@ export interface CalculatorState {
   // Shipping Employees — outsourceable warehouse/logistics team
   shippingEmployeesEnabled: boolean;
   shippingEmployees: ShippingEmployee[];
+  shippingMaterials: ShippingMaterial[]; // boxes, tape, labels, etc. (variable with volume)
 }
 
 // Cash Flow Types
@@ -583,6 +590,7 @@ export interface CashFlowMonth {
   marketingExpenseTotal: number;
   shippingSalaryTotal: number;
   shippingBonusTotal: number;
+  shippingMaterialsTotal: number;
   subscriptionRevenue: number;
 }
 

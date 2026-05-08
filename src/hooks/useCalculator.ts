@@ -12,6 +12,7 @@ import type {
   MarketingEmployee,
   MarketingExpense,
   ShippingEmployee,
+  ShippingMaterial,
 } from "@/types/calculator";
 import { calculate, createDefaultPackaging } from "@/lib/calculator";
 import { useSensitivity } from "./useSensitivity";
@@ -268,6 +269,7 @@ const createDefaultState = (): CalculatorState => {
     marketingExpenses: [],
     shippingEmployeesEnabled: false,
     shippingEmployees: [],
+    shippingMaterials: [],
   };
 };
 
@@ -357,6 +359,7 @@ const migrateState = (raw: Partial<CalculatorState>): CalculatorState => {
     marketingExpenses: raw.marketingExpenses ?? [],
     shippingEmployeesEnabled: raw.shippingEmployeesEnabled ?? false,
     shippingEmployees: raw.shippingEmployees ?? [],
+    shippingMaterials: raw.shippingMaterials ?? [],
   };
 
   return migrated;
@@ -865,6 +868,37 @@ export function useCalculator() {
     }));
   }, []);
 
+  // Shipping Materials
+  const addShippingMaterial = useCallback(() => {
+    setState((prev) => {
+      const entry = createAuditEntry("System", `Added Shipping Material`, `shippingMaterials.${prev.shippingMaterials.length}`, "—", "New material");
+      return {
+        ...prev,
+        shippingMaterials: [...prev.shippingMaterials, { id: uid(), name: "", costPerPack: 0 }],
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const removeShippingMaterial = useCallback((id: string) => {
+    setState((prev) => {
+      const mat = prev.shippingMaterials.find((m) => m.id === id);
+      const entry = createAuditEntry("System", `Removed "${mat?.name || id}"`, `shippingMaterials.${prev.shippingMaterials.findIndex((m) => m.id === id)}`, `$${mat?.costPerPack}/pack`, "Removed");
+      return {
+        ...prev,
+        shippingMaterials: prev.shippingMaterials.filter((m) => m.id !== id),
+        auditLog: trimAuditLog([...prev.auditLog, entry]),
+      };
+    });
+  }, []);
+
+  const updateShippingMaterial = useCallback((id: string, patch: Partial<ShippingMaterial>) => {
+    setState((prev) => ({
+      ...prev,
+      shippingMaterials: prev.shippingMaterials.map((m) => m.id === id ? { ...m, ...patch } : m),
+    }));
+  }, []);
+
   const updateMonthlyVolume = useCallback(
     (skuId: string, qty: number) => {
       setState((prev) => ({
@@ -1358,5 +1392,9 @@ export function useCalculator() {
     addShippingEmployee,
     removeShippingEmployee,
     updateShippingEmployee,
+    shippingMaterials: state.shippingMaterials,
+    addShippingMaterial,
+    removeShippingMaterial,
+    updateShippingMaterial,
   };
 }

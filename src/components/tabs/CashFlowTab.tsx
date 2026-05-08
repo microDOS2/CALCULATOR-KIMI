@@ -401,7 +401,8 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                         <TableHead className="text-right text-xs">Overhead</TableHead>
                         <TableHead className="text-right text-xs">Commissions</TableHead>
                         <TableHead className="text-right text-xs">Marketing</TableHead>
-                        <TableHead className="text-right text-xs">Shipping</TableHead>
+                        <TableHead className="text-right text-xs">Ship Labor</TableHead>
+                        <TableHead className="text-right text-xs">Ship Materials</TableHead>
                         <TableHead className="text-right text-xs">Debt/CapEx</TableHead>
                       </>
                     )}
@@ -432,6 +433,7 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).commissionsPaid)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).marketingSalaryTotal + (row as any).marketingExpenseTotal)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).shippingSalaryTotal + (row as any).shippingBonusTotal)}</TableCell>
+                            <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).shippingMaterialsTotal)}</TableCell>
                             <TableCell className="text-right text-xs text-muted-foreground">{money((row as any).debtServicePaid + (row as any).capexPaid)}</TableCell>
                           </>
                         )}
@@ -468,7 +470,8 @@ export function CashFlowTab({ state, result, isWeekly, onToggleWeekly, updateSta
                               <div><span className="text-muted-foreground">OH:</span> {money((row as any).overheadPaid)}</div>
                               <div><span className="text-muted-foreground">Comm:</span> {money((row as any).commissionsPaid)}</div>
                               <div><span className="text-muted-foreground">Mktg:</span> {money((row as any).marketingSalaryTotal + (row as any).marketingExpenseTotal)}</div>
-                              <div><span className="text-muted-foreground">Ship:</span> {money((row as any).shippingSalaryTotal + (row as any).shippingBonusTotal)}</div>
+                              <div><span className="text-muted-foreground">Ship L:</span> {money((row as any).shippingSalaryTotal + (row as any).shippingBonusTotal)}</div>
+                              <div><span className="text-muted-foreground">Ship M:</span> {money((row as any).shippingMaterialsTotal)}</div>
                               <div><span className="text-muted-foreground">Debt/ CapEx:</span> {money((row as any).debtServicePaid + (row as any).capexPaid)}</div>
                             </>
                           )}

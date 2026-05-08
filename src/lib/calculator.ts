@@ -950,8 +950,11 @@ function calculateCashFlow(
     const shippingBonusTotal = state.shippingEmployeesEnabled
       ? state.shippingEmployees.reduce((s, e) => s + (e.perItemBonusEnabled ? e.perItemBonus * totalMonthlyVolume : 0), 0)
       : 0;
+    const shippingMaterialsTotal = state.shippingEmployeesEnabled
+      ? state.shippingMaterials.reduce((s, m) => s + m.costPerPack * totalMonthlyVolume, 0)
+      : 0;
 
-    const cashOut = cogsPaid + overheadPaid + commissionsPaid + overridesPaid + debtPaid + capexPaid + marketingSalaryTotal + marketingExpenseTotal + shippingSalaryTotal + shippingBonusTotal;
+    const cashOut = cogsPaid + overheadPaid + commissionsPaid + overridesPaid + debtPaid + capexPaid + marketingSalaryTotal + marketingExpenseTotal + shippingSalaryTotal + shippingBonusTotal + shippingMaterialsTotal;
 
     const netCashFlow = cashIn - cashOut;
     balance = startingBalance + netCashFlow;
@@ -989,6 +992,7 @@ function calculateCashFlow(
       marketingExpenseTotal,
       shippingSalaryTotal,
       shippingBonusTotal,
+      shippingMaterialsTotal,
       subscriptionRevenue,
     });
   }
