@@ -27,22 +27,22 @@ const steps = [
   {
     icon: ToggleLeft,
     title: "Step 1: Choose Your Channels (Blank Slate)",
-    body: "All three channels start OFF by design. You must check at least one to begin: Retail (B2C — direct to consumers), Wholesale (B2B — sell to retailers), or Distributor (B2B — sell through middlemen). Go to the Channels tab and check the channels you plan to use. You can toggle any channel on/off at any time.",
+    body: "All three channels start OFF by design. You must check at least one to begin: Retail (B2C — direct to consumers), Wholesale (B2B — sell to retailers), or Distributor (B2B — sell through middlemen). Go to the Costs tab (Tab 3, blue group) and check the channels you plan to use. Set discount percentages and per-channel shipping costs. You can toggle any channel on/off at any time.",
   },
   {
     icon: Package,
-    title: "Step 2: Build Your Product",
-    body: "In the Product tab (blue group), add your SKUs, ingredients (with cost per mg), and packaging layers. The calculator automatically computes COGS per pack. Use the CSV Bulk Import card to paste a spreadsheet of ingredients. Use the Volume Pricing Tiers card to set MOQ discounts.",
+    title: "Step 2: Define Ingredients & Packaging",
+    body: "In the Product tab (Tab 1, blue group), add your SKUs and ingredients with cost per mg. Use the CSV Bulk Import card to paste a spreadsheet of ingredients. Use the Volume Pricing Tiers card to set MOQ discounts. In the Packaging tab (Tab 2), add packaging layers per SKU (jar, bottle, label, box) with unit cost and weight. The calculator automatically computes COGS per pack.",
   },
   {
     icon: ShoppingCart,
-    title: "Step 3: Set Channel Prices & Shipping",
-    body: "In the Channels tab, set retail price, wholesale discount, and distributor discount. The Per-Channel Shipping card lets you set carrier costs per channel. IMPORTANT: Cost per PACK, not per shipment. Example: a $350 pallet with 144 packs = $2.43/pack. Only Retail has a default — Wholesale and Distributor must be defined by you.",
+    title: "Step 3: Set Prices, Shipping & Overhead",
+    body: "In the Costs tab (Tab 3, blue group), set retail price, wholesale discount, and distributor discount. The Per-Channel Shipping card lets you set carrier costs per channel — Retail defaults to $2.50/pack, Wholesale and Distributor default to $0 (you must define them). IMPORTANT: Cost per PACK, not per shipment. Example: a $350 pallet with 144 packs = $2.43/pack. Enter monthly overhead and set volumes per SKU.",
   },
   {
     icon: Store,
     title: "Step 4: Add Operating Costs",
-    body: "In the Costs tab, enter monthly overhead (rent, salaries, utilities, marketing) and set monthly volumes per SKU. Toggle overhead allocation per channel. Optional tabs: Marketing (salary or hourly employees + per-channel ad spend — CSV import/export), Shipping Employees (salary or hourly + per-pack bonus + materials — CSV import/export), Third Party services, or Campaigns. Use the blue CSV Import cards to bulk-upload employee rosters and expense lists.",
+    body: "In the Costs tab, enter monthly overhead (rent, salaries, utilities) and set monthly volumes per SKU. Toggle overhead allocation per channel. Optional tabs: Marketing (Tab 20, salary/hourly employees + per-channel ad spend — CSV import/export), Shipping Employees (Tab 21, salary/hourly + per-pack bonus + materials — CSV import/export), Third Party services (Tab 8), or Campaigns (Tab 16). Use the blue CSV Import cards to bulk-upload employee rosters and expense lists.",
   },
   {
     icon: BarChart3,
@@ -52,12 +52,12 @@ const steps = [
   {
     icon: Target,
     title: "Step 6: Optimize with Power Tools",
-    body: "Goal Seek (Tab 13) — reverse-solve: pick a target, pick an adjustable input, solver finds the exact value. Batch What-If (Tab 14) — test 5-10 values at once with green/red profit indicators. These are the fastest ways to find optimal pricing.",
+    body: "Goal Seek (Tab 12) — reverse-solve: pick a target, pick an adjustable input, solver finds the exact value. Batch What-If (Tab 13) — test 5-10 values at once with green/red profit indicators. These are the fastest ways to find optimal pricing.",
   },
   {
     icon: Table2,
     title: "Step 7: Compare & Save Scenarios",
-    body: "Save model configurations as named scenarios with notes (Tab 18). Export scenarios as .channelcalc files to share or backup. Import .channelcalc files to restore a complete model state. Use the Compare tab (Tab 19) to load two scenarios side-by-side with 13 key metrics and green/red delta indicators.",
+    body: "Save model configurations as named scenarios with notes (Tab 17). Export scenarios as .channelcalc files to share or backup. Import .channelcalc files to restore a complete model state. Use the Compare tab (Tab 18) to load two scenarios side-by-side with 13 key metrics and green/red delta indicators.",
   },
   {
     icon: ShieldCheck,
