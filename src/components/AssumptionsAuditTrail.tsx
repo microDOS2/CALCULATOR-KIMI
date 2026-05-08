@@ -194,6 +194,38 @@ function buildAuditRows(state: CalculatorState, result: CalculationResult): Audi
     });
   });
 
+  // AFFILIATES
+  if (state.affiliate.enabled) {
+    const af = state.affiliate;
+    const tier = af.tiers.find((t) => t.id === af.activeTierId) || af.tiers[0];
+    rows.push({
+      category: "Affiliates",
+      assumption: "Affiliate Program",
+      value: tier ? tier.name : "None",
+      impact: `${af.monthlyNewReferrals} monthly referrals, ${af.clickToPurchaseRate}% click-to-purchase`,
+    });
+    if (tier) {
+      rows.push({
+        category: "Affiliates",
+        assumption: "Initial Commission",
+        value: tier.initialType === "percentage" ? `${tier.initialRate}%` : `${money3(tier.initialRate)}`,
+        impact: `Basis: ${tier.initialBasis.replace(/_/g, " ")} | Min payout: ${money3(tier.minPayoutThreshold)}`,
+      });
+      rows.push({
+        category: "Affiliates",
+        assumption: "Attribution Model",
+        value: af.attributionModel === "first_click" ? "First Click" : "Last Click",
+        impact: `Cookie: ${af.cookieDays} days`,
+      });
+      rows.push({
+        category: "Affiliates",
+        assumption: "Payout Schedule",
+        value: `Day ${af.payoutDayOfMonth}`,
+        impact: `${af.payoutDelayMonths} month delay | Threshold: ${money3(tier.minPayoutThreshold)}`,
+      });
+    }
+  }
+
   return rows;
 }
 

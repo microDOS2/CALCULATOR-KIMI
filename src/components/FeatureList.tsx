@@ -18,7 +18,8 @@ interface FeatureSection {
 
 // Color mapping for tab groups
 const groupColors: Record<string, { badge: string; text: string; border: string; name: string }> = {
-  core:      { badge: "bg-blue-100 text-blue-700",       text: "text-blue-700",       border: "border-l-blue-400",       name: "Core Setup" },
+  core:      { badge: "bg-blue-100 text-blue-700",       text: "text-blue-700",       border: "border-l-blue-400",       name: "Foundation" },
+  b2c:       { badge: "bg-indigo-100 text-indigo-700",   text: "text-indigo-700",     border: "border-l-indigo-400",     name: "B2C Sales" },
   ops:       { badge: "bg-emerald-100 text-emerald-700", text: "text-emerald-700",    border: "border-l-emerald-400",    name: "Operations" },
   power:     { badge: "bg-violet-100 text-violet-700",   text: "text-violet-700",     border: "border-l-violet-400",     name: "Dashboard & Power" },
   forecast:  { badge: "bg-amber-100 text-amber-700",       text: "text-amber-700",       border: "border-l-amber-400",       name: "Forecasting" },
@@ -55,22 +56,36 @@ const features: FeatureSection[] = [
   },
   {
     number: 3,
-    title: "Channel Pricing & Configuration (Tab 3: Channels)",
-    groupColor: "core",
-    groupName: "Core Setup",
+    title: "Retail (Tab 4: Retail)",
+    groupColor: "b2c",
+    groupName: "B2C Sales",
     items: [
-      { text: "Three Sales Channels — Retail, Wholesale, Distributor with independent toggle on/off" },
-      { text: "Cascading Discounts — Wholesale discount % off retail, Distributor discount % off wholesale" },
+      { text: "Retail Price Configuration — Set your direct-to-consumer selling price" },
       { text: "Flat Shipping Rate — Fixed cost per pack" },
       { text: "Weight-Based Shipping Rates — Carrier-like pricing with editable weight brackets (100g, 250g, 500g, 1kg, 2kg, 5kg)" },
       { text: "Retail Sales Tax — Configurable sales tax rate with customer-facing price display" },
-      { text: "Distributor Import Duty — Configurable import duty with cost-with-duty display" },
       { text: "Formula Tooltips — Every metric shows its calculation formula on hover" },
     ],
   },
   {
     number: 4,
-    title: "Overhead Management (Tab 4: Costs)",
+    title: "Affiliate Program (Tab 5: Affiliates)",
+    groupColor: "b2c",
+    groupName: "B2C Sales",
+    items: [
+      { text: "B2C Referral Channel — Affiliates drive customers to retail storefront at retail price; you pay commission after sale" },
+      { text: "Commission Types — Percentage of sale, flat per pack, or flat per order" },
+      { text: "Commission Basis — Product only, product + shipping, or total (incl. tax)" },
+      { text: "Attribution Model — First Click (content friendly) or Last Click (conversion friendly)" },
+      { text: "Cookie Duration — Editable tracking window (default 60 days per AffiliateWP)" },
+      { text: "Volume Assumptions — Monthly referrals, avg order size, click-to-purchase rate" },
+      { text: "Payout Schedule — Day of month, delay period, minimum threshold" },
+      { text: "Impact Summary — Gross revenue, commission cost, net profit, commission % of revenue" },
+    ],
+  },
+  {
+    number: 4,
+    title: "Overhead Management (Tab 3: Costs)",
     groupColor: "core",
     groupName: "Core Setup",
     items: [
@@ -81,7 +96,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 5,
-    title: "Purchase Orders (Tab 6: PO)",
+    title: "Purchase Orders (Tab 6: Orders)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -104,7 +119,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 7,
-    title: "Third-Party Services (Tab 7: Third Party)",
+    title: "Third-Party Services (Tab 8: Third Party)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -115,7 +130,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 8,
-    title: "Visual Analytics (Tab 8: Charts)",
+    title: "Visual Analytics (Tab 9: Charts)",
     groupColor: "ops",
     groupName: "Operations",
     items: [
@@ -126,7 +141,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 9,
-    title: "Executive Dashboard (Tab 9) — Mission Control",
+    title: "Executive Dashboard (Tab 17) — Mission Control",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
@@ -139,7 +154,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 10,
-    title: "Goal Seek / Target Finder (Tab 10)",
+    title: "Goal Seek / Target Finder (Tab 17)",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
@@ -151,7 +166,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 11,
-    title: "Batch What-If Testing (Tab 11)",
+    title: "Batch What-If Testing (Tab 17)",
     groupColor: "power",
     groupName: "Dashboard & Power",
     items: [
@@ -162,7 +177,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 12,
-    title: "Subscription Modeling (Tab 12)",
+    title: "Subscription Modeling (Tab 17)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -175,7 +190,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 13,
-    title: "Cash Flow Forecasting (Tab 13)",
+    title: "Cash Flow Forecasting (Tab 17)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -192,7 +207,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 14,
-    title: "Campaign/Promotion Modeling (Tab 14)",
+    title: "Campaign/Promotion Modeling (Tab 17)",
     groupColor: "forecast",
     groupName: "Forecasting",
     items: [
@@ -203,7 +218,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 15,
-    title: "Scenario Management (Tab 15)",
+    title: "Scenario Management (Tab 17)",
     groupColor: "manage",
     groupName: "Management",
     items: [
@@ -215,7 +230,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 16,
-    title: "Side-by-Side Comparison (Tab 16)",
+    title: "Side-by-Side Comparison (Tab 17)",
     groupColor: "manage",
     groupName: "Management",
     items: [
@@ -288,11 +303,12 @@ export function FeatureList() {
           <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Tab Color Guide</p>
           <div className="flex flex-wrap gap-2">
             {[
-              { label: "Core Setup", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-4" },
-              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "5-8" },
-              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "9-11" },
-              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "12-14" },
-              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "15-16" },
+              { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
+              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-9" },
+              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "10-12" },
+              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "13-15" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "16-17" },
               { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
             ].map((g) => (
               <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>

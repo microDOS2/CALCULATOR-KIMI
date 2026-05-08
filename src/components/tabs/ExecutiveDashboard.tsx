@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Package, DollarSign, Truck, Target, BarChart3, AlertTriangle, Sparkles, Users } from "lucide-react";
 import { InfoTooltip } from "@/components/InfoTooltip";
 import { SanityChecks } from "@/components/SanityChecks";
 import { AssumptionsAuditTrail } from "@/components/AssumptionsAuditTrail";
@@ -209,6 +209,28 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
             </CardContent>
           </Card>
         )}
+
+        {/* Affiliate Commission KPI */}
+        {result.affiliate.enabled && (
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">Affiliate Commission</p>
+                  <p className="text-lg font-bold text-red-600">
+                    {money3(result.affiliate.initialCommission)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {result.affiliate.commissionAsPercentOfRevenue.toFixed(1)}% of affiliate revenue
+                  </p>
+                </div>
+                <div className="p-2 rounded-lg bg-indigo-500">
+                  <Users className="h-5 w-5 text-white" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <Card>
@@ -216,7 +238,7 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
           <CardTitle className="text-sm">Channel Profitability Snapshot</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4 text-center">
+          <div className={`grid gap-4 text-center ${result.affiliate.enabled ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
             <div>
               <p className="text-xs text-muted-foreground">Retail</p>
               <p className={`text-lg font-bold ${result.retail.gp > 0 ? "text-green-600" : "text-red-600"}`}>
@@ -224,6 +246,15 @@ export function ExecutiveDashboard({ state, result }: ExecutiveDashboardProps) {
               </p>
               <p className="text-xs text-muted-foreground">{pct(result.retail.gm)} margin</p>
             </div>
+            {result.affiliate.enabled && (
+              <div>
+                <p className="text-xs text-muted-foreground">Affiliate</p>
+                <p className={`text-lg font-bold ${result.affiliate.netProfit > 0 ? "text-green-600" : "text-red-600"}`}>
+                  {money3(result.affiliate.netProfit)}
+                </p>
+                <p className="text-xs text-muted-foreground">{result.affiliate.commissionAsPercentOfRevenue.toFixed(0)}% commission</p>
+              </div>
+            )}
             <div>
               <p className="text-xs text-muted-foreground">Wholesale</p>
               <p className={`text-lg font-bold ${result.wholesale.gp > 0 ? "text-green-600" : "text-red-600"}`}>

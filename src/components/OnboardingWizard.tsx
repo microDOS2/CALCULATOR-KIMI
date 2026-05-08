@@ -30,7 +30,7 @@ const steps = [
   {
     icon: Store,
     title: "Step 2: Set Your Channels",
-    body: "In the Channels tab (blue group), set retail price, wholesale discount, and distributor discount. Toggle channels on/off to see contribution. Look for the sky-blue Weight-Based Shipping card to model carrier-like pricing by package weight. Use the emerald Tax & Duty card to add Sales Tax on retail and Import Duty on distributor. These are not hidden — they're right below your channel cards.",
+    body: "In the Product tab (blue) (blue group), set retail price, wholesale discount, and distributor discount. Toggle channels on/off to see contribution. Look for the sky-blue Weight-Based Shipping card to model carrier-like pricing by package weight. Use the emerald Tax & Duty card to add Sales Tax on retail and Import Duty on distributor. These are not hidden — they're right below your channel cards.",
   },
   {
     icon: BarChart3,
@@ -40,22 +40,22 @@ const steps = [
   {
     icon: Target,
     title: "Step 4: Optimize with Power Tools",
-    body: "The violet tabs are your power tools. Goal Seek (Tab 10) reverse-calculates: enter a target margin or profit, pick an input to adjust, and the solver finds the exact value. Batch What-If (Tab 11) tests 5-10 values at once in a comparison table with green/red profit indicators. These are the fastest ways to find your optimal pricing and cost structure.",
+    body: "The violet tabs are your power tools. Goal Seek (Tab 14) reverse-calculates: enter a target margin or profit, pick an input to adjust, and the solver finds the exact value. Batch What-If (Tab 14) tests 5-10 values at once in a comparison table with green/red profit indicators. These are the fastest ways to find your optimal pricing and cost structure.",
   },
   {
     icon: Table2,
     title: "Step 5: Compare & Save Scenarios",
-    body: "Save your model configurations as named scenarios with notes (Tab 15, slate group). Use the Compare tab (Tab 16, slate group) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. Notes help you remember why you saved each scenario. This is the fastest way to evaluate strategic decisions.",
+    body: "Save your model configurations as named scenarios with notes (Tab 17, slate group). Use the Compare tab (Tab 17, slate group) to load two scenarios side-by-side and see 13 key metrics with green/red delta indicators. Notes help you remember why you saved each scenario. This is the fastest way to evaluate strategic decisions.",
   },
   {
     icon: ShieldCheck,
     title: "Step 6: Validate & Audit",
-    body: "The Dashboard (Tab 9, violet group) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 8 industry benchmarks and flags problems. Below that, 10 live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
+    body: "The Dashboard (Tab 14, violet group) is your Mission Control. It starts with the rose Sanity Checks panel that auto-validates your model against 8 industry benchmarks and flags problems. Below that, 10 live KPI cards with benchmark comparisons. At the bottom, the slate Assumptions Audit Trail lists every assumption in your model. Use this for investor meetings, bank applications, and due diligence.",
   },
   {
     icon: Wrench,
     title: "Step 7: Cash Flow & Advanced Tools",
-    body: "The Cash Flow tab (Tab 13, amber group) includes orange tool cards for Capital Expenditures (equipment, vehicles) and Debt Service (monthly loan payments). These affect your 12-month cash projection. Model subscriptions with churn and growth projections. The Simulate button (rose) opens a floating panel for live what-if analysis. Remember: Ctrl+Z undoes up to 50 steps.",
+    body: "The Cash Flow tab (Tab 14, amber group) includes orange tool cards for Capital Expenditures (equipment, vehicles) and Debt Service (monthly loan payments). These affect your 12-month cash projection. Model subscriptions with churn and growth projections. The Simulate button (rose) opens a floating panel for live what-if analysis. Remember: Ctrl+Z undoes up to 50 steps.",
   },
 ];
 

@@ -150,6 +150,34 @@ const createDefaultState = (): CalculatorState => {
     beIncludeOverhead: true,
     retailSalesTaxRate: 0,
     distributorImportDutyRate: 0,
+    affiliate: {
+      enabled: false,
+      tiers: [
+        {
+          id: uid(),
+          name: 'Standard',
+          initialType: 'percentage',
+          initialRate: 20,
+          initialBasis: 'product_only',
+          subscriptionEnabled: true,
+          subscriptionTiers: [
+            { id: uid(), monthStart: 1, monthEnd: 12, rate: 15 },
+            { id: uid(), monthStart: 13, monthEnd: 36, rate: 10 },
+            { id: uid(), monthStart: 37, monthEnd: 60, rate: 5 },
+          ],
+          minPayoutThreshold: 50,
+        },
+      ],
+      activeTierId: '', // set at runtime below
+      monthlyNewReferrals: 100,
+      avgOrderPacks: 2,
+      subscriptionConversionRate: 25,
+      cookieDays: 60,
+      attributionModel: 'first_click',
+      clickToPurchaseRate: 5,
+      payoutDayOfMonth: 15,
+      payoutDelayMonths: 1,
+    },
     commissions: {
       president: {
         name: "President of Sales",
@@ -385,6 +413,14 @@ export function useCalculator() {
     }, 500);
     return () => clearTimeout(timer);
   }, [state]);
+
+  // Ensure affiliate activeTierId is set
+  useEffect(() => {
+    if (state.affiliate.enabled && state.affiliate.tiers.length > 0 && !state.affiliate.activeTierId) {
+      updateState({ affiliate: { ...state.affiliate, activeTierId: state.affiliate.tiers[0].id } });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.affiliate.enabled, state.affiliate.tiers, state.affiliate.activeTierId]);
 
   // Auto-save every 30 seconds
   useEffect(() => {

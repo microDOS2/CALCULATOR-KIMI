@@ -138,6 +138,51 @@ export interface ChannelCalc {
   profitPerUnit: number;
 }
 
+// --- Affiliate Types ---
+export interface AffiliateRenewalTier {
+  id: string;
+  monthStart: number;
+  monthEnd: number;
+  rate: number; // commission percentage for renewals in this window
+}
+
+export interface AffiliateTier {
+  id: string;
+  name: string;
+  initialType: 'percentage' | 'flat_per_pack' | 'flat_per_order';
+  initialRate: number;
+  initialBasis: 'product_only' | 'product_plus_shipping' | 'total';
+  subscriptionEnabled: boolean;
+  subscriptionTiers: AffiliateRenewalTier[];
+  minPayoutThreshold: number;
+}
+
+export interface AffiliateState {
+  enabled: boolean;
+  tiers: AffiliateTier[];
+  activeTierId: string;
+  monthlyNewReferrals: number;
+  avgOrderPacks: number;
+  subscriptionConversionRate: number; // % of referred customers who subscribe
+  cookieDays: number;
+  attributionModel: 'first_click' | 'last_click';
+  clickToPurchaseRate: number; // % of clicks that result in purchase
+  payoutDayOfMonth: number;
+  payoutDelayMonths: number;
+}
+
+export interface AffiliateCalc {
+  enabled: boolean;
+  tierName: string;
+  monthlyReferrals: number;
+  monthlyPacks: number;
+  grossRevenue: number;
+  initialCommission: number;
+  projectedRenewalCommission: number; // annual
+  netProfit: number;
+  commissionAsPercentOfRevenue: number;
+}
+
 export interface CalculationResult {
   unitSystem: 'mg' | 'oz';
   skus: SKU[];
@@ -178,6 +223,7 @@ export interface CalculationResult {
   retail: ChannelCalc;
   wholesale: ChannelCalc;
   distributor: ChannelCalc;
+  affiliate: AffiliateCalc;
 
   // Tax & regulatory
   retailPriceWithTax: number;
@@ -411,6 +457,7 @@ export interface CalculatorState {
   beIncludeOverhead: boolean;
   retailSalesTaxRate: number; // % sales tax on retail (e.g., 8.5)
   distributorImportDutyRate: number; // % import duty on distributor (e.g., 5)
+  affiliate: AffiliateState;
   commissions: CommissionState;
   thirdPartyCompanies: ThirdPartyCompany[];
   subscriptionPlans: SubscriptionPlan[];

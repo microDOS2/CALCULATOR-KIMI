@@ -186,7 +186,37 @@ function runChecks(result: CalculationResult): SanityCheck[] {
     }
   }
 
-  // 7. Channel profitability
+  // 7. Affiliate commission check
+  if (result.affiliate.enabled) {
+    const af = result.affiliate;
+    if (af.commissionAsPercentOfRevenue > 50) {
+      checks.push({
+        id: "affiliate-commission-high",
+        severity: "error",
+        title: "Affiliate Commission Exceeds 50%",
+        message: `Commission is ${af.commissionAsPercentOfRevenue.toFixed(1)}% of affiliate revenue — unsustainable.`,
+        detail: `Your affiliate commission eats up ${af.commissionAsPercentOfRevenue.toFixed(0)}% of affiliate-driven revenue. With COGS and overhead also deducted, you may be losing money on every affiliate sale. Consider reducing the commission rate or switching to a flat per-order structure.`,
+      });
+    } else if (af.commissionAsPercentOfRevenue > 30) {
+      checks.push({
+        id: "affiliate-commission-warning",
+        severity: "warning",
+        title: "Affiliate Commission Is High",
+        message: `Commission is ${af.commissionAsPercentOfRevenue.toFixed(1)}% of affiliate revenue — above 30%.`,
+        detail: `At ${af.commissionAsPercentOfRevenue.toFixed(0)}% of revenue, your affiliate program leaves a thin margin after COGS and overhead. The supplement industry typically sees 15-25% affiliate commissions.`,
+      });
+    } else if (af.commissionAsPercentOfRevenue > 0) {
+      checks.push({
+        id: "affiliate-commission-ok",
+        severity: "ok",
+        title: "Affiliate Commission Healthy",
+        message: `Commission is ${af.commissionAsPercentOfRevenue.toFixed(1)}% of affiliate revenue.`,
+        detail: `Your ${af.commissionAsPercentOfRevenue.toFixed(0)}% commission rate is within a healthy range for supplement affiliate programs (15-25% typical).`,
+      });
+    }
+  }
+
+  // 8. Channel profitability
   const channels = [
     { name: "Retail", ch: result.retail, included: result.includeR },
     { name: "Wholesale", ch: result.wholesale, included: result.includeW },

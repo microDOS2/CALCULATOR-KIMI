@@ -382,6 +382,45 @@ export function calculate(state: CalculatorState): CalculationResult {
   const omW = avgPriceW > 0 ? opW / avgPriceW : 0;
   const omD = avgPriceD > 0 ? opD / avgPriceD : 0;
 
+  // Affiliate calculations
+  const afState = state.affiliate;
+  const afEnabled = afState.enabled;
+  const afTier = afEnabled ? afState.tiers.find((t) => t.id === afState.activeTierId) || afState.tiers[0] : null;
+
+  let afCommissionPerPack = 0;
+  let afGrossRevenue = 0;
+  let afInitialCommission = 0;
+  let afNetProfit = 0;
+
+  if (afEnabled && afTier) {
+    // Affiliate sells at retail price
+    const afPacks = afState.monthlyNewReferrals * afState.avgOrderPacks;
+    afGrossRevenue = avgPriceR * afPacks;
+
+    // Initial commission
+    let commissionBasis = avgPriceR;
+    if (afTier.initialBasis === 'product_only') {
+      commissionBasis = avgPriceR;
+    } else if (afTier.initialBasis === 'product_plus_shipping') {
+      commissionBasis = avgPriceR + shipPerPack;
+    } else if (afTier.initialBasis === 'total') {
+      commissionBasis = avgPriceR + shipPerPack + retailTaxAmount;
+    }
+
+    if (afTier.initialType === 'percentage') {
+      afCommissionPerPack = commissionBasis * (afTier.initialRate / 100);
+    } else if (afTier.initialType === 'flat_per_pack') {
+      afCommissionPerPack = afTier.initialRate;
+    } else if (afTier.initialType === 'flat_per_order') {
+      afCommissionPerPack = afTier.initialRate / afState.avgOrderPacks;
+    }
+
+    afInitialCommission = afCommissionPerPack * afPacks;
+    const afCogs = cogsPerPack * afPacks;
+    const afShipping = includeShip ? shipPerPack * afPacks : 0;
+    afNetProfit = afGrossRevenue - afCogs - afShipping - afInitialCommission;
+  }
+
   // Blended
   const totalRevenue = totalRevenueR + totalRevenueW + totalRevenueD;
   const totalGp = totalGpR + totalGpW + totalGpD;
@@ -598,6 +637,17 @@ export function calculate(state: CalculatorState): CalculationResult {
       om: omD,
       costPerUnit,
       profitPerUnit: profitPerUnitD,
+    },
+    affiliate: {
+      enabled: afEnabled,
+      tierName: afTier?.name || '',
+      monthlyReferrals: afEnabled ? afState.monthlyNewReferrals : 0,
+      monthlyPacks: afEnabled ? afState.monthlyNewReferrals * afState.avgOrderPacks : 0,
+      grossRevenue: afGrossRevenue,
+      initialCommission: afInitialCommission,
+      projectedRenewalCommission: 0, // Phase 2
+      netProfit: afNetProfit,
+      commissionAsPercentOfRevenue: afGrossRevenue > 0 ? (afInitialCommission / afGrossRevenue) * 100 : 0,
     },
     retailPriceWithTax,
     retailTaxAmount,
