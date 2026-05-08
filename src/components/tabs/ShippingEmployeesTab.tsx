@@ -93,7 +93,7 @@ export function ShippingEmployeesTab({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center items-end">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center items-end">
                 <div>
                   <p className="text-[10px] text-muted-foreground font-medium mb-1">CARRIER COST / PACK</p>
                   <div className="relative">
@@ -108,11 +108,17 @@ export function ShippingEmployeesTab({
                     />
                   </div>
                 </div>
-                <div>
-                  <p className={`text-lg font-bold ${state.includeShip ? "text-green-700" : "text-red-600"}`}>
-                    {state.includeShip ? "Included" : "Excluded"}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground">In COGS calc</p>
+                <div className="flex items-center justify-center pb-2">
+                  <Label className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={state.includeShip}
+                      onCheckedChange={(v) => updateState({ includeShip: !!v })}
+                      className="data-[state=checked]:bg-green-600"
+                    />
+                    <span className={state.includeShip ? "text-green-700 font-medium" : "text-red-600 font-medium"}>
+                      {state.includeShip ? "In COGS" : "Not in COGS"}
+                    </span>
+                  </Label>
                 </div>
                 <div>
                   <p className={`text-lg font-bold ${state.includeShip ? "text-amber-700" : "text-muted-foreground"}`}>
@@ -123,6 +129,16 @@ export function ShippingEmployeesTab({
                 <div>
                   <p className="text-lg font-bold text-amber-700">{money((state.includeShip ? state.shippingPerPack : 0))}/p</p>
                   <p className="text-[10px] text-muted-foreground">Effective cost</p>
+                </div>
+                <div className="flex items-center justify-center pb-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateState({ useShippingRateTable: !state.useShippingRateTable })}
+                    className="text-xs"
+                  >
+                    {state.useShippingRateTable ? "Use Flat Rate" : "Use Rate Table"}
+                  </Button>
                 </div>
               </div>
             </CardContent>
