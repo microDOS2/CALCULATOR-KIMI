@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Upload, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Upload, AlertCircle, CheckCircle2, FileSpreadsheet } from "lucide-react";
 import type { Ingredient } from "@/types/calculator";
 import { MG_PER_OZ } from "@/lib/calculator";
+import { InfoTooltip } from "@/components/InfoTooltip";
 
 interface CsvImportSectionProps {
   existingIngredients: Ingredient[];
@@ -64,7 +65,6 @@ function parseIngredients(rows: string[][], headers: string[], unitSystem: 'mg' 
 export function CsvImportSection({ existingIngredients, unitSystem, setIngredients }: CsvImportSectionProps) {
   const [csvText, setCsvText] = useState("");
   const [importResult, setImportResult] = useState<{ valid: Ingredient[]; errors: string[] } | null>(null);
-  const [showImport, setShowImport] = useState(false);
 
   const handlePreview = () => {
     const { headers, rows } = parseCSV(csvText);
@@ -77,71 +77,72 @@ export function CsvImportSection({ existingIngredients, unitSystem, setIngredien
     setIngredients([...existingIngredients, ...importResult.valid]);
     setCsvText("");
     setImportResult(null);
-    setShowImport(false);
   };
 
   return (
-    <div className="pt-2 border-t">
-      <button
-        onClick={() => setShowImport(!showImport)}
-        className="text-xs text-muted-foreground hover:text-foreground underline flex items-center gap-1"
-      >
-        <Upload className="h-3 w-3" />
-        {showImport ? "Hide" : "Bulk import ingredients from CSV"}
-      </button>
+    <Card className="border-dashed border-2">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <FileSpreadsheet className="h-5 w-5 text-primary" />
+          CSV Bulk Import
+          <InfoTooltip
+            text="Paste a CSV spreadsheet to bulk-import ingredients in seconds. Supports: name, mgPerUnit, costPerMg, supplierPaymentDays columns. Import 20+ ingredients at once instead of entering them one by one."
+            label="CSV Import"
+          />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3 pt-0">
+        <p className="text-xs text-muted-foreground">
+          Paste CSV with columns:{" "}
+          <code className="bg-muted px-1 rounded font-mono">name, mgPerUnit, costPerMg, supplierPaymentDays</code>
+        </p>
+        <Textarea
+          className="text-xs font-mono h-28"
+          placeholder={`name,mgPerUnit,costPerMg,supplierPaymentDays\nVitamin C,500,0.0002,30\nZinc (Elemental),25,0.001,30\nMagnesium Glycinate,200,0.00015,30\nAshwagandha Root,300,0.00008,45\nTurmeric Curcumin,400,0.00012,30`}
+          value={csvText}
+          onChange={(e) => setCsvText(e.target.value)}
+        />
+        <div className="flex items-center gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={handlePreview} disabled={!csvText.trim()}>
+            <Upload className="h-3.5 w-3.5 mr-1" /> Preview
+          </Button>
+          {importResult && (
+            <Button size="sm" onClick={handleImport} disabled={importResult.valid.length === 0}>
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+              Import {importResult.valid.length} ingredient{importResult.valid.length !== 1 ? 's' : ''}
+            </Button>
+          )}
+        </div>
 
-      {showImport && (
-        <Card className="mt-2">
-          <CardContent className="p-3 space-y-2">
-            <p className="text-xs text-muted-foreground">
-              Paste CSV with columns: <code className="bg-muted px-1 rounded">name, mgPerUnit, costPerMg, supplierPaymentDays</code>
-              <br />
-              Example: <code className="bg-muted px-1 rounded">Vitamin C, 500, 0.0002, 30</code>
-            </p>
-            <Textarea
-              className="text-xs font-mono h-24"
-              placeholder={`name,mgPerUnit,costPerMg,supplierPaymentDays\nVitamin C,500,0.0002,30\nZinc,25,0.001,30`}
-              value={csvText}
-              onChange={(e) => setCsvText(e.target.value)}
-            />
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline" onClick={handlePreview} disabled={!csvText.trim()}>
-                Preview
-              </Button>
-              {importResult && (
-                <Button size="sm" onClick={handleImport} disabled={importResult.valid.length === 0}>
-                  <CheckCircle2 className="h-3 w-3 mr-1" />
-                  Import {importResult.valid.length} ingredients
-                </Button>
-              )}
-            </div>
-
-            {importResult && (
-              <div className="space-y-1">
-                {importResult.errors.length > 0 && (
-                  <div className="text-xs text-red-500 space-y-0.5">
-                    <div className="flex items-center gap-1 font-medium">
-                      <AlertCircle className="h-3 w-3" /> {importResult.errors.length} errors:
-                    </div>
-                    {importResult.errors.slice(0, 5).map((err, i) => (
-                      <div key={i}>{err}</div>
-                    ))}
-                    {importResult.errors.length > 5 && (
-                      <div>...and {importResult.errors.length - 5} more</div>
-                    )}
-                  </div>
-                )}
-                {importResult.valid.length > 0 && (
-                  <div className="text-xs text-green-600">
-                    <CheckCircle2 className="h-3 w-3 inline mr-1" />
-                    {importResult.valid.length} valid ingredients ready to import
-                  </div>
+        {importResult && (
+          <div className="space-y-2">
+            {importResult.errors.length > 0 && (
+              <div className="text-xs text-red-600 space-y-0.5 bg-red-50 rounded-md p-2">
+                <div className="flex items-center gap-1 font-medium">
+                  <AlertCircle className="h-3 w-3" /> {importResult.errors.length} error{importResult.errors.length !== 1 ? 's' : ''}:
+                </div>
+                {importResult.errors.slice(0, 5).map((err, i) => (
+                  <div key={i} className="pl-4">{err}</div>
+                ))}
+                {importResult.errors.length > 5 && (
+                  <div className="pl-4">...and {importResult.errors.length - 5} more</div>
                 )}
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            {importResult.valid.length > 0 && (
+              <div className="text-xs text-green-700 bg-green-50 rounded-md p-2 flex items-center gap-1">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                {importResult.valid.length} valid ingredient{importResult.valid.length !== 1 ? 's' : ''} ready to import
+              </div>
+            )}
+            {importResult.valid.length === 0 && importResult.errors.length === 0 && (
+              <div className="text-xs text-amber-700 bg-amber-50 rounded-md p-2">
+                No ingredients found. Check your CSV format matches the expected columns.
+              </div>
+            )}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
