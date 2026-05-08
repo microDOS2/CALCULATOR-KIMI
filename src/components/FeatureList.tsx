@@ -12,12 +12,27 @@ interface FeatureSection {
   number: number;
   title: string;
   items: FeatureItem[];
+  groupColor: string;
+  groupName: string;
 }
+
+// Color mapping for tab groups
+const groupColors: Record<string, { badge: string; text: string; border: string; name: string }> = {
+  core:      { badge: "bg-blue-100 text-blue-700",       text: "text-blue-700",       border: "border-l-blue-400",       name: "Core Setup" },
+  ops:       { badge: "bg-emerald-100 text-emerald-700", text: "text-emerald-700",    border: "border-l-emerald-400",    name: "Operations" },
+  power:     { badge: "bg-violet-100 text-violet-700",   text: "text-violet-700",     border: "border-l-violet-400",     name: "Dashboard & Power" },
+  forecast:  { badge: "bg-amber-100 text-amber-700",       text: "text-amber-700",       border: "border-l-amber-400",       name: "Forecasting" },
+  manage:    { badge: "bg-slate-100 text-slate-700",       text: "text-slate-700",       border: "border-l-slate-400",       name: "Management" },
+  simulate:  { badge: "bg-rose-100 text-rose-700",         text: "text-rose-700",        border: "border-l-rose-400",         name: "Simulate" },
+  system:    { badge: "bg-gray-100 text-gray-700",          text: "text-gray-700",        border: "border-l-gray-400",          name: "System" },
+};
 
 const features: FeatureSection[] = [
   {
     number: 1,
     title: "Core Product Modeling (Tab 1: Product)",
+    groupColor: "core",
+    groupName: "Core Setup",
     items: [
       { text: "Multi-SKU Support — Add/remove unlimited SKUs, each with units-per-pack, retail price, and channel mix split (Retail/Wholesale/Distributor)" },
       { text: "Ingredient Management — Add/remove unlimited ingredients with mg-per-unit, cost-per-mg, and supplier payment terms (NET days)" },
@@ -30,6 +45,8 @@ const features: FeatureSection[] = [
   {
     number: 2,
     title: "Per-SKU Packaging (Tab 2: Packaging)",
+    groupColor: "core",
+    groupName: "Core Setup",
     items: [
       { text: "Unlimited Packaging Layers per SKU — Jar, bottle, label, box, etc." },
       { text: "Cost & Weight per Layer — Cost per unit + weight in grams per unit" },
@@ -39,6 +56,8 @@ const features: FeatureSection[] = [
   {
     number: 3,
     title: "Channel Pricing & Configuration (Tab 3: Channels)",
+    groupColor: "core",
+    groupName: "Core Setup",
     items: [
       { text: "Three Sales Channels — Retail, Wholesale, Distributor with independent toggle on/off" },
       { text: "Cascading Discounts — Wholesale discount % off retail, Distributor discount % off wholesale" },
@@ -52,6 +71,8 @@ const features: FeatureSection[] = [
   {
     number: 4,
     title: "Overhead Management (Tab 4: Costs)",
+    groupColor: "core",
+    groupName: "Core Setup",
     items: [
       { text: "Unlimited Overhead Items — Rent, salaries, utilities, marketing, etc." },
       { text: "Per-Channel Allocation — Toggle overhead attribution to R/W/D channels independently" },
@@ -61,6 +82,8 @@ const features: FeatureSection[] = [
   {
     number: 5,
     title: "Purchase Orders (Tab 6: PO)",
+    groupColor: "ops",
+    groupName: "Operations",
     items: [
       { text: "Auto-Generated PO Line Items — Per-SKU totals with profit breakdown by channel" },
       { text: "Grand Totals — Total qty, profit, COGS, and average cost/profit per unit" },
@@ -69,6 +92,8 @@ const features: FeatureSection[] = [
   {
     number: 6,
     title: "Commission Hierarchy (Tab 7: Commissions)",
+    groupColor: "ops",
+    groupName: "Operations",
     items: [
       { text: "4-Tier Sales Org — President, VPs, RSMs, Salespersons" },
       { text: "Two Compensation Types — Percent of gross revenue OR per-pack flat rate" },
@@ -80,6 +105,8 @@ const features: FeatureSection[] = [
   {
     number: 7,
     title: "Third-Party Services (Tab 7: Third Party)",
+    groupColor: "ops",
+    groupName: "Operations",
     items: [
       { text: "5 Pre-Loaded Company Templates — Sales, Operations, Fulfillment, Business Management, Marketing — each with 25 line items" },
       { text: "Toggle Inclusion — Include/exclude entire companies" },
@@ -89,6 +116,8 @@ const features: FeatureSection[] = [
   {
     number: 8,
     title: "Visual Analytics (Tab 8: Charts)",
+    groupColor: "ops",
+    groupName: "Operations",
     items: [
       { text: "Sensitivity Tornado Chart — 8-input diverging bar chart showing +/-10% impact on blended gross margin" },
       { text: "Cost Breakdown Pie Chart — Ingredients, packaging, shipping, overhead per pack with auto-colors" },
@@ -98,6 +127,8 @@ const features: FeatureSection[] = [
   {
     number: 9,
     title: "Executive Dashboard (Tab 9) — Mission Control",
+    groupColor: "power",
+    groupName: "Dashboard & Power",
     items: [
       { text: "10 Live KPI Cards — Blended Margin, Break-Even Revenue, Monthly Volume, COGS/Pack, Retail GP, Wholesale GP, Distributor GP, Shipping/Pack, Top Cost Driver, Tax/Campaign Impact" },
       { text: "Industry Benchmark Overlays — Supplement industry ranges displayed on select KPIs (e.g., \"Industry: 45%-75%\")" },
@@ -109,6 +140,8 @@ const features: FeatureSection[] = [
   {
     number: 10,
     title: "Goal Seek / Target Finder (Tab 10)",
+    groupColor: "power",
+    groupName: "Dashboard & Power",
     items: [
       { text: "Reverse Solver — Pick a target metric, pick an adjustable input, solver finds the exact value" },
       { text: "5 Target Metrics — Total Gross Profit, Blended Gross Margin %, Break-Even Revenue, COGS/Pack, Monthly Volume" },
@@ -119,6 +152,8 @@ const features: FeatureSection[] = [
   {
     number: 11,
     title: "Batch What-If Testing (Tab 11)",
+    groupColor: "power",
+    groupName: "Dashboard & Power",
     items: [
       { text: "Multi-Value Comparison Table — Enter comma-separated values, get instant comparison" },
       { text: "5 Input Variables — Retail Price, Wholesale Discount, Distributor Discount, Ingredient Cost (multiplier), Shipping Cost" },
@@ -128,6 +163,8 @@ const features: FeatureSection[] = [
   {
     number: 12,
     title: "Subscription Modeling (Tab 12)",
+    groupColor: "forecast",
+    groupName: "Forecasting",
     items: [
       { text: "Unlimited Subscription Plans — Monthly price, starting subscribers, growth rate, churn rate, CAC" },
       { text: "Plan Items — Assign SKUs with packs-per-month to each plan" },
@@ -139,6 +176,8 @@ const features: FeatureSection[] = [
   {
     number: 13,
     title: "Cash Flow Forecasting (Tab 13)",
+    groupColor: "forecast",
+    groupName: "Forecasting",
     items: [
       { text: "12-Month Monthly Projection — Starting balance, cash in, cash out, net flow, ending balance with full line-item detail" },
       { text: "Weekly View Toggle — Switch to 52-week granularity" },
@@ -154,6 +193,8 @@ const features: FeatureSection[] = [
   {
     number: 14,
     title: "Campaign/Promotion Modeling (Tab 14)",
+    groupColor: "forecast",
+    groupName: "Forecasting",
     items: [
       { text: "Unlimited Campaigns — Name, discount %, duration in weeks, affected channels, expected volume uplift %" },
       { text: "Impact Analysis — Revenue At Risk, Margin Compression, Net Annual Effect with green/red indicators" },
@@ -163,6 +204,8 @@ const features: FeatureSection[] = [
   {
     number: 15,
     title: "Scenario Management (Tab 15)",
+    groupColor: "manage",
+    groupName: "Management",
     items: [
       { text: "Save Scenarios with Labels & Notes — Descriptive notes explain the rationale behind each saved state" },
       { text: "Load / Delete / Clear All — Full CRUD for saved scenarios" },
@@ -173,6 +216,8 @@ const features: FeatureSection[] = [
   {
     number: 16,
     title: "Side-by-Side Comparison (Tab 16)",
+    groupColor: "manage",
+    groupName: "Management",
     items: [
       { text: "Two-Scenario Comparison — Load any two saved scenarios" },
       { text: "13 Key Metrics Compared — Price, margin, break-even, volume, profit, shipping, COGS" },
@@ -183,6 +228,8 @@ const features: FeatureSection[] = [
   {
     number: 17,
     title: "Live Simulation (Tab Simulate / Floating Panel)",
+    groupColor: "simulate",
+    groupName: "Simulate",
     items: [
       { text: "Shadow State — Experiment without modifying your real model" },
       { text: "8 Adjustable Sliders — Retail Price, Units/Pack, Wholesale Discount, Distributor Discount, Monthly Volume, Subscription Price, Growth Rate, Churn Rate" },
@@ -194,6 +241,8 @@ const features: FeatureSection[] = [
   {
     number: 18,
     title: "System Features",
+    groupColor: "system",
+    groupName: "System",
     items: [
       { text: "50-Step Undo/Redo — Ctrl+Z / Ctrl+Y with visual buttons in header" },
       { text: "Auto-Save — Every 30 seconds to localStorage" },
@@ -207,6 +256,7 @@ const features: FeatureSection[] = [
       { text: "Feature List Button — This dialog: complete inventory of all features organized by tab" },
       { text: "Info Tooltips Everywhere — \"i\" icons on every input and metric with detailed explanations" },
       { text: "Color-Coded Tool Cards — Every advanced feature in a visually distinct card: Blue (Import), Amber (Pricing), Sky (Shipping), Emerald (Tax), Orange (Cash Flow), Violet (Power Tools), Rose (Validation), Slate (Audit)" },
+      { text: "Tab Color Groups — Blue (Setup), Emerald (Operations), Violet (Power), Amber (Forecast), Slate (Manage), Rose (Simulate)" },
       { text: "Mobile Responsive — Tables become card stacks on phones/tablets" },
       { text: "Schema Migration — Automatic state migration when app updates" },
       { text: "Sticky Header — Toolbar stays visible while scrolling" },
@@ -229,29 +279,55 @@ export function FeatureList() {
             Complete Feature List
           </DialogTitle>
           <DialogDescription className="text-sm">
-            18 feature categories across 17 tabs. Click the tab numbers to navigate.
+            18 feature categories across 16 tabs. Each tab group has a color so you can navigate at a glance.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 text-sm mt-2">
-          {features.map((section) => (
-            <section key={section.number}>
-              <h3 className="font-semibold text-sm mb-2 flex items-center gap-2 text-foreground">
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold shrink-0">
-                  {section.number}
-                </span>
-                {section.title}
-              </h3>
-              <ul className="space-y-1.5 ml-8">
-                {section.items.map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                    <CheckCircle className="h-3.5 w-3.5 text-primary/60 shrink-0 mt-0.5" />
-                    <span className="leading-relaxed">{item.text}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+        {/* Color Legend */}
+        <div className="mt-2 mb-4 p-3 rounded-lg border bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+          <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Tab Color Guide</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Core Setup", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-4" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "5-8" },
+              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "9-11" },
+              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "12-14" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "15-16" },
+              { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
+            ].map((g) => (
+              <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
+                <span className="w-2 h-2 rounded-full bg-current opacity-60" />
+                {g.label} <span className="opacity-60 font-normal">({g.tabs})</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-5 text-sm">
+          {features.map((section) => {
+            const colors = groupColors[section.groupColor] || groupColors.system;
+            return (
+              <section key={section.number} className={`border-l-4 ${colors.border} pl-3`}>
+                <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                  <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${colors.badge} text-xs font-bold shrink-0`}>
+                    {section.number}
+                  </span>
+                  <span className={colors.text}>{section.title}</span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded ${colors.badge} font-medium`}>
+                    {colors.name}
+                  </span>
+                </h3>
+                <ul className="space-y-1.5 ml-8">
+                  {section.items.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <CheckCircle className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${colors.text} opacity-60`} />
+                      <span className="leading-relaxed">{item.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
 
           <div className="pt-4 border-t text-center text-xs text-muted-foreground">
             Channel Calculator v10 — 16 tabs, 40+ major features, fully client-side.

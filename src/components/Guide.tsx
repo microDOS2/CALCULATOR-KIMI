@@ -23,6 +23,26 @@ export function Guide() {
           </DialogDescription>
         </DialogHeader>
 
+        {/* Color Legend */}
+        <div className="mt-2 mb-4 p-3 rounded-lg border bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+          <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Tab Color Guide</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              { label: "Core Setup", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-4" },
+              { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "5-8" },
+              { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "9-11" },
+              { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "12-14" },
+              { label: "Management", cls: "bg-slate-100 text-slate-700 border-slate-200", tabs: "15-16" },
+              { label: "Simulate", cls: "bg-rose-100 text-rose-700 border-rose-200", tabs: "●" },
+            ].map((g) => (
+              <span key={g.label} className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold border ${g.cls}`}>
+                <span className="w-2 h-2 rounded-full bg-current opacity-60" />
+                {g.label} <span className="opacity-60 font-normal">({g.tabs})</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
         <div className="space-y-6 text-sm">
           <section>
             <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
@@ -33,66 +53,66 @@ export function Guide() {
               Follow these steps in order to build a complete channel model. Each tab builds on the previous one.
             </p>
             <ol className="space-y-3 list-decimal list-inside">
-              <li className="pl-1">
-                <span className="font-medium">Product (Tab 1)</span> — Add your SKUs with units-per-pack, units-per-case, and pricing. Add ingredients with mg-per-unit, cost-per-mg, and supplier payment terms. Use <strong>MOQ Pricing Tiers</strong> (amber tool card) to model volume discounts: "$0.70/mg at 1kg, $0.55/mg at 5kg". Use the <strong>CSV Bulk Import</strong> (blue tool card) to bulk-paste ingredients from a spreadsheet. The calculator auto-computes COGS per pack.
+              <li className="pl-1 border-l-2 border-l-blue-300">
+                <span className="font-medium text-blue-700">Product (Tab 1)</span> — Add your SKUs with units-per-pack, units-per-case, and pricing. Add ingredients with mg-per-unit, cost-per-mg, and supplier payment terms. Use <strong>MOQ Pricing Tiers</strong> (amber tool card) to model volume discounts: "$0.70/mg at 1kg, $0.55/mg at 5kg". Use the <strong>CSV Bulk Import</strong> (blue tool card) to bulk-paste ingredients from a spreadsheet. The calculator auto-computes COGS per pack.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Packaging (Tab 2)</span> — Define packaging layers per SKU (jar, bottle, label, box). Set unit cost and weight (grams) for each layer. Packaging weight is used for <strong>weight-based shipping rates</strong>.
+              <li className="pl-1 border-l-2 border-l-blue-300">
+                <span className="font-medium text-blue-700">Packaging (Tab 2)</span> — Define packaging layers per SKU (jar, bottle, label, box). Set unit cost and weight (grams) for each layer. Packaging weight is used for <strong>weight-based shipping rates</strong>.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Channels (Tab 3)</span> — Set your retail selling price, wholesale discount %, and distributor discount %. Toggle channels on/off to see how each contributes. Use the <strong>Weight-Based Shipping Rates</strong> card (sky blue) to replace flat-rate shipping with carrier-like pricing by package weight. Use the <strong>Tax &amp; Duty</strong> card (emerald green) to add Sales Tax on retail and Import Duty on distributor. Formula tooltips on every metric show the calculation on hover.
+              <li className="pl-1 border-l-2 border-l-blue-300">
+                <span className="font-medium text-blue-700">Channels (Tab 3)</span> — Set your retail selling price, wholesale discount %, and distributor discount %. Toggle channels on/off to see how each contributes. Use the <strong>Weight-Based Shipping Rates</strong> card (sky blue) to replace flat-rate shipping with carrier-like pricing by package weight. Use the <strong>Tax &amp; Duty</strong> card (emerald green) to add Sales Tax on retail and Import Duty on distributor. Formula tooltips on every metric show the calculation on hover.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Overhead (Tab 4)</span> — Enter your monthly overhead costs (rent, salaries, utilities, marketing). Toggle whether overhead is allocated to each channel. This directly affects operating profit.
+              <li className="pl-1 border-l-2 border-l-blue-300">
+                <span className="font-medium text-blue-700">Overhead (Tab 4)</span> — Enter your monthly overhead costs (rent, salaries, utilities, marketing). Toggle whether overhead is allocated to each channel. This directly affects operating profit.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">3rd Party (Tab 5)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">3rd Party (Tab 5)</span> — Add third-party logistics or service providers. Include their markup %, which gets added to your cost structure.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">PO (Tab 6)</span> — View purchase order projections. The calculator generates POs for raw materials and finished goods based on your production plan and ingredient lead times.
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">PO (Tab 6)</span> — View purchase order projections. The calculator generates POs for raw materials and finished goods based on your production plan and ingredient lead times.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Commissions (Tab 7)</span> — Configure sales commissions. Set commission % per channel and see the total commission impact on your operating profit.
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Commissions (Tab 7)</span> — Configure sales commissions. Set commission % per channel and see the total commission impact on your operating profit.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Charts (Tab 8)</span> — Visual breakdown of your business. <strong>Sensitivity Tornado Chart</strong> shows which inputs most affect your blended margin (diverging bars for ±10% changes). Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels. Time-series charts appear in their respective tabs.
+              <li className="pl-1 border-l-2 border-l-emerald-300">
+                <span className="font-medium text-emerald-700">Charts (Tab 8)</span> — Visual breakdown of your business. <strong>Sensitivity Tornado Chart</strong> shows which inputs most affect your blended margin (diverging bars for ±10% changes). Pie chart shows cost composition (ingredients, packaging, overhead, shipping). Bar chart compares gross profit across all three channels. Time-series charts appear in their respective tabs.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Dashboard (Tab 9)</span> — One-screen "Mission Control". Starts with the <strong>Sanity Checks</strong> panel (rose red) that validates your model against 8 industry benchmarks. Below that, 10 live KPI cards with industry benchmark ranges and trend indicators. At the bottom, the <strong>Assumptions Audit Trail</strong> (slate gray) lists every assumption in your model. Use this for investor meetings or bank applications.
+              <li className="pl-1 border-l-2 border-l-violet-300">
+                <span className="font-medium text-violet-700">Dashboard (Tab 9)</span> — One-screen "Mission Control". Starts with the <strong>Sanity Checks</strong> panel (rose red) that validates your model against 8 industry benchmarks. Below that, 10 live KPI cards with industry benchmark ranges and trend indicators. At the bottom, the <strong>Assumptions Audit Trail</strong> (slate gray) lists every assumption in your model. Use this for investor meetings or bank applications.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Goal Seek (Tab 10)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Work backward from a target. Select what you want to achieve (e.g., "$50 gross profit per pack"), pick which input to adjust (e.g., "Retail Price"), and the solver finds the exact value that hits your target using 30-iteration binary search. Supports 5 target metrics and 7 adjustable inputs including ingredient/packaging cost multipliers.
+              <li className="pl-1 border-l-2 border-l-violet-300">
+                <span className="font-medium text-violet-700">Goal Seek (Tab 10)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Work backward from a target. Select what you want to achieve (e.g., "$50 gross profit per pack"), pick which input to adjust (e.g., "Retail Price"), and the solver finds the exact value that hits your target using 30-iteration binary search. Supports 5 target metrics and 7 adjustable inputs including ingredient/packaging cost multipliers.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Batch (Tab 11)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Test multiple values for a single input at once. Enter comma-separated values (e.g., "20, 25, 30, 35, 40" for retail price) and get a comparison table with gross profit, margin, break-even, COGS, and break-even packs for each value. Rows highlight green when profit improves vs. the previous row, red when it declines.
+              <li className="pl-1 border-l-2 border-l-violet-300">
+                <span className="font-medium text-violet-700">Batch (Tab 11)</span> — <strong className="text-violet-600">Power Tool</strong> (violet card). Test multiple values for a single input at once. Enter comma-separated values (e.g., "20, 25, 30, 35, 40" for retail price) and get a comparison table with gross profit, margin, break-even, COGS, and break-even packs for each value. Rows highlight green when profit improves vs. the previous row, red when it declines.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Subscriptions (Tab 12)</span> — Model recurring revenue with subscription plans. Set monthly price, churn rate, and growth rate. See a 12-month projection of subscribers, MRR, and cumulative profit. Includes subscriber growth chart and revenue chart per plan. Toggle between monthly table view and mobile-friendly card view.
+              <li className="pl-1 border-l-2 border-l-amber-300">
+                <span className="font-medium text-amber-700">Subscriptions (Tab 12)</span> — Model recurring revenue with subscription plans. Set monthly price, churn rate, and growth rate. See a 12-month projection of subscribers, MRR, and cumulative profit. Includes subscriber growth chart and revenue chart per plan. Toggle between monthly table view and mobile-friendly card view.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Cash Flow (Tab 13)</span> — Profitability does not equal viability. This tab projects 12 months of cash inflows and outflows, including payment term delays (NET 30/60/90), ingredient PO lead times, and debt service. Use the <strong>Capital Expenditures</strong> card (orange) to model one-time investments. Use the <strong>Debt Service</strong> card (orange) for monthly loan payments. Toggle between Monthly and Weekly views. Includes a 12-month cash balance bar chart. Watch for the red warning cards if your balance drops below $5,000.
+              <li className="pl-1 border-l-2 border-l-amber-300">
+                <span className="font-medium text-amber-700">Cash Flow (Tab 13)</span> — Profitability does not equal viability. This tab projects 12 months of cash inflows and outflows, including payment term delays (NET 30/60/90), ingredient PO lead times, and debt service. Use the <strong>Capital Expenditures</strong> card (orange) to model one-time investments. Use the <strong>Debt Service</strong> card (orange) for monthly loan payments. Toggle between Monthly and Weekly views. Includes a 12-month cash balance bar chart. Watch for the red warning cards if your balance drops below $5,000.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Campaigns (Tab 14)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive). Includes before/during/after revenue comparison chart.
+              <li className="pl-1 border-l-2 border-l-amber-300">
+                <span className="font-medium text-amber-700">Campaigns (Tab 14)</span> — Model time-boxed promotions like "Black Friday: 20% off for 2 weeks." Set discount %, duration, volume uplift %, and affected channels. The impact analysis shows Revenue At Risk, Margin Compression, and Net Annual Effect. If volume uplift outweighs the discount, net effect is green (positive). Includes before/during/after revenue comparison chart.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Scenarios (Tab 15)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 16 tabs. Notes help you remember the rationale behind each saved scenario.
+              <li className="pl-1 border-l-2 border-l-slate-300">
+                <span className="font-medium text-slate-700">Scenarios (Tab 15)</span> — Save your current model configuration with a label and an optional note/description. Load previously saved scenarios. Delete or clear all. Scenarios persist in localStorage and survive browser restarts. Each scenario captures the complete state of all 16 tabs. Notes help you remember the rationale behind each saved scenario.
               </li>
-              <li className="pl-1">
-                <span className="font-medium">Compare (Tab 16)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
+              <li className="pl-1 border-l-2 border-l-slate-300">
+                <span className="font-medium text-slate-700">Compare (Tab 16)</span> — Load two saved scenarios side-by-side. Compare 13 key metrics (price, margin, break-even, volume, profit, shipping, COGS) with green/red delta indicators showing percentage change. Scenario notes appear in dropdowns and card headers for context. This is the fastest way to evaluate strategic decisions.
               </li>
             </ol>
           </section>
 
           <section>
-            <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-base mb-2 flex items-center gap-2 border-l-4 border-l-rose-300 pl-3">
+              <ShieldCheck className="h-4 w-4 text-rose-500" />
               Sanity Checks &amp; Validation
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-muted-foreground mb-3 pl-3">
               The Dashboard starts with an automated Sanity Checks panel (rose red card) that validates your model against industry benchmarks and business logic in real-time.
             </p>
-            <ul className="space-y-2 list-disc list-inside text-xs text-muted-foreground">
+            <ul className="space-y-2 list-disc list-inside text-xs text-muted-foreground pl-3">
               <li className="pl-1"><strong className="text-foreground">COGS Ratio</strong> — Checks if COGS is 20-45% of retail price (supplement industry norm).</li>
               <li className="pl-1"><strong className="text-foreground">Blended Margin</strong> — Validates gross margin is within the 45-75% healthy range.</li>
               <li className="pl-1"><strong className="text-foreground">Break-Even Feasibility</strong> — Warns if break-even volume exceeds 2,000 packs/month.</li>
@@ -105,11 +125,11 @@ export function Guide() {
           </section>
 
           <section>
-            <h3 className="font-semibold text-base mb-2 flex items-center gap-2">
-              <ClipboardList className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-base mb-2 flex items-center gap-2 border-l-4 border-l-slate-300 pl-3">
+              <ClipboardList className="h-4 w-4 text-slate-500" />
               Assumptions Audit Trail
             </h3>
-            <p className="text-xs text-muted-foreground mb-3">
+            <p className="text-xs text-muted-foreground mb-3 pl-3">
               The Dashboard includes a complete Assumptions Audit Trail (slate gray card) — every assumption in your model listed by category (Product, Ingredients, Packaging, Channels, Shipping, Overhead, Tax, Volume, Cash Flow, Subscriptions, Campaigns). Each row shows the assumption name, its current value, and its business impact. Use this for due diligence, investor meetings, or when handing off a model to another team member.
             </p>
           </section>
