@@ -56,7 +56,7 @@ const features: FeatureSection[] = [
   },
   {
     number: 3,
-    title: "Retail (Tab 4: Retail)",
+    title: "Retail + Affiliates (Tab 4)",
     groupColor: "b2c",
     groupName: "B2C Sales",
     items: [
@@ -64,23 +64,13 @@ const features: FeatureSection[] = [
       { text: "Flat Shipping Rate — Fixed cost per pack" },
       { text: "Weight-Based Shipping Rates — Carrier-like pricing with editable weight brackets (100g, 250g, 500g, 1kg, 2kg, 5kg)" },
       { text: "Retail Sales Tax — Configurable sales tax rate with customer-facing price display" },
-      { text: "Formula Tooltips — Every metric shows its calculation formula on hover" },
-    ],
-  },
-  {
-    number: 4,
-    title: "Affiliate Program (Tab 5: Affiliates)",
-    groupColor: "b2c",
-    groupName: "B2C Sales",
-    items: [
-      { text: "B2C Referral Channel — Affiliates drive customers to retail storefront at retail price; you pay commission after sale" },
-      { text: "Commission Types — Percentage of sale, flat per pack, or flat per order" },
-      { text: "Commission Basis — Product only, product + shipping, or total (incl. tax)" },
-      { text: "Attribution Model — First Click (content friendly) or Last Click (conversion friendly)" },
-      { text: "Cookie Duration — Editable tracking window (default 60 days per AffiliateWP)" },
+      { text: "Affiliate Program — B2C referral channel; affiliates drive customers at retail price, you pay commission after sale" },
+      { text: "Commission Types — Percentage of sale, flat per pack, or flat per order; product-only or total basis" },
+      { text: "Attribution Model — First Click (content friendly) or Last Click (conversion friendly) with editable cookie duration" },
       { text: "Volume Assumptions — Monthly referrals, avg order size, click-to-purchase rate" },
       { text: "Payout Schedule — Day of month, delay period, minimum threshold" },
       { text: "Impact Summary — Gross revenue, commission cost, net profit, commission % of revenue" },
+      { text: "Formula Tooltips — Every metric shows its calculation formula on hover" },
     ],
   },
   {
@@ -304,7 +294,7 @@ export function FeatureList() {
           <div className="flex flex-wrap gap-2">
             {[
               { label: "Foundation", cls: "bg-blue-100 text-blue-700 border-blue-200", tabs: "1-3" },
-              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4-5" },
+              { label: "B2C Sales", cls: "bg-indigo-100 text-indigo-700 border-indigo-200", tabs: "4" },
               { label: "Operations", cls: "bg-emerald-100 text-emerald-700 border-emerald-200", tabs: "6-9" },
               { label: "Dashboard & Power", cls: "bg-violet-100 text-violet-700 border-violet-200", tabs: "10-12" },
               { label: "Forecasting", cls: "bg-amber-100 text-amber-700 border-amber-200", tabs: "13-15" },
